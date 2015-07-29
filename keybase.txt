@@ -1,0 +1,67 @@
+==================================================================
+https://keybase.io/nishant
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://shukla.io
+  * I am nishant (https://keybase.io/nishant) on keybase.
+  * I have a public key with fingerprint D1D5 712D 68FF 9F79 0080  980E B351 8F17 06E1 77D1
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "d1d5712d68ff9f790080980eb3518f1706e177d1",
+            "host": "keybase.io",
+            "key_id": "b3518f1706e177d1",
+            "kid": "010100c65c93317cc7d14081f1e317eecc85a8278aee6c82f0a0c15cc63adbdeddb80a",
+            "uid": "6277a58afca46ac01c87533fb365c219",
+            "username": "nishant"
+        },
+        "service": {
+            "hostname": "shukla.io",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1438164431,
+    "expire_in": 157680000,
+    "prev": "191a414eec0e26e6e23d11ce178c8cabc327e49d1fec892c9e017096b892f838",
+    "seqno": 7,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.34
+Comment: https://keybase.io/crypto
+
+yMIWAnicbVJdSBRRFF7Xn9Aooh5Ke5FBssifuTOzM3cWySLJtIiUCh+E5c6dO+6k
+zqyzu9q6axgVSVtQGgSFD4VhQYQZgkKYimhqKhpBJoYJRmJIhUIWZXfM3rr34XLO
++c537vdx+rfEOpJiJpnIfGxPSXPMSG9O0HG688F4mFFMNcS4w0w5WX803Sgjls/S
+jQDjZlSguiTAqSLUNFmTZJaFrAxZovAuADUgsSIBkqQCJoPxmn67g9IoyE+ydJPm
+aODRVZr9D758vcACelksurDM80DCmBYFFgINEBoSgjF0IchJEBEiYshpLGIxcGEs
+8khVVKKqCmQRpQuu04mcJCEXRBpGgogwCzCUXDyvKTydwAHZBvqJZaBKQtGG7vci
+qrMug6HJah0T2wFbyAbA7w2WV6C/WnyWGTCxWUHT3kDA57a7AiGfDashimeDwKPo
+hkotpA3VxPLrpsG4AUXigG4zAoGHQBQEHmQw5JxPt4hHtxEuSYQsPfYYUk0pgQyQ
+AARqAEs4kYiE41UAMHUPYoiRgnlOIoKsAo1gKHNYJix1VxYVGmiQh4wtqcowGbdE
+v4nKbDF6mYECQYswdX09pXGOmCRHQrzTXgJHUuK2f6uxy9z0O6132DM9+nmsa365
+uz7xRXbx2pchNuGZ/Pj7ipl5gjv2umdh4mVpoVDWqLUMiFmtRfzAD81KfTp9K3Kx
+QKn81mOkLP6Kph0tl4ZTG5PvVu6ee+cd/FRjGfMH+iNNzrVT6Vvruqqcb9um7t0B
+F843fWx6Ej18dkGamnm+GCmuTw9EGhqPv9mc6/2QV3EymjJsdTwcnJXHr+4sDO8V
+l+IaMvd3C6sFbbP5fYcGr+dd+TqUMrJjDnQWlvS1F+Snx88XZZXmhmqza1uWS2+S
+5rHRPZdb29sZ4f6ZoZyc6O3J0e2xP1dXZt73h8cvLT7aF0o+4gxPLFUdfDUX3yE4
++m9c+wOAcy5V
+=Fk3y
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/nishant
+
+==================================================================
