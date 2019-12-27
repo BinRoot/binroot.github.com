@@ -7,6 +7,24 @@ body {
     font-family: 'Pavanam', sans-serif;
 }
 
+.google-scholar {
+    width:130px; 
+    float:right; 
+    margin-right: 20px;
+}
+
+.social-icon {
+    margin: 5px;
+}
+
+.multiple-shadows {
+    box-shadow: 
+        0 20px 30px -15px rgba(0,0,0,0.5),
+        0 40px 40px -20px rgba(0,0,0,0.4),
+        0 70px 50px -30px rgba(0,0,0,0.3),
+        0 40px 60px -5px rgba(203,14,40,0.3);
+}
+
 .book-cover {
     height: 18em;
     margin-top: 1em;
@@ -20,13 +38,24 @@ body {
              0px 18px 23px rgba(0,0,0,0.1);
 }
 
+.book-title:hover {
+    color: rgb(172, 224, 255);
+}
+
 .parallelogram {
     width: 100%;
-    height: 95%;
+    height: 90%;
     margin-left: 1em;
     z-index: -1;
     position: absolute;
     transform: skew(10deg);
+}
+
+.rectangle {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform: skew(0deg);
 }
 
 .white-color {
