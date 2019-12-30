@@ -45,10 +45,10 @@ body {
 .parallelogram {
     width: 85%;
     height: 90%;
-    margin-left: 1em;
+    margin-left: 0.7em;
     z-index: -1;
     position: absolute;
-    transform: skew(10deg);
+    transform: skew(7deg);
 }
 
 .rectangle {
