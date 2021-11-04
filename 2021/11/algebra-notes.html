@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Shukla - Algebra Notes</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-42279029-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-42279029-1');
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Pavanam|Vidaloka&display=swap">
+  <link rel="stylesheet" href="../../css/style.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+    integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"
+    integrity="sha384-z1fJDqw8ZApjGO3/unPWUPsIymfsJmyrDVWC8Tv/a1HeOtGmkwNd/7xUS0Xcnvsx"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+  <!-- <link rel="stylesheet" href="https://csswizardry.com/ct/ct.css" class="ct" /> -->
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <div class="article">
+            <p>
+              You're wandering through a forest, and spot a binary operator <span class="math">\star</span>.
+            </p>
+            <div class="math">(a, b) \star (c, d) = (a + c, b + d)</div>
+            <p>
+              "Cute," you say, "it's just vector addition."
+            </p>
+            <p>
+              It retreats into a bush.
+            </p>
+            <p>
+              The sound of something else familiar catches your eye.
+            </p>
+            <div class="math">(a, b) \star_2 (c, d) = (ad + bc, bd)</div>
+            <p>
+              "Funny little thing, aren't you?"
+            </p>
+            <p>
+              You find comfort in what <span class="math">\star_2</span> does to the second terms. It simply multiplies
+              them, <span class="math">bd</span>.
+            </p>
+            <p>
+              "I know you."
+            </p>
+            <p>
+              You realize it's nothing more than adding fractions <span class="math">\frac{a}{b}</span> and <span
+                class="math">\frac{c}{d}</span>.
+            </p>
+            <p>
+              As the sky darkens, mysterious creatures wander closer.
+            </p>
+            <div class="math">(a, b) \star_3 (c, d) = (ac - bd, ad + bc)</div>
+            <p>
+              There's no way you recognize it.
+            </p>
+            <p>
+              This is the process of multiplying complex numbers <span class="math">a + bi</span> and <span
+                class="math">c + di</span>.
+            </p>
+            <p>
+              "How peculiar, " you say, "I would have never guessed."
+            </p>
+            <p>
+              As you look at the next beast ahead, you shout, "this has got to be nonsense."
+            </p>
+            <div class="math">(a, b) \star_4 (c, d) = (ac + 2bd, ad + bc)</div>
+            <p>
+              What you see is the multiplication of numbers of the form
+              <span class="math">a + b \sqrt{2}</span> and <span class="math">c+ d \sqrt{2}</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      for (const mathElem of document.getElementsByClassName("math")) {
+        katex.render(mathElem.textContent, mathElem, {
+          throwOnError: false
+        });
+      }
+    });
+
+  </script>
+</body>
+
+</html>

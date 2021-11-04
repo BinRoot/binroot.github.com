@@ -7,6 +7,11 @@ body {
     font-family: 'Pavanam', sans-serif;
 }
 
+.social-icon {
+    font-size: 2em;
+    padding: 0.5em;
+}
+
 .google-scholar {
     width:130px; 
     float:right; 
@@ -72,4 +77,10 @@ body {
 
 .hs-colors {
     background: linear-gradient(90deg, rgb(99, 99, 99) 0%, rgb(66,66,66) 50%); 
+}
+
+div.math {
+    margin: auto;
+    width: 50%;
+    padding: 1em;
 }
