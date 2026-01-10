@@ -19,7 +19,7 @@ mathcolor:
     math:
       - '\vec{\mu}'
       - "v_M"
-	  - 'X_M'
+      - 'X_M'
     text:
       - magistrates
       - magistrate
@@ -27,7 +27,7 @@ mathcolor:
     math:
       - '\vec{\sigma}'
       - "v_S"
-	  - 'X_S'
+      - 'X_S'
     text:
       - subjects
       - subject
@@ -68,26 +68,26 @@ mathcolor:
       - '\cap'
 ---
 
-In Cyberpunk 2077, players noticed that the 3D models of children were just that of adults scaled down in size[^1].
+In Cyberpunk 2077, players noticed that the 3D models of children were just those of adults scaled down in size[^1].
 These uncanny figures roamed Night City with unexpected body proportions and aged facial structures.
 You know, some things don't scale down naturally: a mobile app is not just a smaller website, a short story is not just a shorter novel, and a bathtub is not just a mini pool.
 
-## Political Science at a nano-scale
+## Political Science at a nanoscale
 
 Similarly, political science at a nano-scale breaks down as well.
-How exactly does it "break down" and when must we draw a line between the "maco" and the "nano" government?
+How exactly does it "break down" and when must we draw a line between the "macro" and "nano" governments?
 
 [![](./nasuh.webp)](https://publicdomainreview.org/collection/the-maps-of-matrakci-nasuh-ottoman-polymath/)
 
 I admit, I've set up a problem that I have no business probing into, since I am no authority on this topic.
-My interests are strictly in inventing mathematical formulation for the sake of it, to see where it leads,
+My interests are strictly in inventing mathematical formulations for the sake of it, to see where it leads,
 to experiment in a sandbox of the mind, and if lucky, to gain new insights on social dynamics.
 
-So before we touch any equations, here's a couple examples of how small groups of people often organize themselves into familiar patterns:
+So before we touch any equations, here are a couple of examples of how small groups of people often organize themselves into familiar patterns:
 
-- A friend planning a BBQ might appear like a benevolent autocrat, where one leader orchestrates the evening.
+- A friend planning a BBQ might appear as a benevolent autocrat, where one leader orchestrates the evening.
 - Classmates working on a group project may resemble an oligarchy, where a few decide the plan and carry it out: "he'll be late, so let's start without him."
-- Coworkers picking a place to eat tend to vote, like a direct democracy (aside: RIP Foursquare[^2])
+- Coworkers picking a place to eat tend to vote, like a direct democracy (aside: RIP Foursquare[^2].)
 
 Can we predict how a stranded crew of astronauts on Mars would organize themselves? Assume, of course, that all communication with the mainland has been cut off (say, due to software that cannot adapt to change[^3]).
 
@@ -105,9 +105,9 @@ Let's represent a person's will by a vector $\vec{p}$, in some arbitrary vector 
 Now, if LLMs have shown us anything, it is that vector embeddings are a good enough mechanism to store natural language.
 If a body of text can be embedded in a semantic vector space, then we can borrow that manifold for our purposes too,
 because we assume the will is legible through written text, much like the letter of the law,
-with the same limitations that it strips away the contextual information behind whatever produced the text.
+with the same limitation: it strips away the contextual information behind whatever produced the text.
 
-Anyways, back to a couple more definitions. The list of individual wills is $P = (\vec p_1,\dots,\vec p_n)$.
+Anyway, back to a couple more definitions. The list of individual wills is $P = (\vec p_1,\dots,\vec p_n)$.
 
 <div id="demo_010_population" class="figure"><div id="demo_010_tooltip" class="tooltip"></div></div>
 <script type="module" src="./demo_010_population.js"></script>
@@ -149,14 +149,14 @@ $$
 
 ## Microfoundation
 
-It sounds like what you'd call the backbone of a conspiracy theory, or if you ask my wife, a tiny bit of make up to even out the complexion of a face. 
-Not quite, we're actually talking about "microeconomic foundations": you can ground large-scale behavior of a group into individual-level behavior[^5].
+It sounds like what you'd call the backbone of a conspiracy theory, or if you ask my wife, a tiny bit of makeup to even out the complexion of a face. 
+Not quite. We're actually talking about "microeconomic foundations": you can ground large-scale behavior of a group in individual-level behavior[^5].
 
 For example, as if the will of a person wasn't already a complex enough topic, the will of a group is even more controversial.
 Instead of averaging all the wills of people in a group to predict how they would act, let's zoom in to the individuals.
 
-Applying microfoundation, the voice of the sovereign $X_S$ at any time can be estimated through turnout participation or sampling.
-The voice of the magistrates $X_M$ at any time can be estimated by a few delegates, or a random sampling.
+Applying microfoundations, the voice of the sovereign $X_S$ at any time can be estimated through turnout or sampling.
+The voice of the magistrates $X_M$ at any time can be estimated by a few delegates, or a random sample.
 
 
 $X_S$ is a noisy signal of $\vec{\sigma}$, and $X_M$ is a noisy signal of $\vec{\mu}$:
@@ -214,7 +214,7 @@ $$
 \underbrace{\operatorname{tr}\big(\operatorname{Cov}(\vec{\gamma}(t))\big)}_{\text{instability (ineffectiveness)}}.
 $$
 
-So minimizing $\mathrm{Cost}(t)$ means chosing a government that is both:
+So minimizing $\mathrm{Cost}(t)$ means choosing a government that is both:
 
 - legitimate (aligned to the public will)
 - effective (not unstable due to noise).
@@ -258,20 +258,20 @@ In expectation over partitions, $\vec{\gamma}$ is in the interest of the people,
 But, the effectiveness of carrying out actions is largely a property of the magistrates.
 Let $w_M$ be defined as the within-group variance of the magistrates, which is interpreted as the "friction" among the magistrates to get anything done.
 
-The loss function of a government is a function of alignment (distance to $\vec{\rho}$) and effectiveness ($w_M$). Let $\lambda$ be a hyper-parameter. Then, we define the loss as
+The loss function of a government is a function of alignment (distance to $\vec{\rho}$) and effectiveness ($w_M$). Let $\lambda$ be a hyperparameter. Then, we define the loss as
 
 $$
-\mathcal{L}(\vec{\gamma}) = || \vec{\gamma} - \vec{\rho} ||^2 + \lambda w_M.
+\mathcal{L}(\vec{\gamma}) = \| \vec{\gamma} - \vec{\rho} \|^2 + \lambda w_M.
 $$
 
-In the demo below, we can better see the intuition that having too many chefs in the kitchen (i.e. to many magistrates) will lead to suboptimal governments.
+In the demo below, we can better see the intuition that having too many chefs in the kitchen (i.e. too many magistrates) will lead to suboptimal governments.
 
 <div id="demo_030_optimal_government" class="figure"></div>
 <script type="module" src="./demo_030_optimal_government.js"></script>
 
-After playing with the demo above for long enough, you may start to notice that the loss function of governments formed with 15+ population count all end up looking practically the same. It's always just a line sloped slightly up and to the right. In fact, most of the times the optimal government is found when the magistrates make up only a tiny fraction of the population.
+After playing with the demo above for long enough, you may start to notice that the loss function of governments with 15+ people all end up looking practically the same. It's always just a line sloped slightly up and to the right. In fact, most of the time the optimal government is found when the magistrates make up only a tiny fraction of the population.
 
-Whereas for a population count of 9 or fewer, we instead see that the local optimal governments occur when about half of the population is part of the magistrates.
+Whereas for a population count of 9 or fewer, we instead see that the local optima occur when about half of the population is part of the magistrates.
 
 Most notably, the optimal fraction of the population that should be part of the magistrates is not a smooth transition from nano governments to macro governments.
 
@@ -289,7 +289,7 @@ Instead of a smooth transition, we see a clear boundary between the small and th
 This is our first evidence that nano governments are a beast of their own.
 
 Note, the term _regime_ in the context of statistical models was first introduced to me by my Ph.D. advisor Song-Chun Zhu[^8].
-Coincidentally, and maybe even obviously, _regime_ also has a political meaning, that a stronger writer that myself would avoid using to squash confusion.
+Coincidentally, and maybe even obviously, _regime_ also has a political meaning, which a stronger writer than myself would avoid using to squash confusion.
 
 
 
@@ -299,21 +299,21 @@ Help me out here, there's more to investigate:
 
 a. In this article, we used $\mathbb{R}^3$ because it's easier to visualize. How does the nano government regime boundary change as the dimension increases?
 b. How can we train an embedding model such that the will of the population is indeed simply the arithmetic mean of the vectors?
-c. What systematic ways are there to identify an optimal value of the hyper-parameter $\lambda$.
+c. What systematic ways are there to identify an optimal value of the hyperparameter $\lambda$?
 d. What if an individual is a member of both the magistrates and the sovereign? How does that affect the formulation and regime boundary?
 e. Does any of this theory hold up in the real world?
 f. Why is there a regime split?
-g. We made it this far without mentioning any of the tenants of game theory. What makes the study of nano governments different from the study of game theory? After all, both deal with the analysis of agents.
+g. We made it this far without mentioning any of the tenets of game theory. What makes the study of nano governments different from the study of game theory? After all, both deal with the analysis of agents.
 
 ## Meta
 
-I was hoping to finish this post a couple weeks ago during the holidays. 
+I was hoping to finish this post a couple of weeks ago during the holidays. 
 Early on, I knew Emacs would be my editor, Markdown my source, and Pandoc my compiler.
 The math was getting sloppy and hard to read, so I spent a few cycles on a Lua plugin to syntax highlight $\LaTeX$.
 That honestly made a world of difference, so much so that I started color-coding all interactive demos as well.
 
 Before LLMs, generating one-off experimental demos to analyze simulations meant subscribing to a framework (whether it be Jupyter Notebooks, Wolfram Mathematica, MATLAB, etc.). 
-I was curious, and pleasantly surprised that JavaScript and Three.js were pretty much all I needed for small scale experiments. 
+I was curious, and pleasantly surprised that JavaScript and Three.js were pretty much all I needed for small-scale experiments. 
 Many demos were culled in the making of this post, so that the ones that survived the cut are worth your time.
 
 Happy New Year!

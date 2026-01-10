@@ -131,5 +131,65 @@
         }
       })();
     </script>
+
+    <script>
+      (function () {
+        const headings = document.querySelectorAll("h2[id], h3[id]");
+        if (headings.length < 2) return;
+
+        const toc = document.createElement("nav");
+        toc.className = "toc-indicator";
+        toc.setAttribute("aria-label", "Table of contents");
+
+        headings.forEach((h) => {
+          const item = document.createElement("a");
+          item.className = "toc-item";
+          item.href = "#" + h.id;
+          item.dataset.level = h.tagName[1];
+
+          const dot = document.createElement("span");
+          dot.className = "toc-dot";
+
+          const label = document.createElement("span");
+          label.className = "toc-label";
+          label.textContent = h.textContent.replace(/^#\s*/, "");
+
+          item.appendChild(dot);
+          item.appendChild(label);
+          toc.appendChild(item);
+
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
+            h.scrollIntoView({ behavior: "smooth", block: "start" });
+            history.pushState(null, "", "#" + h.id);
+          });
+        });
+
+        document.body.appendChild(toc);
+
+        const tocItems = toc.querySelectorAll(".toc-item");
+
+        function updateActive() {
+          let current = null;
+          const offset = window.innerHeight * 0.3;
+
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top <= offset) {
+              current = h;
+            }
+          });
+
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              current && item.getAttribute("href") === "#" + current.id
+            );
+          });
+        }
+
+        window.addEventListener("scroll", updateActive, { passive: true });
+        updateActive();
+      })();
+    </script>
   </body>
 </html>

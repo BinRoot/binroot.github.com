@@ -282,3 +282,86 @@ h3:hover .header-anchor,
 h4:hover .header-anchor {
   opacity: 1;
 }
+
+/* === For the table of contents === */
+/* Table of Contents Indicator */
+.toc-indicator {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.toc-indicator:hover {
+  opacity: 1;
+}
+
+.toc-indicator:hover .toc-item {
+  width: auto;
+  padding-right: 0.75rem;
+}
+
+.toc-indicator:hover .toc-label {
+  opacity: 1;
+  max-width: 200px;
+  padding-left: 0.5rem;
+}
+
+.toc-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--toc-bg, rgba(128, 128, 128, 0.9));
+  transition: all 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.toc-item:hover {
+  background: var(--toc-hover, rgba(128, 128, 128, 1));
+}
+
+.toc-item.active {
+  background: var(--toc-active, #3b82f6);
+}
+
+.toc-item.active .toc-label {
+  font-weight: 600;
+}
+
+.toc-dot {
+  min-width: 4px;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.toc-item[data-level="3"] .toc-dot {
+  height: 0.75rem;
+}
+
+.toc-label {
+  font-size: 0.75rem;
+  opacity: 0;
+  max-width: 0;
+  transition: all 0.25s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+  .toc-indicator {
+    display: none;
+  }
+}
