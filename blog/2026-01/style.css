@@ -365,3 +365,20 @@ h4:hover .header-anchor {
     display: none;
   }
 }
+
+/* Mobile: let figures break out of article padding for full-width display */
+@media (max-width: 700px) {
+  main.article {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .figure {
+    width: calc(
+      100% + 2rem
+    ); /* extend beyond the article's 1rem padding on each side */
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0; /* flush to edges looks cleaner on mobile */
+  }
+}
