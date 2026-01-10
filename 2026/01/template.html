@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>$pagetitle$</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee+Hairline&family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    $if(description)$
+    <meta name="description" content="$description$" />
+    $endif$ $if(keywords)$
+    <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+    $endif$
+
+    <meta name="color-scheme" content="light dark" />
+
+    <link rel="stylesheet" href="./style.css" />
+
+    $for(header-includes)$ $header-includes$ $endfor$ $if(math)$
+    <script>
+      window.MathJax = {
+        loader: {
+          load: ["[tex]/html"],
+          versionWarnings: false,
+        },
+        tex: { packages: { "[+]": ["html"] } },
+      };
+    </script>
+    $math$ $endif$
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.164.0/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script
+      src="https://cdn.counter.dev/script.js"
+      data-id="476c224d-08f5-44d4-a25a-005e5c890f79"
+      data-utcoffset="-7"
+      defer
+    ></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a
+        class="home-link"
+        href="../.."
+        rel="home"
+        aria-label="Back to main page"
+        >Home</a
+      >
+      <div class="post-meta">
+        $if(date)$
+        <span class="post-date">$date$</span>
+        $endif$ $if(author)$ $if(date)$
+        <span class="post-meta-sep">·</span>
+        $endif$
+        <span class="post-author"
+          >&copy; $for(author)$$author$$sep$, $endfor$</span
+        >
+        $endif$
+      </div>
+    </header>
+    <main class="article">
+      $if(title)$
+      <h1 class="article-title">$title$</h1>
+      $endif$ $body$
+
+      <div class="support-link">
+        <p class="support-contact">
+          Contact:
+          <span>nishant</span>
+          <svg
+            class="email-svg email-at"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0 -4 8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <a href="https://shukla.io" target="_blank" rel="noopener noreferrer"
+            >shukla.io</a
+          >
+        </p>
+
+        <a
+          class="support-cta"
+          href="https://buymeacoffee.com/binroot"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Buy me a coffee</a
+        >
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        const headings = document.querySelectorAll("h2[id], h3[id], h4[id]");
+        for (const h of headings) {
+          const a = document.createElement("a");
+          a.className = "header-anchor";
+          a.href = "#" + h.id;
+          a.setAttribute("aria-label", "Link to this section");
+          a.textContent = "#";
+          h.prepend(a);
+        }
+      })();
+    </script>
+  </body>
+</html>

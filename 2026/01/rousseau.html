@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nano Governments</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee+Hairline&family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+         <meta name="keywords" content="political
+science, governments, Rousseau, The Social
+Contract, democracy, oligarchy, magistrates, sovereign, bias-variance
+decomposition, vector embeddings" />
+    
+    <meta name="color-scheme" content="light dark" />
+
+    <link rel="stylesheet" href="./style.css" />
+
+         <script>
+      window.MathJax = {
+        loader: {
+          load: ["[tex]/html"],
+          versionWarnings: false,
+        },
+        tex: { packages: { "[+]": ["html"] } },
+      };
+    </script>
+    <script
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+type="text/javascript"></script> 
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.164.0/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script
+      src="https://cdn.counter.dev/script.js"
+      data-id="476c224d-08f5-44d4-a25a-005e5c890f79"
+      data-utcoffset="-7"
+      defer
+    ></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a
+        class="home-link"
+        href="../.."
+        rel="home"
+        aria-label="Back to main page"
+        >Home</a
+      >
+      <div class="post-meta">
+                <span class="post-date">January 10, 2026</span>
+                  <span class="post-meta-sep">·</span>
+                <span class="post-author"
+          >&copy; Nishant Shukla</span
+        >
+        
+      </div>
+    </header>
+    <main class="article">
+            <h1 class="article-title">Nano Governments</h1>
+       <p>In Cyberpunk 2077, players noticed that the 3D models of
+children were just that of adults scaled down in size<a href="#fn1"
+class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.
+These uncanny figures roamed Night City with unexpected body proportions
+and aged facial structures. You know, some things don’t scale down
+naturally: a mobile app is not just a smaller website, a short story is
+not just a shorter novel, and a bathtub is not just a mini pool.</p>
+<h2 id="political-science-at-a-nano-scale">Political Science at a
+nano-scale</h2>
+<p>Similarly, political science at a nano-scale breaks down as well. How
+exactly does it “break down” and when must we draw a line between the
+“maco” and the “nano”
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>?</p>
+<p><a
+href="https://publicdomainreview.org/collection/the-maps-of-matrakci-nasuh-ottoman-polymath/"
+target="_blank" rel="noopener noreferrer"><img
+src="./nasuh.webp" /></a></p>
+<p>I admit, I’ve set up a problem that I have no business probing into,
+since I am no authority on this topic. My interests are strictly in
+inventing mathematical formulation for the sake of it, to see where it
+leads, to experiment in a sandbox of the mind, and if lucky, to gain new
+insights on social dynamics.</p>
+<p>So before we touch any equations, here’s a couple examples of how
+small groups of people often organize themselves into familiar
+patterns:</p>
+<ul>
+<li>A friend planning a BBQ might appear like a benevolent autocrat,
+where one leader orchestrates the evening.</li>
+<li>Classmates working on a group project may resemble an oligarchy,
+where a few decide the plan and carry it out: “he’ll be late, so let’s
+start without him.”</li>
+<li>Coworkers picking a place to eat tend to vote, like a direct
+democracy (aside: RIP Foursquare<a href="#fn2" class="footnote-ref"
+id="fnref2" role="doc-noteref"><sup>2</sup></a>)</li>
+</ul>
+<p>Can we predict how a stranded crew of astronauts on Mars would
+organize themselves? Assume, of course, that all communication with the
+mainland has been cut off (say, due to software that cannot adapt to
+change<a href="#fn3" class="footnote-ref" id="fnref3"
+role="doc-noteref"><sup>3</sup></a>).</p>
+<p>Let’s use Rousseau’s <em>The Social Contract</em><a href="#fn4"
+class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> as
+a starting point, keeping in mind that it is by no means on par with
+modern political philosophy. He introduces language to describe
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>,
+while warning us about the limitations of “mathematical precision.”</p>
+<blockquote>
+<p>“…although I have borrowed … the language of mathematics, I am still
+well aware that mathematical precision has no place in moral
+calculations” (105).</p>
+</blockquote>
+<p>Foolishly, we’ll proceed anyway.</p>
+<h2 id="will-of-the-people">Will of the people</h2>
+<p>Let’s represent a
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">person</span>’s
+will by a vector <span class="math inline">\(\vec{p}\)</span>, in some
+arbitrary vector space (say <span
+class="math inline">\(\mathbb{R}^{3}\)</span> for simplicity).</p>
+<p>Now, if LLMs have shown us anything, it is that vector embeddings are
+a good enough mechanism to store natural language. If a body of text can
+be embedded in a semantic vector space, then we can borrow that manifold
+for our purposes too, because we assume the will is legible through
+written text, much like the letter of the law, with the same limitations
+that it strips away the contextual information behind whatever produced
+the text.</p>
+<p>Anyways, back to a couple more definitions. The list of individual
+wills is <span class="math inline">\(P = (\vec p_1,\dots,\vec
+p_n)\)</span>.</p>
+<div id="demo_010_population" class="figure">
+<div id="demo_010_tooltip" class="tooltip">
+
+</div>
+</div>
+<script type="module" src="./demo_010_population.js"></script>
+<p>A legitimate
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+aligns with the will of the people. For it to function, someone needs to
+carry out the administration and enforcement duties.</p>
+<h2 id="introducing-the-magistrates">Introducing the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span></h2>
+<p>Rousseau calls this role the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrate</span>:
+the “man or body charged with that administration” (102).</p>
+<p>Thus, we divide the
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">public</span>
+into two groups of wills:</p>
+<ol type="1">
+<li>the wills of the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>
+<span class="math inline">\(S\)</span> (those who make the laws)</li>
+<li>the wills of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+<span class="math inline">\(M\)</span> (those who administer and enforce
+the laws)</li>
+</ol>
+<p>Define the vector embedding such that the will of the
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">public</span>
+is the mean will of the population:</p>
+<p><span class="math display">\[
+\style{color:#ee854a;}{\vec{\rho}} = \frac{1}{n}
+\style{color:#797979;}{\sum}_{i=1}^{n} \vec{p}_i.
+\]</span></p>
+<p>Likewise, the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>
+will is written <span
+class="math inline">\(\style{color:#d65f5f;}{\vec{\sigma}}\)</span>, and
+the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>’
+will is <span
+class="math inline">\(\style{color:#4878d0;}{\vec{\mu}}\)</span>.</p>
+<p>In the demo below, try adding a few
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+and observe how that affects the variance within a group and the
+distance between groups. You may intuit variance as “friction to get
+anything done” and distance as “conflict of interest between the two
+bodies.”</p>
+<div id="demo_020_division" class="figure">
+<div id="demo_020_tooltip" class="tooltip">
+
+</div>
+</div>
+<script type="module" src="./demo_020_division.js"></script>
+<p>There are many more ways to partition <span
+class="math inline">\(P\)</span> into <span
+class="math inline">\(M\)</span> and <span
+class="math inline">\(S\)</span> than shown in the demo, on the order of
+<span class="math inline">\(2^n\)</span> to be more precise. So, we
+treat them as random variables over all partitions, such that:</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{\vec{\sigma}}]
+= \style{color:#ee854a;}{\vec{\rho}},
+\qquad
+\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{\vec{\mu}}] =
+\style{color:#ee854a;}{\vec{\rho}}.
+\]</span></p>
+<h2 id="microfoundation">Microfoundation</h2>
+<p>It sounds like what you’d call the backbone of a conspiracy theory,
+or if you ask my wife, a tiny bit of make up to even out the complexion
+of a face. Not quite, we’re actually talking about “microeconomic
+foundations”: you can ground large-scale behavior of a group into
+individual-level behavior<a href="#fn5" class="footnote-ref" id="fnref5"
+role="doc-noteref"><sup>5</sup></a>.</p>
+<p>For example, as if the will of a
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">person</span>
+wasn’t already a complex enough topic, the will of a group is even more
+controversial. Instead of averaging all the wills of people in a group
+to predict how they would act, let’s zoom in to the individuals.</p>
+<p>Applying microfoundation, the voice of the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>
+<span class="math inline">\(\style{color:#d65f5f;}{X_S}\)</span> at any
+time can be estimated through turnout participation or sampling. The
+voice of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+<span class="math inline">\(\style{color:#4878d0;}{X_M}\)</span> at any
+time can be estimated by a few delegates, or a random sampling.</p>
+<p><span class="math inline">\(\style{color:#d65f5f;}{X_S}\)</span> is a
+noisy signal of <span
+class="math inline">\(\style{color:#d65f5f;}{\vec{\sigma}}\)</span>, and
+<span class="math inline">\(\style{color:#4878d0;}{X_M}\)</span> is a
+noisy signal of <span
+class="math inline">\(\style{color:#4878d0;}{\vec{\mu}}\)</span>:</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{X_S} \mid S] =
+\style{color:#d65f5f;}{\vec{\sigma}},
+\qquad
+\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{X_M} \mid M] =
+\style{color:#4878d0;}{\vec{\mu}}.
+\]</span></p>
+<h2 id="formulation-of-a-government">Formulation of a
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span></h2>
+<p>A
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>’s
+will <span
+class="math inline">\(\style{color:#956cb4;}{\vec{\gamma}}\)</span> is a
+tug-of-war between the voice of the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>
+<span class="math inline">\(\style{color:#d65f5f;}{X_S}\)</span> and the
+voice of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+<span class="math inline">\(\style{color:#4878d0;}{X_M}\)</span>. It
+lives somewhere between the two points. Given some <span
+class="math inline">\(t \in \mathbb{R}\)</span> where <span
+class="math inline">\(0 \leq t \leq 1\)</span>, define</p>
+<p><span class="math display">\[
+\style{color:#956cb4;}{\vec{\gamma}}(t) = t \style{color:#4878d0;}{X_M}
++ (1 - t) \style{color:#d65f5f;}{X_S}.
+\]</span></p>
+<p>In the demo below, hover over a partition to see a visual
+representation of <span
+class="math inline">\(\style{color:#956cb4;}{\vec{\gamma}}(t)\)</span>.</p>
+<div id="demo_025_partitions" class="figure">
+
+</div>
+<script type="module" src="./demo_025_partitions.js"></script>
+<p>The
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>’s
+will <span
+class="math inline">\(\style{color:#956cb4;}{\vec{\gamma}}(t)\)</span>
+is also an unbiased estimator of the
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">public</span>
+will:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\style{color:#797979;}{\mathbb{E}}[\style{color:#956cb4;}{\vec{\gamma}}(t)]
+&amp;= \style{color:#797979;}{\mathbb{E}}\!\left[\, t
+\style{color:#4878d0;}{X_M} + (1-t) \style{color:#d65f5f;}{X_S}
+\,\right] \\
+&amp;=
+t\,\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{X_M}] +
+(1-t)\,\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{X_S}]
+\\
+&amp;=
+t\,\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{\vec{\mu}}]
++
+(1-t)\,\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{\vec{\sigma}}]
+\\
+&amp;= t \style{color:#ee854a;}{\vec{\rho}} +
+(1-t)\style{color:#ee854a;}{\vec{\rho}} \\
+&amp;= \style{color:#ee854a;}{\vec{\rho}}.
+\end{aligned}
+\]</span></p>
+<p>We define the cost of a
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+as the mean squared error relative to the
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">public</span>
+will:</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathrm{Cost}}(t) =
+\style{color:#797979;}{\mathbb{E}}\big[ \|
+\style{color:#956cb4;}{\vec{\gamma}}(t) -
+\style{color:#ee854a;}{\vec{\rho}} \|^2 \big].
+\]</span></p>
+<p>By the bias-variance decomposition for squared loss:</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathrm{Cost}}(t)
+=
+\underbrace{\big\|
+\style{color:#797979;}{\mathbb{E}}[\style{color:#956cb4;}{\vec{\gamma}}(t)]
+- \style{color:#ee854a;}{\vec{\rho}} \big\|^2}_{\text{systematic
+misalignment (legitimacy)}}
+\;+\;
+\underbrace{\style{color:#797979;}{\operatorname{tr}}\big(\style{color:#797979;}{\operatorname{Cov}}(\style{color:#956cb4;}{\vec{\gamma}}(t))\big)}_{\text{instability
+(ineffectiveness)}}.
+\]</span></p>
+<p>So minimizing <span
+class="math inline">\(\style{color:#797979;}{\mathrm{Cost}}(t)\)</span>
+means chosing a
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+that is both:</p>
+<ul>
+<li>legitimate (aligned to the
+<span style="text-decoration:underline;text-decoration-color:#ee854a;">public</span>
+will)</li>
+<li>effective (not unstable due to noise).</li>
+</ul>
+<p>Since <span
+class="math inline">\(\style{color:#797979;}{\mathbb{E}}[\style{color:#956cb4;}{\vec{\gamma}}(t)]
+= \style{color:#ee854a;}{\vec{\rho}}\)</span>, the cost simplifies to
+just the variance term</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathrm{Cost}}(t) =
+\style{color:#797979;}{\operatorname{tr}}\big(\style{color:#797979;}{\operatorname{Cov}}(\style{color:#956cb4;}{\vec{\gamma}}(t))\big).
+\]</span></p>
+<p>Assuming the two bodies’ estimation errors are uncorrelated, by the
+covariance rule for a linear combination<a href="#fn6"
+class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>,
+and the linearity rule of a trace<a href="#fn7" class="footnote-ref"
+id="fnref7" role="doc-noteref"><sup>7</sup></a>, we get</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathrm{Cost}}(t) = t^2
+\style{color:#4878d0;}{v_M} + (1 - t)^2 \style{color:#d65f5f;}{v_S}
+\qquad
+\text{where}
+\qquad
+\style{color:#4878d0;}{v_M} =
+\style{color:#797979;}{\operatorname{tr}}(\style{color:#797979;}{\operatorname{Cov}}(\style{color:#4878d0;}{X_M}))
+\quad
+\text{and}
+\quad
+\style{color:#d65f5f;}{v_S} =
+\style{color:#797979;}{\operatorname{tr}}(\style{color:#797979;}{\operatorname{Cov}}(\style{color:#d65f5f;}{X_S}))
+\]</span></p>
+<p>The optimal
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+is at <span class="math inline">\(\frac{d
+\style{color:#797979;}{\mathrm{Cost}}}{dt} = 2 t
+\style{color:#4878d0;}{v_M} + 2(t - 1)\style{color:#d65f5f;}{v_S} =
+0\)</span>, or simply</p>
+<p><span class="math display">\[
+t = \frac{\style{color:#d65f5f;}{v_S}}{\style{color:#d65f5f;}{v_S} +
+\style{color:#4878d0;}{v_M}}.
+\]</span></p>
+<p>Neat, we’ve derived the phenomenon that a body with more internal
+disagreement is less effective! This can also be interpreted as: the
+higher the variance of a body, the less influence it has on the
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>.
+The influence of the individual diminishes as the population increases.
+The inverse is true as well, which leads to Rousseau’s conclusion that a
+small
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrate</span>
+rules with more power.</p>
+<blockquote>
+<p>“…<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+slackens to the extent that the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+are multiplied…” (109).</p>
+</blockquote>
+<h2 id="comparing-governments">Comparing
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span></h2>
+<p>The best
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+carries out actions <em>swiftly</em> in the interest of the people. In
+expectation over partitions, <span
+class="math inline">\(\style{color:#956cb4;}{\vec{\gamma}}\)</span> is
+in the interest of the people, because it achieves the equilibrium point
+between the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+and the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>.
+But, the effectiveness of carrying out actions is largely a property of
+the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>.
+Let <span class="math inline">\(w_M\)</span> be defined as the
+within-group variance of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>,
+which is interpreted as the “friction” among the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+to get anything done.</p>
+<p>The loss function of a
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+is a function of alignment (distance to <span
+class="math inline">\(\style{color:#ee854a;}{\vec{\rho}}\)</span>) and
+effectiveness (<span class="math inline">\(w_M\)</span>). Let <span
+class="math inline">\(\lambda\)</span> be a hyper-parameter. Then, we
+define the loss as</p>
+<p><span class="math display">\[
+\style{color:#797979;}{\mathcal{L}}(\style{color:#956cb4;}{\vec{\gamma}})
+= || \style{color:#956cb4;}{\vec{\gamma}} -
+\style{color:#ee854a;}{\vec{\rho}} ||^2 + \lambda w_M.
+\]</span></p>
+<p>In the demo below, we can better see the intuition that having too
+many chefs in the kitchen (i.e. to many
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>)
+will lead to suboptimal
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>.</p>
+<div id="demo_030_optimal_government" class="figure">
+
+</div>
+<script type="module" src="./demo_030_optimal_government.js"></script>
+<p>After playing with the demo above for long enough, you may start to
+notice that the loss function of
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+formed with 15+ population count all end up looking practically the
+same. It’s always just a line sloped slightly up and to the right. In
+fact, most of the times the optimal
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+is found when the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+make up only a tiny fraction of the population.</p>
+<p>Whereas for a population count of 9 or fewer, we instead see that the
+local optimal
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+occur when about half of the population is part of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>.</p>
+<p>Most notably, the optimal fraction of the population that should be
+part of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+is not a smooth transition from nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+to macro
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>.</p>
+<h2 id="regime-split">Regime split</h2>
+<p>This brings us back to our initial point: a nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+is not simply a smaller
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>.</p>
+<p>In the demo below, the x-axis is the population size, and the y-axis
+is the ratio of
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+that make up the optimal
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>.</p>
+<div id="demo_040_optimal_magistrates" class="figure">
+
+</div>
+<script type="module" src="./demo_040_optimal_magistrates.js"></script>
+<p>There are clearly two regimes! Instead of a smooth transition, we see
+a clear boundary between the small and the big! This is our first
+evidence that nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+are a beast of their own.</p>
+<p>Note, the term <em>regime</em> in the context of statistical models
+was first introduced to me by my Ph.D. advisor Song-Chun Zhu<a
+href="#fn8" class="footnote-ref" id="fnref8"
+role="doc-noteref"><sup>8</sup></a>. Coincidentally, and maybe even
+obviously, <em>regime</em> also has a political meaning, that a stronger
+writer that myself would avoid using to squash confusion.</p>
+<h2 id="further-study">Further study</h2>
+<p>Help me out here, there’s more to investigate:</p>
+<ol type="a">
+<li>In this article, we used <span
+class="math inline">\(\mathbb{R}^3\)</span> because it’s easier to
+visualize. How does the nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+regime boundary change as the dimension increases?</li>
+<li>How can we train an embedding model such that the will of the
+population is indeed simply the arithmetic mean of the vectors?</li>
+<li>What systematic ways are there to identify an optimal value of the
+hyper-parameter <span class="math inline">\(\lambda\)</span>.</li>
+<li>What if an individual is a member of both the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+and the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>?
+How does that affect the formulation and regime boundary?</li>
+<li>Does any of this theory hold up in the real world?</li>
+<li>Why is there a regime split?</li>
+<li>We made it this far without mentioning any of the tenants of game
+theory. What makes the study of nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+different from the study of game theory? After all, both deal with the
+analysis of agents.</li>
+</ol>
+<h2 id="meta">Meta</h2>
+<p>I was hoping to finish this post a couple weeks ago during the
+holidays. Early on, I knew Emacs would be my editor, Markdown my source,
+and Pandoc my compiler. The math was getting sloppy and hard to read, so
+I spent a few cycles on a Lua plugin to syntax highlight <span
+class="math inline">\(\LaTeX\)</span>. That honestly made a world of
+difference, so much so that I started color-coding all interactive demos
+as well.</p>
+<p>Before LLMs, generating one-off experimental demos to analyze
+simulations meant subscribing to a framework (whether it be Jupyter
+Notebooks, Wolfram Mathematica, MATLAB, etc.). I was curious, and
+pleasantly surprised that JavaScript and Three.js were pretty much all I
+needed for small scale experiments. Many demos were culled in the making
+of this post, so that the ones that survived the cut are worth your
+time.</p>
+<p>Happy New Year!</p>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Elise Nelson, “What Is Going On With the Cyberpunk 2077
+Children?”, SVG, December 31, 2020, <a
+href="https://www.svg.com/304858/what-is-going-on-with-the-cyberpunk-2077-children/"
+target="_blank"
+rel="noopener noreferrer">https://www.svg.com/304858/what-is-going-on-with-the-cyberpunk-2077-children/</a>
+(accessed December 29, 2025).<a href="#fnref1" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Sarah Perez, “Farewell to Foursquare’s app,” TechCrunch,
+October 22, 2024, <a
+href="https://techcrunch.com/2024/10/22/farewell-to-foursquares-app/"
+target="_blank"
+rel="noopener noreferrer">https://techcrunch.com/2024/10/22/farewell-to-foursquares-app/</a>
+(accessed December 29, 2025).<a href="#fnref2" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Nishant Shukla, “An Introduction to Task-Oriented
+Programming,” freeCodeCamp, December 23, 2019, <a
+href="https://www.freecodecamp.org/news/dmpl/" target="_blank"
+rel="noopener noreferrer">https://www.freecodecamp.org/news/dmpl/</a>
+(accessed January 4, 2026).<a href="#fnref3" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Jean-Jacques Rousseau, <em>The Social Contract</em>,
+trans. Maurice Cranston, intro. Maurice Cranston (Penguin Classics,
+2003). ISBN 9780140442014.<a href="#fnref4" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Robert E. Lucas Jr., “Econometric policy evaluation: A
+critique,” <em>Carnegie-Rochester Conference Series on Public
+Policy</em> 1 (1976): 19–46,
+https://doi.org/10.1016/S0167-2231(76)80003-6, <a
+href="https://www.sciencedirect.com/science/article/pii/S0167223176800036"
+target="_blank"
+rel="noopener noreferrer">https://www.sciencedirect.com/science/article/pii/S0167223176800036</a>
+(accessed January 10, 2026).<a href="#fnref5" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Wikipedia contributors, “Covariance,”
+<em>Wikipedia</em>, last edited December 12, 2025, <a
+href="https://en.wikipedia.org/wiki/Covariance#Covariance_of_linear_combinations"
+target="_blank"
+rel="noopener noreferrer">https://en.wikipedia.org/wiki/Covariance#Covariance_of_linear_combinations</a>
+(accessed December 29, 2025).<a href="#fnref6" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Wikipedia contributors, “Trace (linear algebra),”
+<em>Wikipedia</em>, last edited November 20, 2025, <a
+href="https://en.wikipedia.org/wiki/Trace_(linear_algebra)#Basic_properties"
+target="_blank"
+rel="noopener noreferrer">https://en.wikipedia.org/wiki/Trace_(linear_algebra)#Basic_properties</a>
+(accessed December 29, 2025).<a href="#fnref7" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>Ying Nian Wu, Cheng-En Guo, and Song-Chun Zhu, “From
+Information Scaling of Natural Images to Regimes of Statistical Models,”
+<em>Quarterly of Applied Mathematics</em> 66, no. 1 (March 2008):
+81–122, https://doi.org/10.1090/S0033-569X-07-01063-2, <a
+href="https://escholarship.org/content/qt0d78z39s/qt0d78z39s_noSplash_1b2f9365551a33008aa75ec070284626.pdf"
+target="_blank"
+rel="noopener noreferrer">https://escholarship.org/content/qt0d78z39s/…1b2f9365551a33008aa75ec070284626.pdf</a>
+(accessed January 5, 2026).<a href="#fnref8" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+
+      <div class="support-link">
+        <p class="support-contact">
+          Contact:
+          <span>nishant</span>
+          <svg
+            class="email-svg email-at"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0 -4 8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <a href="https://shukla.io" target="_blank" rel="noopener noreferrer"
+            >shukla.io</a
+          >
+        </p>
+
+        <a
+          class="support-cta"
+          href="https://buymeacoffee.com/binroot"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Buy me a coffee</a
+        >
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        const headings = document.querySelectorAll("h2[id], h3[id], h4[id]");
+        for (const h of headings) {
+          const a = document.createElement("a");
+          a.className = "header-anchor";
+          a.href = "#" + h.id;
+          a.setAttribute("aria-label", "Link to this section");
+          a.textContent = "#";
+          h.prepend(a);
+        }
+      })();
+    </script>
+  </body>
+</html>

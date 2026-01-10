@@ -1,0 +1,284 @@
+blockquote {
+  margin: 1.2em 0;
+  padding: 0.4em 1em;
+  border-left: 0.3em solid #c8c8c8;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+blockquote > :first-child {
+  margin-top: 0;
+}
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.figure {
+  width: min(600px, 90vw);
+  min-height: min(400px, 60vh);
+  border-radius: 12px;
+  overflow: visible;
+  /* softened shadow using charcoal tones */
+  box-shadow: 0 18px 40px rgba(51, 51, 51, 0.8);
+  margin: 1.5rem auto;
+  padding: 1rem;
+  background: radial-gradient(circle at top left, #333333, #1a1a1a);
+}
+
+/* Demo-specific: this one has its own internal sizing; don't force extra vertical space */
+#demo_020_division.figure {
+  min-height: 0;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 1000;
+  padding: 4px 10px;
+  background: rgba(51, 51, 51, 0.95); /* dark grey backdrop */
+  color: #fffaf0; /* light ivory text */
+  border-radius: 6px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translate(-50%, -110%);
+  display: none;
+  border: 1px solid #887788; /* golden accent border */
+}
+
+body {
+  margin: 0;
+  font-family: "Ubuntu Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+  line-height: 1.6;
+  /* deep charcoal gradient for the page */
+  background: radial-gradient(circle at top, #1a1a1a, #000000);
+  color: #fffaf0; /* light text for strong contrast */
+}
+
+.site-header {
+  max-width: 80ch;
+  margin: 1.25rem auto 0;
+  padding: 0 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(255, 250, 240, 0.85);
+}
+
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(136, 119, 136, 0.4);
+  background: rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+  color: #887788;
+  font-weight: 600;
+  transition: background 150ms ease, border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.home-link::before {
+  content: "←";
+  display: inline-block;
+  transform: translateY(-0.16em);
+}
+
+.home-link:hover,
+.home-link:focus-visible {
+  background: rgba(136, 119, 136, 0.12);
+  border-color: rgba(136, 119, 136, 0.7);
+}
+
+.home-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(136, 119, 136, 0.18);
+}
+
+.post-meta {
+  margin-left: auto;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(136, 119, 136, 0.25);
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 0.92rem;
+  color: #887788;
+}
+
+.post-meta:empty {
+  display: none;
+}
+
+.support-link {
+  margin: 2rem 0 0;
+  padding: 1.25rem 1rem;
+  border: 1px solid rgba(136, 119, 136, 0.28);
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.support-link p {
+  margin: 0;
+  max-width: 60ch;
+  color: rgba(255, 250, 240, 0.78);
+}
+
+.support-contact {
+  max-width: none;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18em;
+}
+
+.support-contact a {
+  color: rgba(235, 214, 255, 0.92);
+  text-decoration: underline;
+  text-decoration-color: rgba(149, 108, 180, 0.6);
+  text-underline-offset: 0.22em;
+}
+
+.support-contact a:hover,
+.support-contact a:focus-visible {
+  color: rgba(235, 214, 255, 1);
+  text-decoration-color: rgba(149, 108, 180, 0.85);
+}
+
+.support-contact a:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid rgba(149, 108, 180, 0.35);
+  outline-offset: 3px;
+}
+
+.email-svg {
+  height: 1.05em;
+  width: auto;
+  display: inline-block;
+  transform: translateY(0.08em);
+}
+
+.support-link .support-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(149, 108, 180, 0.85);
+  background: rgba(149, 108, 180, 0.35);
+  color: rgba(255, 250, 240, 0.96);
+  text-decoration: none;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  transition: background 150ms ease, border-color 150ms ease,
+    box-shadow 150ms ease;
+  box-shadow: 0 10px 30px rgba(149, 108, 180, 0.18);
+}
+
+.support-link .support-cta:hover,
+.support-link .support-cta:focus-visible {
+  background: rgba(149, 108, 180, 0.48);
+  border-color: rgba(149, 108, 180, 1);
+  box-shadow: 0 14px 38px rgba(149, 108, 180, 0.26);
+}
+
+.support-link .support-cta:focus-visible {
+  box-shadow: 0 0 0 3px rgba(149, 108, 180, 0.25),
+    0 14px 38px rgba(149, 108, 180, 0.26);
+}
+
+.post-meta-sep {
+  margin: 0;
+  opacity: 0.55;
+}
+
+.post-date {
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+}
+
+.post-author {
+  color: inherit;
+  font-weight: 600;
+}
+
+main.article {
+  max-width: 80ch;
+  margin: 3rem auto;
+  margin-top: 1rem;
+  padding: 2.5rem 2rem;
+  background: rgba(51, 51, 51, 0.94); /* charcoal card */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  border-radius: 18px;
+  border: 1px solid rgba(136, 119, 136, 0.4); /* subtle gold outline */
+  /* Enable container query units (cqw, cqh, etc.) for responsive typography inside */
+  container-type: inline-size;
+}
+
+/* Keep images from overflowing the article container */
+main.article img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Center standalone images placed inside paragraphs (common Pandoc/Markdown output) */
+main.article p > img {
+  display: block;
+  margin: 1rem auto;
+}
+
+/* default math to gray; mathcolor filter overrides specific tokens */
+mjx-container {
+  color: #cbb7be;
+}
+
+/* headline styling with gold */
+.article-title {
+  font-family: "Bungee Hairline", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  text-wrap: balance;
+  font-size: clamp(2rem, 3vw, 4rem);
+  letter-spacing: 0em;
+  text-shadow: 3 2 56px rgba(207, 50, 186, 0.14);
+}
+
+.footnote-ref,
+.footnote-back {
+  text-decoration: none;
+}
+
+/* Prevent superscript footnote markers from changing paragraph line spacing */
+.footnote-ref sup {
+  line-height: 0;
+}
+
+/* anchor links */
+
+.header-anchor {
+  opacity: 0;
+  text-decoration: none;
+  margin-right: 0.4rem;
+  font-size: 0.9em;
+}
+h2:hover .header-anchor,
+h3:hover .header-anchor,
+h4:hover .header-anchor {
+  opacity: 1;
+}
