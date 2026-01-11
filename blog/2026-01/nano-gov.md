@@ -192,11 +192,13 @@ $$
 \mathbb{E}[\vec{\gamma}(t)]
 &= \mathbb{E}\!\left[\, t X_M + (1-t) X_S \,\right] \\
 &= t\,\mathbb{E}[X_M] + (1-t)\,\mathbb{E}[X_S] \\
+&= t\,\mathbb{E}\!\left[\mathbb{E}[X_M \mid M]\right] + (1-t)\,\mathbb{E}\!\left[\mathbb{E}[X_S \mid S]\right] \\
 &= t\,\mathbb{E}[\vec{\mu}] + (1-t)\,\mathbb{E}[\vec{\sigma}] \\
 &= t \vec{\rho} + (1-t)\vec{\rho} \\
 &= \vec{\rho}.
 \end{aligned}
 $$
+
 
 We define the cost of a government as the mean squared error relative to the public will:
 
@@ -271,29 +273,34 @@ After playing with the demo above for long enough, you may start to notice that 
 
 Whereas for a population count of 9 or fewer, we instead see that the local optima occur when about half of the population is part of the magistrates.
 
-Most notably, the optimal fraction of the population that should be part of the magistrates is not a smooth transition from nano governments to macro governments.
-
 ## Regime split
 
+Most notably, the optimal fraction of the population that should be part of the magistrates is not a smooth transition from nano governments to macro governments.
 This brings us back to our initial point: a nano government is not simply a smaller government.
+There is a clear split between the two.
 
 In the demo below, the x-axis is the population size, and the y-axis is the ratio of magistrates that make up the optimal government.
 
 <div id="demo_040_optimal_magistrates" class="figure"></div>
 <script type="module" src="./demo_040_optimal_magistrates.js"></script>
 
-There are clearly two regimes! 
+There are two regimes! 
 Instead of a smooth transition, we see a clear boundary between the small and the big!
 This is our first evidence that nano governments are a beast of their own.
 
 Note, the term _regime_ in the context of statistical models was first introduced to me by my Ph.D. advisor Song-Chun Zhu[^8].
 Coincidentally, and maybe even obviously, _regime_ also has a political meaning, which a stronger writer than myself would avoid using to squash confusion.
 
+## Discussion and further study
 
+The catalyst for writing this post was my surprise at reading Rousseau's argument that a bigger group of magistrates is not more powerful. 
+After operationalizing the claim, I think I finally understand what he meant.
+Moreover, as a fun consequence of this exploration, we see that there's a fascinating regime split between the nanoscale and the traditional scale.
 
-## Further study
+From the demos above, I've noticed that optimal nano governments usually take the form of dipoles, or two separate clusters. Like a bow-tie, it has dense clusters on either side, joined at a point in the middle.
+Surprisingly, in this regime, the sovereign and the magistrates can have completely opposite wills, but as long as both bodies are dense, the government will ends up near the population will, while keeping within-body variance of the magistrates low.
 
-Help me out here, there's more to investigate:
+There's more to investigate:
 
 a. In this article, we used $\mathbb{R}^3$ because it's easier to visualize. How does the nano government regime boundary change as the dimension increases?
 b. How can we train an embedding model such that the will of the population is indeed simply the arithmetic mean of the vectors?

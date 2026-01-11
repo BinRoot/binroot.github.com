@@ -280,6 +280,11 @@ t\,\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{X_M}] +
 (1-t)\,\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{X_S}]
 \\
 &amp;=
+t\,\style{color:#797979;}{\mathbb{E}}\!\left[\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{X_M}
+\mid M]\right] +
+(1-t)\,\style{color:#797979;}{\mathbb{E}}\!\left[\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{X_S}
+\mid S]\right] \\
+&amp;=
 t\,\style{color:#797979;}{\mathbb{E}}[\style{color:#4878d0;}{\vec{\mu}}]
 +
 (1-t)\,\style{color:#797979;}{\mathbb{E}}[\style{color:#d65f5f;}{\vec{\sigma}}]
@@ -426,18 +431,19 @@ make up only a tiny fraction of the population.</p>
 <p>Whereas for a population count of 9 or fewer, we instead see that the
 local optima occur when about half of the population is part of the
 <span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>.</p>
+<h2 id="regime-split">Regime split</h2>
 <p>Most notably, the optimal fraction of the population that should be
 part of the
 <span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
 is not a smooth transition from nano
 <span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
 to macro
-<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>.</p>
-<h2 id="regime-split">Regime split</h2>
-<p>This brings us back to our initial point: a nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>.
+This brings us back to our initial point: a nano
 <span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
 is not simply a smaller
-<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>.</p>
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>.
+There is a clear split between the two.</p>
 <p>In the demo below, the x-axis is the population size, and the y-axis
 is the ratio of
 <span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
@@ -447,9 +453,9 @@ that make up the optimal
 
 </div>
 <script type="module" src="./demo_040_optimal_magistrates.js"></script>
-<p>There are clearly two regimes! Instead of a smooth transition, we see
-a clear boundary between the small and the big! This is our first
-evidence that nano
+<p>There are two regimes! Instead of a smooth transition, we see a clear
+boundary between the small and the big! This is our first evidence that
+nano
 <span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
 are a beast of their own.</p>
 <p>Note, the term <em>regime</em> in the context of statistical models
@@ -458,8 +464,30 @@ href="#fn8" class="footnote-ref" id="fnref8"
 role="doc-noteref"><sup>8</sup></a>. Coincidentally, and maybe even
 obviously, <em>regime</em> also has a political meaning, which a
 stronger writer than myself would avoid using to squash confusion.</p>
-<h2 id="further-study">Further study</h2>
-<p>Help me out here, there’s more to investigate:</p>
+<h2 id="discussion-and-further-study">Discussion and further study</h2>
+<p>The catalyst for writing this post was my surprise at reading
+Rousseau’s argument that a bigger group of
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+is not more powerful. After operationalizing the claim, I think I
+finally understand what he meant. Moreover, as a fun consequence of this
+exploration, we see that there’s a fascinating regime split between the
+nanoscale and the traditional scale.</p>
+<p>From the demos above, I’ve noticed that optimal nano
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">governments</span>
+usually take the form of dipoles, or two separate clusters. Like a
+bow-tie, it has dense clusters on either side, joined at a point in the
+middle. Surprisingly, in this regime, the
+<span style="text-decoration:underline;text-decoration-color:#d65f5f;">sovereign</span>
+and the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+can have completely opposite wills, but as long as both bodies are
+dense, the
+<span style="text-decoration:underline;text-decoration-color:#956cb4;">government</span>
+will ends up near the population will, while keeping within-body
+variance of the
+<span style="text-decoration:underline;text-decoration-color:#4878d0;">magistrates</span>
+low.</p>
+<p>There’s more to investigate:</p>
 <ol type="a">
 <li>In this article, we used <span
 class="math inline">\(\mathbb{R}^3\)</span> because it’s easier to
