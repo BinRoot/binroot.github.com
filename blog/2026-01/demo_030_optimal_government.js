@@ -1057,12 +1057,14 @@ import { OrbitControls } from "https://unpkg.com/three@0.164.0/examples/jsm/cont
 
   function initUI() {
     const root = document.createElement("div");
+    root.className = "demo030-root";
     root.style.display = "flex";
     root.style.flexDirection = "column";
     root.style.gap = "0.75rem";
     mount.appendChild(root);
 
     const controls = document.createElement("div");
+    controls.className = "demo030-controls";
     controls.style.display = "flex";
     controls.style.flexWrap = "wrap";
     controls.style.alignItems = "center";
@@ -1137,19 +1139,24 @@ import { OrbitControls } from "https://unpkg.com/three@0.164.0/examples/jsm/cont
 
     // Plots row
     const plotsRow = document.createElement("div");
+    plotsRow.className = "demo030-row";
     plotsRow.style.display = "flex";
     plotsRow.style.gap = "0.85rem";
     plotsRow.style.alignItems = "stretch";
     plotsRow.style.width = "100%";
     plotsRow.style.height = "360px";
+    // Critical for flexbox: allow children to shrink instead of overflowing horizontally.
+    plotsRow.style.minWidth = "0";
     root.appendChild(plotsRow);
 
     // Left panel: 2D canvas cost plot
     const costPanel = document.createElement("div");
+    costPanel.className = "demo030-panel demo030-panel--cost";
     costPanel.style.flex = "1";
     costPanel.style.display = "flex";
     costPanel.style.flexDirection = "column";
     costPanel.style.gap = "0.35rem";
+    costPanel.style.minWidth = "0";
     plotsRow.appendChild(costPanel);
 
     const costTitle = document.createElement("div");
@@ -1160,22 +1167,27 @@ import { OrbitControls } from "https://unpkg.com/three@0.164.0/examples/jsm/cont
     costPanel.appendChild(costTitle);
 
     const costHost = document.createElement("div");
+    costHost.className = "demo030-host demo030-host--cost";
     costHost.style.flex = "1";
     costHost.style.borderRadius = "10px";
     costHost.style.overflow = "hidden";
     costHost.style.border = "1px solid rgba(229,231,235,0.18)";
+    costHost.style.minWidth = "0";
     costPanel.appendChild(costHost);
 
     const costCanvas = document.createElement("canvas");
+    costCanvas.className = "demo030-costCanvas";
     costCanvas.style.display = "block";
     costHost.appendChild(costCanvas);
 
     // Right panel: Three.js
     const threePanel = document.createElement("div");
+    threePanel.className = "demo030-panel demo030-panel--three";
     threePanel.style.flex = "1";
     threePanel.style.display = "flex";
     threePanel.style.flexDirection = "column";
     threePanel.style.gap = "0.35rem";
+    threePanel.style.minWidth = "0";
     plotsRow.appendChild(threePanel);
 
     const threeTitle = document.createElement("div");
@@ -1186,10 +1198,12 @@ import { OrbitControls } from "https://unpkg.com/three@0.164.0/examples/jsm/cont
     threePanel.appendChild(threeTitle);
 
     const threeHost = document.createElement("div");
+    threeHost.className = "demo030-host demo030-host--three";
     threeHost.style.flex = "1";
     threeHost.style.borderRadius = "10px";
     threeHost.style.overflow = "hidden";
     threeHost.style.border = "1px solid rgba(229,231,235,0.18)";
+    threeHost.style.minWidth = "0";
     threePanel.appendChild(threeHost);
 
     const tooltip = createTooltip();

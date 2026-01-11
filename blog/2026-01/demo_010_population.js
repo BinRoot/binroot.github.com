@@ -5,6 +5,9 @@ const numPoints = 4;
 
 const container = document.getElementById("demo_010_population");
 const tooltip = document.getElementById("demo_010_tooltip");
+if (!container || !tooltip) {
+  throw new Error("demo_010_population: missing container or tooltip element");
+}
 container.style.position = "relative";
 
 function getContentBoxSize(el) {
@@ -28,7 +31,7 @@ camera.position.set(4, 4, 6);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(initW, initH);
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(window.devicePixelRatio || 1);
 renderer.domElement.style.display = "block";
 container.appendChild(renderer.domElement);
 
@@ -114,13 +117,29 @@ Object.assign(controls, {
   autoRotate: false,
 });
 
+let lastW = 0;
+let lastH = 0;
 const onResize = () => {
   const { width, height } = getContentBoxSize(container);
+  if (!width || !height) return;
+  if (width === lastW && height === lastH) return;
+  lastW = width;
+  lastH = height;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
 };
 window.addEventListener("resize", onResize);
+
+// Some mobile browsers change layout without firing a window resize (address bar,
+// late-applied CSS, etc.). Observe the container so the renderer always matches it.
+if ("ResizeObserver" in window) {
+  const ro = new ResizeObserver(() => onResize());
+  ro.observe(container);
+}
+
+// Ensure first frame uses final layout metrics.
+requestAnimationFrame(onResize);
 
 (function animate() {
   requestAnimationFrame(animate);

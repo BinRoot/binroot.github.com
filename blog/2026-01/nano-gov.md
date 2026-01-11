@@ -206,12 +206,13 @@ $$
 
 By the bias-variance decomposition for squared loss:
 
+
 $$
 \mathrm{Cost}(t)
 =
-\underbrace{\big\| \mathbb{E}[\vec{\gamma}(t)] - \vec{\rho} \big\|^2}_{\text{systematic misalignment (legitimacy)}}
+\underbrace{\big\| \mathbb{E}[\vec{\gamma}(t)] - \vec{\rho} \big\|^2}_{\text{illegitimacy}}
 \;+\;
-\underbrace{\operatorname{tr}\big(\operatorname{Cov}(\vec{\gamma}(t))\big)}_{\text{instability (ineffectiveness)}}.
+\underbrace{\operatorname{tr}\big(\operatorname{Cov}(\vec{\gamma}(t))\big)}_{\text{ineffectiveness}}.
 $$
 
 So minimizing $\mathrm{Cost}(t)$ means choosing a government that is both:
@@ -228,15 +229,12 @@ $$
 Assuming the two bodies' estimation errors are uncorrelated, by the covariance rule for a linear combination[^6], and the linearity rule of a trace[^7], we get
 
 $$
-\mathrm{Cost}(t) = t^2 v_M + (1 - t)^2 v_S
-\qquad
-\text{where}
-\qquad
-v_M = \operatorname{tr}(\operatorname{Cov}(X_M))
-\quad
-\text{and}
-\quad
-v_S = \operatorname{tr}(\operatorname{Cov}(X_S))
+\begin{aligned}
+\mathrm{Cost}(t) &= t^2 v_M + (1 - t)^2 v_S \\
+\text{where}\quad
+v_M &= \operatorname{tr}(\operatorname{Cov}(X_M)), \\
+v_S &= \operatorname{tr}(\operatorname{Cov}(X_S)).
+\end{aligned}
 $$
 
 The optimal government is at $\frac{d \mathrm{Cost}}{dt} = 2 t v_M + 2(t - 1)v_S = 0$, or simply

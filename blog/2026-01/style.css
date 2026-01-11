@@ -234,6 +234,12 @@ main.article img {
   height: auto;
 }
 
+/* Allow long URLs (especially in footnotes) to wrap instead of causing horizontal scroll */
+main.article a {
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
 /* Center standalone images placed inside paragraphs (common Pandoc/Markdown output) */
 main.article p > img {
   display: block;
@@ -374,11 +380,64 @@ h4:hover .header-anchor {
   }
 
   .figure {
+    /* Needed because `.figure` has padding; without border-box the mobile "break-out"
+       width math can make the border box wider than the viewport and reintroduce
+       horizontal scrolling (most noticeable in the simpler demo_010). */
+    box-sizing: border-box;
     width: calc(
       100% + 2rem
     ); /* extend beyond the article's 1rem padding on each side */
     margin-left: -1rem;
     margin-right: -1rem;
     border-radius: 0; /* flush to edges looks cleaner on mobile */
+  }
+
+  /* Stack demo_020_division (horizontal flex) vertically on mobile */
+  #demo_020_division {
+    flex-direction: column !important;
+  }
+  #demo_020_division > div:first-child {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #demo_020_division > div:last-child {
+    min-height: 280px;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+  #demo_020_division > div:last-child canvas {
+    max-width: 100%;
+  }
+
+  /* Demo 030: stack Cost + Population vertically on mobile (JS sets a fixed 360px row height) */
+  #demo_030_optimal_government .demo030-row {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  /* Give each plot a real height so it participates in document flow and pushes text down */
+  #demo_030_optimal_government .demo030-host--cost,
+  #demo_030_optimal_government .demo030-host--three {
+    height: 320px;
+  }
+
+  /* Stack demo_025_partitions layout vertically */
+  #demo_025_partitions .p25-row {
+    flex-direction: column;
+    /* demo_025_partitions injects `height: 360px` via a <style> tag at runtime.
+       On mobile (stacked), that fixed height makes the 3D view spill out and overlap
+       the content below. Force auto height here. */
+    height: auto !important;
+  }
+  #demo_025_partitions .p25-panel--grid {
+    flex: 0 0 auto !important;
+  }
+  #demo_025_partitions .p25-panel--three {
+    flex: 0 0 auto !important;
+    height: 300px;
+  }
+  #demo_025_partitions .p25-threeHost {
+    height: 100%;
   }
 }

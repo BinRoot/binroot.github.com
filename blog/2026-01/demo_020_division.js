@@ -15,7 +15,8 @@ container.style.alignItems = "stretch";
 
 const uiPanel = document.createElement("div");
 Object.assign(uiPanel.style, {
-  width: "280px",
+  flex: "0 1 280px",
+  minWidth: "200px",
   padding: "10px",
   boxSizing: "border-box",
   display: "flex",
@@ -31,6 +32,8 @@ Object.assign(threePanel.style, {
   flex: "1",
   position: "relative",
   minHeight: "260px",
+  minWidth: "0",
+  overflow: "hidden",
 });
 container.appendChild(threePanel);
 
@@ -184,21 +187,38 @@ const lineMaterialM = new THREE.LineBasicMaterial({
 
 // === Plot canvas for variance vs. #magistrates ===
 const plotCanvas = document.createElement("canvas");
-plotCanvas.width = 260;
-plotCanvas.height = 120;
 Object.assign(plotCanvas.style, {
   borderRadius: "4px",
+  width: "100%",
+  height: "120px",
 });
 uiPanel.appendChild(plotCanvas);
 
 // === Plot canvas for Legitimacy ===
 const legCanvas = document.createElement("canvas");
-legCanvas.width = 260;
-legCanvas.height = 120;
 Object.assign(legCanvas.style, {
   borderRadius: "4px",
+  width: "100%",
+  height: "120px",
 });
 uiPanel.appendChild(legCanvas);
+
+// === Canvas resize helper for HiDPI ===
+function resizeCanvas(canvas, height = 120) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = height * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function resizeCanvases() {
+  resizeCanvas(plotCanvas, 120);
+  resizeCanvas(legCanvas, 120);
+  drawPlot();
+  drawLegPlot();
+}
 
 // history arrays
 const magCounts = []; // x values = number of magistrates
@@ -219,9 +239,7 @@ for (let i = 0; i < populationCount; i++) {
     pointGeometry,
     isMagistrate ? pointMaterialM : pointMaterialS
   );
-  point.userData.label =
-    `${isMagistrate ? "Magistrate" : "Subject"} ` +
-    `\\( \\vec{p}_{${i + 1}} \\)`;
+  point.userData.label = `\\( \\vec{p}_{${i + 1}} \\)`;
 
   const randomPoint = [
     Math.random() * 2 - 1,
@@ -237,20 +255,21 @@ for (let i = 0; i < populationCount; i++) {
 
 // === Create average points ===
 avgPointS = new THREE.Mesh(pointGeometryAvg, avgMaterialS);
-avgPointS.userData.label = `Subject avg \\( \\vec{\\sigma} \\)`;
+avgPointS.userData.label = `\\( \\vec{\\sigma} \\)`;
 scene.add(avgPointS);
 points.push(avgPointS);
 
 avgPointM = new THREE.Mesh(pointGeometryAvg, avgMaterialM);
-avgPointM.userData.label = `Magistrate avg \\( \\vec{\\mu} \\)`;
+avgPointM.userData.label = `\\( \\vec{\\mu} \\)`;
 scene.add(avgPointM);
 points.push(avgPointM);
 
 // === Plot helpers (variance) ===
 function drawPlot() {
   const ctx = plotCanvas.getContext("2d");
-  const w = plotCanvas.width;
-  const h = plotCanvas.height;
+  const rect = plotCanvas.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
 
   ctx.clearRect(0, 0, w, h);
 
@@ -369,8 +388,9 @@ function drawPlot() {
 // === Plot helpers (Legitimacy) ===
 function drawLegPlot() {
   const ctx = legCanvas.getContext("2d");
-  const w = legCanvas.width;
-  const h = legCanvas.height;
+  const rect = legCanvas.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
 
   ctx.clearRect(0, 0, w, h);
 
@@ -508,9 +528,7 @@ function updateMagistratesAndAverages(recordPoint = false) {
     point.material = isMagistrate ? pointMaterialM : pointMaterialS;
 
     // label
-    point.userData.label =
-      `${isMagistrate ? "Magistrate" : "Subject"} ` +
-      `\\( \\vec{p}_{${i + 1}} \\)`;
+    point.userData.label = `\\( \\vec{p}_{${i + 1}} \\)`;
 
     if (isMagistrate) {
       avgMagistrate[0] += pos[0];
@@ -540,9 +558,9 @@ function updateMagistratesAndAverages(recordPoint = false) {
   avgPointM.position.set(...avgMagistrate);
   avgPointS.position.set(...avgSovereign);
 
-  // update avg point labels (include counts)
-  avgPointM.userData.label = `Magistrate avg \\( \\vec{\\mu} \\), N = ${countM}`;
-  avgPointS.userData.label = `Subject avg \\( \\vec{\\sigma} \\), N = ${countS}`;
+  // update avg point labels
+  avgPointM.userData.label = `\\( \\vec{\\mu} \\)`;
+  avgPointS.userData.label = `\\( \\vec{\\sigma} \\)`;
 
   // --- compute variances (average squared distance to respective mean) ---
   let sumSqMag = 0;
@@ -637,9 +655,14 @@ const onResize = () => {
   camera.aspect = clientWidth / clientHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(clientWidth, clientHeight);
+  resizeCanvases();
 };
 window.addEventListener("resize", onResize);
-onResize(); // ensure correct size after layout
+// Initial sizing after layout settles
+requestAnimationFrame(() => {
+  resizeCanvases();
+  onResize();
+});
 
 // === Buttons logic ===
 incBtn.addEventListener("click", () => {

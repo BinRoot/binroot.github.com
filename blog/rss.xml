@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Nishant Shukla</title>
+    <link>https://shukla.io</link>
+    <description>A blog about Math, Computer Science, and Software Engineering.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 11 Jan 2026 00:00:00 GMT</lastBuildDate>
+
+    <item>
+      <title>Nano Governments</title>
+      <link>https://shukla.io/blog/2026-01/nano-gov.html</link>
+      <guid>https://shukla.io/blog/2026-01/nano-gov.html</guid>
+      <pubDate>Sun, 11 Jan 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      Mathematical formulations of nanoscale governments
+      ]]></description>
+    </item>
+
+    <item>
+      <title>Algebra Notes</title>
+      <link>https://shukla.io/blog/2021-11/algebra-notes.html</link>
+      <guid>https://shukla.io/blog/2021-11/algebra-notes.html</guid>
+      <pubDate>Fri, 12 Nov 2021 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      Diabolical charades of algebra
+      ]]></description>
+    </item>
+
+  </channel>
+</rss>
