@@ -1,0 +1,15 @@
+{
+  "name": "grammar-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx scripts/main.ts",
+    "dev": "tsx scripts/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
+  }
+}
