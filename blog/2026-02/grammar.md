@@ -18,6 +18,28 @@ I suspect this is a tranditional software "bug" and not exactly the fault of Gem
 
 ## Grammar Model
 
+Here's a naive sandwich-making model that appears straightforward at first sight.
+
+```
+init: and(spread-pb-on-bread, spread-jelly-on-bread)
+spread-pb-on-bread: and(bread, pb)
+spread-jelly-on-bread: and(bread, jelly)
+```
+
+You get the sample `bread pb bread jelly`. 
+
+Notice how the structure is lost. 
+
+Here's a cool magic trick. Let's make actions like `spread` and `stack` into terminals. 
+
+Samples may look like this `bread pb spread bread jelly spread stack`.
+
+You may argue there is still no structure here; it's just a flat list of words.
+
+The good news is that if we identify "spread" and "stack" as functions, then we can actually represent this sequence of words as a valid Forth program. 
+
+Moreover, a static validator can prove the grammar only produces valid Forth, guaranteeing correctness by construction.
+
 ## Learning a Grammar Model
 
 ## Closed Loop
