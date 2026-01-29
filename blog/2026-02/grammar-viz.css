@@ -1,0 +1,141 @@
+/* Visualization label */
+.viz-label {
+  display: block;
+  font-family: monospace;
+  font-size: 0.75em;
+  color: #a89984;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75em;
+}
+
+/* Grammar rule visualization */
+.grammar-graph {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grammar-rule {
+  display: flex;
+  align-items: flex-start;
+  margin: 0.5em 0;
+  font-family: monospace;
+  font-size: 1.1em;
+}
+
+.grammar-lhs {
+  color: #83a598;
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.grammar-arrow {
+  color: #a89984;
+  margin: 0 0.5em;
+}
+
+.grammar-rhs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.grammar-alt {
+  display: flex;
+  gap: 0.4em;
+}
+
+.grammar-pipe {
+  color: #fe8019;
+  margin: 0 0.3em;
+  font-weight: bold;
+}
+
+.grammar-terminal {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.grammar-nonterminal {
+  background: #458588;
+  color: #ebdbb2;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+/* Parse tree visualization */
+.parse-tree {
+  margin: 1.5em 0;
+  padding: 1.5em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.parse-tree-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+}
+
+/* Render yield visualization */
+.render-yield {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-items: center;
+  font-family: monospace;
+}
+
+.yield-token {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.25em 0.6em;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Distribution histogram */
+.distribution {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.distribution-svg {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.dist-bar {
+  fill: #83a598;
+}
+
+.dist-bar-zero {
+  fill: #504945;
+}
+
+.dist-label {
+  font-family: monospace;
+  font-size: 12px;
+  fill: #a89984;
+}

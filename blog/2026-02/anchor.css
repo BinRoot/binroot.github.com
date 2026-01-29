@@ -1,0 +1,22 @@
+/* Header anchor links */
+.header-anchor {
+  opacity: 0;
+  text-decoration: none;
+  color: var(--text-light);
+  font-weight: normal;
+  transition: opacity 0.15s ease;
+  margin-right: 0.4em;
+}
+
+h1:hover .header-anchor,
+h2:hover .header-anchor,
+h3:hover .header-anchor,
+h4:hover .header-anchor,
+h5:hover .header-anchor,
+h6:hover .header-anchor {
+  opacity: 1;
+}
+
+.header-anchor:hover {
+  color: var(--accent);
+}

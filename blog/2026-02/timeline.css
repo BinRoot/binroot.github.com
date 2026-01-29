@@ -1,0 +1,130 @@
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: calc(0.5rem + 5px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent, #0066cc), var(--accent-hover, #004499));
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 0.35rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg, #fff);
+  border: 2px solid var(--accent, #0066cc);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.timeline-item:hover::before {
+  transform: scale(1.3);
+  background: var(--accent, #0066cc);
+}
+
+.timeline-year {
+  display: inline-block;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent, #0066cc);
+  min-width: 5ch;
+  margin-right: 0.5rem;
+}
+
+.timeline-era {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-skip {
+  color: var(--text-light, #666);
+  font-style: italic;
+}
+
+/* Hide the circle bullet for skip items */
+.timeline-skip::before {
+  display: none;
+}
+
+/* Cover the straight line and draw zig-zag */
+.timeline-skip::after {
+  content: '';
+  position: absolute;
+  left: calc(-1.5rem + 5px - 7px);
+  top: -0.5rem;
+  width: 16px;
+  height: calc(100% + 1rem);
+  background-color: var(--bg, #fff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='48' viewBox='0 0 16 48' preserveAspectRatio='none'%3E%3Cpath d='M8 0 L8 8 L12 16 L4 24 L12 32 L4 40 L8 48' stroke='%23ffb300' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 100%;
+  background-position: center;
+}
+
+.timeline-subitem {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: 0.75rem;
+  margin-left: 0.5rem;
+  border-left: 1px dashed var(--border, #ccc);
+}
+
+.timeline-subitem:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-subitem::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0.45rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border, #ccc);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .timeline {
+    padding-left: 1.5rem;
+  }
+
+  .timeline::before {
+    left: calc(0.25rem + 4px);
+  }
+
+  .timeline-item {
+    padding-left: 1rem;
+  }
+
+  .timeline-item::before {
+    left: -1.25rem;
+    width: 10px;
+    height: 10px;
+  }
+
+  .timeline-year {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+}

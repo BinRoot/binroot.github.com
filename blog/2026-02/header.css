@@ -1,0 +1,38 @@
+/* Header title spacing */
+#title-block-header {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  background: none;
+  border: none;
+}
+
+#title-block-header .title {
+  margin-bottom: 0.5rem;
+}
+
+/* Header meta row: home left, author/date right */
+.header-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
+
+.header-meta {
+  color: var(--text-light);
+}
+
+.meta-sep {
+  opacity: 0.5;
+  margin: 0 0.35rem;
+}

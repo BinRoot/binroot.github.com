@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Grammar Models are back, baby!</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+  <link rel="stylesheet" href="timeline.css" />
+  <link rel="stylesheet" href="highlight.css" />
+  <link rel="stylesheet" href="grammar-viz.css" />
+  <link rel="stylesheet" href="header.css" />
+  <link rel="stylesheet" href="anchor.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+  <h1 class="title">Grammar Models are back, baby!</h1>
+</header>
+<div class="header-meta-row">
+  <a href="/" class="home-link">← Home</a>
+  <span class="header-meta">
+    <span class="author">Nishant Shukla</span>
+    <span class="meta-sep">·</span>
+    <span class="date">February 1, 2026</span>
+  </span>
+</div>
+
+<p>Grammar models are back, baby!</p>
+<div class="timeline">
+<div class="timeline-item"><div class="timeline-era">From the <span class="timeline-year">60s-80s</span>, we saw fundamental contributions to the study of
+context-free grammar:</div>
+<div class="timeline-subitem"><span class="timeline-year">1961</span>the CYK parsing algorithm was published <span class="citation"
+data-cites="cyk">(<a href="#ref-cyk" role="doc-biblioref">Younger
+1967</a>)</span></div>
+<div class="timeline-subitem"><span class="timeline-year">1968</span>the Earley parser was published <span class="citation"
+data-cites="earley">(<a href="#ref-earley" role="doc-biblioref">Earley
+1968</a>)</span></div>
+<div class="timeline-subitem"><span class="timeline-year">1974</span>the GLR parser was formulated <span class="citation"
+data-cites="lang-glr">(<a href="#ref-lang-glr" role="doc-biblioref">Lang
+1974</a>)</span>, and then in 1984 it was implemented <span
+class="citation" data-cites="tomita-glr">(<a href="#ref-tomita-glr"
+role="doc-biblioref">Tomita 1986</a>)</span></div></div>
+<div class="timeline-item timeline-skip">(… skipping a bunch of other things …)</div>
+<div class="timeline-item"><span class="timeline-year">2023</span>llama.cpp popularized grammar-constrained decoding for local
+LLMs <span class="citation" data-cites="llama-grammar">(<a
+href="#ref-llama-grammar" role="doc-biblioref">Maurer 2023</a>)</span>.</div>
+<div class="timeline-item"><span class="timeline-year">2025</span>we begin to see state-machine grammars become mainstream <span
+class="citation" data-cites="mastra-state-machine">(<a
+href="#ref-mastra-state-machine" role="doc-biblioref">Mastra Team
+2025</a>)</span>. Around this time, I built a context-free grammar
+system to constrain function calls in the multi-agent framework at my
+current employer.</div>
+<div class="timeline-item"><span class="timeline-year">2025</span>OpenAI introduced native support for constraining LLM outputs
+with context-free grammar production rules, making grammars a first-call
+tool for controlling generation <span class="citation"
+data-cites="openai-cfg">(<a href="#ref-openai-cfg"
+role="doc-biblioref">OpenAI 2025</a>)</span>.</div>
+</div>
+<p>Structure is fashionable again, but this is February 2026 and I hear
+crickets.</p>
+<p>The purpose of this post is to outline a framework to talk about
+grammar generation, inference, and scoring all at once in a clean
+interface, with the hope that this explanation will simplify future
+research efforts on this topic.</p>
+<p>It feels like we’re one good abstraction away from grammars having
+their moment, and I think that abstraction is finally obvious.</p>
+<h2 id="a-clean-interface"><a href="#a-clean-interface"
+class="header-anchor">#</a>A Clean Interface</h2>
+<p>Think of a grammar as a strongly-typed object.</p>
+<p>For example, this is <code>G</code>:</p>
+<div class="grammar-graph">
+<span class="viz-label">grammar</span>
+<div class="grammar-rule">
+<span class="grammar-lhs">root</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-terminal">setup</span>
+<span class="grammar-nonterminal">tests</span>
+<span class="grammar-terminal">teardown</span>
+</div>
+</div>
+</div>
+<div class="grammar-rule">
+<span class="grammar-lhs">tests</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-terminal">test</span>
+<span class="grammar-nonterminal">tests</span>
+</div>
+<span class="grammar-pipe">|</span>
+<div class="grammar-alt">
+<span class="grammar-terminal">test</span>
+</div>
+</div>
+</div>
+</div>
+<h3 id="top-down-generation"><a href="#top-down-generation"
+class="header-anchor">#</a>Top-down generation</h3>
+<p>You can sample from the grammar (assuming uniform distribution over
+production choices):</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> G<span class="op">.</span><span class="fu">sample</span>()  <span class="co">// returns a Parse</span></span></code></pre></div>
+<p>You may get a parse that looks like this:</p>
+<div class="parse-tree">
+<span class="viz-label">parse</span>
+<svg class="parse-tree-svg" viewBox="0 0 429 196" preserveAspectRatio="xMidYMid meet">
+<style>
+  .tree-text { font-family: monospace; font-size: 14px; }
+  .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
+  .tree-text.terminal { fill: #1d2021; font-weight: 500; }
+  .tree-rect.nonterminal { fill: #458588; }
+  .tree-rect.terminal { fill: #b8bb26; }
+  .tree-line { stroke: #665c54; stroke-width: 2; }
+</style>
+<line class="tree-line" x1="214" y1="36" x2="214" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="375" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="40" y2="60"/>
+<line class="tree-line" x1="201" y1="48" x2="201" y2="60"/>
+<line class="tree-line" x1="375" y1="48" x2="375" y2="60"/>
+<rect class="tree-rect terminal" x="9" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text terminal" x="40" y="78" text-anchor="middle">setup</text>
+<line class="tree-line" x1="201" y1="86" x2="201" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="281" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="121" y2="110"/>
+<line class="tree-line" x1="201" y1="98" x2="201" y2="110"/>
+<line class="tree-line" x1="281" y1="98" x2="281" y2="110"/>
+<rect class="tree-rect terminal" x="95" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="121" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="175" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="201" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="255" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="281" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect nonterminal" x="170" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="201" y="78" text-anchor="middle">tests</text>
+<rect class="tree-rect terminal" x="331" y="60" width="88" height="26" rx="4"/>
+<text class="tree-text terminal" x="375" y="78" text-anchor="middle">teardown</text>
+<rect class="tree-rect nonterminal" x="188" y="10" width="52" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="214" y="28" text-anchor="middle">root</text>
+</svg>
+</div>
+<p>Then, you can render data from the parse:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> G<span class="op">.</span><span class="fu">render</span>(p)  <span class="co">// returns an Observation</span></span></code></pre></div>
+<div class="render-yield">
+<span class="viz-label">render</span>
+<span class="yield-token">setup</span>
+<span class="yield-token">test</span>
+<span class="yield-token">test</span>
+<span class="yield-token">test</span>
+<span class="yield-token">teardown</span>
+</div>
+<p>A sample is not usually deterministic.</p>
+<p>So, who knows, you may instead get a parse that looks like this:</p>
+<div class="parse-tree">
+<span class="viz-label">parse</span>
+<svg class="parse-tree-svg" viewBox="0 0 909 196" preserveAspectRatio="xMidYMid meet">
+<style>
+  .tree-text { font-family: monospace; font-size: 14px; }
+  .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
+  .tree-text.terminal { fill: #1d2021; font-weight: 500; }
+  .tree-rect.nonterminal { fill: #458588; }
+  .tree-rect.terminal { fill: #b8bb26; }
+  .tree-line { stroke: #665c54; stroke-width: 2; }
+</style>
+<line class="tree-line" x1="454" y1="36" x2="454" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="855" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="40" y2="60"/>
+<line class="tree-line" x1="441" y1="48" x2="441" y2="60"/>
+<line class="tree-line" x1="855" y1="48" x2="855" y2="60"/>
+<rect class="tree-rect terminal" x="9" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text terminal" x="40" y="78" text-anchor="middle">setup</text>
+<line class="tree-line" x1="441" y1="86" x2="441" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="761" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="121" y2="110"/>
+<line class="tree-line" x1="201" y1="98" x2="201" y2="110"/>
+<line class="tree-line" x1="281" y1="98" x2="281" y2="110"/>
+<line class="tree-line" x1="361" y1="98" x2="361" y2="110"/>
+<line class="tree-line" x1="441" y1="98" x2="441" y2="110"/>
+<line class="tree-line" x1="521" y1="98" x2="521" y2="110"/>
+<line class="tree-line" x1="601" y1="98" x2="601" y2="110"/>
+<line class="tree-line" x1="681" y1="98" x2="681" y2="110"/>
+<line class="tree-line" x1="761" y1="98" x2="761" y2="110"/>
+<rect class="tree-rect terminal" x="95" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="121" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="175" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="201" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="255" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="281" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="335" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="361" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="415" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="441" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="495" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="521" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="575" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="601" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="655" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="681" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="735" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="761" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect nonterminal" x="410" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="441" y="78" text-anchor="middle">tests</text>
+<rect class="tree-rect terminal" x="811" y="60" width="88" height="26" rx="4"/>
+<text class="tree-text terminal" x="855" y="78" text-anchor="middle">teardown</text>
+<rect class="tree-rect nonterminal" x="428" y="10" width="52" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="454" y="28" text-anchor="middle">root</text>
+</svg>
+</div>
+<p>Producing parses and rendering observations from those parses is the
+easy part.</p>
+<h3 id="bottom-up-inference"><a href="#bottom-up-inference"
+class="header-anchor">#</a>Bottom-up inference</h3>
+<p>The harder problem is parsing raw observations.</p>
+<p>To demonstrate this, let’s change the grammar to be more interesting,
+one that introduces the concept of running tests in parallel.</p>
+<div class="grammar-graph">
+<span class="viz-label">grammar</span>
+<div class="grammar-rule">
+<span class="grammar-lhs">root</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-terminal">setup</span>
+<span class="grammar-nonterminal">tests</span>
+<span class="grammar-terminal">teardown</span>
+</div>
+</div>
+</div>
+<div class="grammar-rule">
+<span class="grammar-lhs">tests</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-terminal">test</span>
+</div>
+<span class="grammar-pipe">|</span>
+<div class="grammar-alt">
+<span class="grammar-nonterminal">seq</span>
+</div>
+<span class="grammar-pipe">|</span>
+<div class="grammar-alt">
+<span class="grammar-nonterminal">par</span>
+</div>
+</div>
+</div>
+<div class="grammar-rule">
+<span class="grammar-lhs">seq</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-nonterminal">tests</span>
+<span class="grammar-terminal">then</span>
+<span class="grammar-nonterminal">tests</span>
+</div>
+</div>
+</div>
+<div class="grammar-rule">
+<span class="grammar-lhs">par</span><span class="grammar-arrow">→</span>
+<div class="grammar-rhs">
+<div class="grammar-alt">
+<span class="grammar-nonterminal">tests</span>
+<span class="grammar-terminal">and</span>
+<span class="grammar-nonterminal">tests</span>
+</div>
+</div>
+</div>
+</div>
+<p>Try parsing this observation:</p>
+<div class="render-yield">
+<span class="viz-label">render</span>
+<span class="yield-token">setup</span>
+<span class="yield-token">test</span>
+<span class="yield-token">then</span>
+<span class="yield-token">test</span>
+<span class="yield-token">and</span>
+<span class="yield-token">test</span>
+<span class="yield-token">teardown</span>
+</div>
+<p>We can call <code>infer</code> to discover which parses can explain
+this data:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(obs <span class="kw">=&gt;</span> x <span class="op">==</span> obs)  <span class="co">// returns Dist&lt;Parse&gt; | null</span></span></code></pre></div>
+<p>There are two potential parses for the same sequence:</p>
+<p>Candidate 1:</p>
+<div class="parse-tree">
+<span class="viz-label">parse</span>
+<svg class="parse-tree-svg" viewBox="0 0 589 246" preserveAspectRatio="xMidYMid meet">
+<style>
+  .tree-text { font-family: monospace; font-size: 14px; }
+  .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
+  .tree-text.terminal { fill: #1d2021; font-weight: 500; }
+  .tree-rect.nonterminal { fill: #458588; }
+  .tree-rect.terminal { fill: #b8bb26; }
+  .tree-line { stroke: #665c54; stroke-width: 2; }
+</style>
+<line class="tree-line" x1="294" y1="36" x2="294" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="535" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="40" y2="60"/>
+<line class="tree-line" x1="281" y1="48" x2="281" y2="60"/>
+<line class="tree-line" x1="535" y1="48" x2="535" y2="60"/>
+<rect class="tree-rect terminal" x="9" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text terminal" x="40" y="78" text-anchor="middle">setup</text>
+<line class="tree-line" x1="281" y1="86" x2="281" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="361" y2="98"/>
+<line class="tree-line" x1="121" y1="98" x2="121" y2="110"/>
+<line class="tree-line" x1="201" y1="98" x2="201" y2="110"/>
+<line class="tree-line" x1="361" y1="98" x2="361" y2="110"/>
+<rect class="tree-rect terminal" x="95" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="121" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="175" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="201" y="128" text-anchor="middle">then</text>
+<line class="tree-line" x1="361" y1="136" x2="361" y2="148"/>
+<line class="tree-line" x1="281" y1="148" x2="441" y2="148"/>
+<line class="tree-line" x1="281" y1="148" x2="281" y2="160"/>
+<line class="tree-line" x1="361" y1="148" x2="361" y2="160"/>
+<line class="tree-line" x1="441" y1="148" x2="441" y2="160"/>
+<rect class="tree-rect terminal" x="255" y="160" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="281" y="178" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="336" y="160" width="50" height="26" rx="4"/>
+<text class="tree-text terminal" x="361" y="178" text-anchor="middle">and</text>
+<rect class="tree-rect terminal" x="415" y="160" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="441" y="178" text-anchor="middle">test</text>
+<rect class="tree-rect nonterminal" x="336" y="110" width="50" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="361" y="128" text-anchor="middle">par</text>
+<rect class="tree-rect nonterminal" x="256" y="60" width="50" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="281" y="78" text-anchor="middle">seq</text>
+<rect class="tree-rect terminal" x="491" y="60" width="88" height="26" rx="4"/>
+<text class="tree-text terminal" x="535" y="78" text-anchor="middle">teardown</text>
+<rect class="tree-rect nonterminal" x="268" y="10" width="52" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="294" y="28" text-anchor="middle">root</text>
+</svg>
+</div>
+<p>Candidate 2:</p>
+<div class="parse-tree">
+<span class="viz-label">parse</span>
+<svg class="parse-tree-svg" viewBox="0 0 589 246" preserveAspectRatio="xMidYMid meet">
+<style>
+  .tree-text { font-family: monospace; font-size: 14px; }
+  .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
+  .tree-text.terminal { fill: #1d2021; font-weight: 500; }
+  .tree-rect.nonterminal { fill: #458588; }
+  .tree-rect.terminal { fill: #b8bb26; }
+  .tree-line { stroke: #665c54; stroke-width: 2; }
+</style>
+<line class="tree-line" x1="294" y1="36" x2="294" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="535" y2="48"/>
+<line class="tree-line" x1="40" y1="48" x2="40" y2="60"/>
+<line class="tree-line" x1="281" y1="48" x2="281" y2="60"/>
+<line class="tree-line" x1="535" y1="48" x2="535" y2="60"/>
+<rect class="tree-rect terminal" x="9" y="60" width="61" height="26" rx="4"/>
+<text class="tree-text terminal" x="40" y="78" text-anchor="middle">setup</text>
+<line class="tree-line" x1="281" y1="86" x2="281" y2="98"/>
+<line class="tree-line" x1="201" y1="98" x2="441" y2="98"/>
+<line class="tree-line" x1="201" y1="98" x2="201" y2="110"/>
+<line class="tree-line" x1="361" y1="98" x2="361" y2="110"/>
+<line class="tree-line" x1="441" y1="98" x2="441" y2="110"/>
+<line class="tree-line" x1="201" y1="136" x2="201" y2="148"/>
+<line class="tree-line" x1="121" y1="148" x2="281" y2="148"/>
+<line class="tree-line" x1="121" y1="148" x2="121" y2="160"/>
+<line class="tree-line" x1="201" y1="148" x2="201" y2="160"/>
+<line class="tree-line" x1="281" y1="148" x2="281" y2="160"/>
+<rect class="tree-rect terminal" x="95" y="160" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="121" y="178" text-anchor="middle">test</text>
+<rect class="tree-rect terminal" x="175" y="160" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="201" y="178" text-anchor="middle">then</text>
+<rect class="tree-rect terminal" x="255" y="160" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="281" y="178" text-anchor="middle">test</text>
+<rect class="tree-rect nonterminal" x="176" y="110" width="50" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="201" y="128" text-anchor="middle">seq</text>
+<rect class="tree-rect terminal" x="336" y="110" width="50" height="26" rx="4"/>
+<text class="tree-text terminal" x="361" y="128" text-anchor="middle">and</text>
+<rect class="tree-rect terminal" x="415" y="110" width="52" height="26" rx="4"/>
+<text class="tree-text terminal" x="441" y="128" text-anchor="middle">test</text>
+<rect class="tree-rect nonterminal" x="256" y="60" width="50" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="281" y="78" text-anchor="middle">par</text>
+<rect class="tree-rect terminal" x="491" y="60" width="88" height="26" rx="4"/>
+<text class="tree-text terminal" x="535" y="78" text-anchor="middle">teardown</text>
+<rect class="tree-rect nonterminal" x="268" y="10" width="52" height="26" rx="4"/>
+<text class="tree-text nonterminal" x="294" y="28" text-anchor="middle">root</text>
+</svg>
+</div>
+<p>That’s why <code>infer(...)</code> returns a probability
+distribution.</p>
+<p>You can imagine the probability distribution looks somewhat like
+this:</p>
+<div class="distribution">
+<span class="viz-label">distribution</span>
+<svg class="distribution-svg" viewBox="0 0 510 155" preserveAspectRatio="xMidYMid meet">
+<rect class="dist-bar-zero" x="10" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="30" y="148" text-anchor="middle">1</text>
+<rect class="dist-bar-zero" x="60" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="80" y="148" text-anchor="middle">2</text>
+<rect class="dist-bar" x="110" y="10" width="40" height="120" rx="2"/>
+<text class="dist-label" x="130" y="148" text-anchor="middle">3</text>
+<rect class="dist-bar-zero" x="160" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="180" y="148" text-anchor="middle">4</text>
+<rect class="dist-bar-zero" x="210" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="230" y="148" text-anchor="middle">5</text>
+<rect class="dist-bar" x="260" y="10" width="40" height="120" rx="2"/>
+<text class="dist-label" x="280" y="148" text-anchor="middle">6</text>
+<rect class="dist-bar-zero" x="310" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="330" y="148" text-anchor="middle">7</text>
+<rect class="dist-bar-zero" x="360" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="380" y="148" text-anchor="middle">8</text>
+<rect class="dist-bar-zero" x="410" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="430" y="148" text-anchor="middle">9</text>
+<rect class="dist-bar-zero" x="460" y="128" width="40" height="2" rx="1"/>
+<text class="dist-label" x="480" y="148" text-anchor="middle">10</text>
+</svg>
+</div>
+<p>Abstracted away is the fact that <code>infer</code> is performing a
+complicated parsing algorithm. It’s giving you access to the
+posterier:</p>
+<p><span class="math display">\[
+P(p | x) \propto P(x | p) P(p)
+\]</span></p>
+<p>Is one more likely than the other? We can compare two likihoods using
+<code>score</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p1<span class="op">,</span> x1)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p2<span class="op">,</span> x2)</span></code></pre></div>
+<h2 id="monte-carlo-tree-search-mcts"><a
+href="#monte-carlo-tree-search-mcts" class="header-anchor">#</a>Monte
+Carlo Tree Search (MCTS)</h2>
+<p><code>G.infer(...)</code> only tells you the next <em>possible
+moves</em>.</p>
+<p>MCTS, on the other hand, finds you the approx. <em>best
+move</em>.</p>
+<p>Don’t get stuck on the name, though.</p>
+<p><span class="math display">\[
+\underbrace{
+  \text{Monte Carlo}
+  \qquad
+  \underbrace{
+    \text{Tree}
+    \qquad
+    \underbrace{\text{Search}}_{\substack{\\[1.0ex]\text{algorithm}}}
+  }_{\substack{\\[1.3ex]\text{uses a tree data structure}}}
+}_{\substack{\\[1.6ex]\text{named after Monte Carlo sampling}}}
+\]</span></p>
+<p>In the algorithm, you construct a tree from scratch, where each path
+from the root represents the sequence of actions you may take.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// root</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span>]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1 -&gt; grandchild_1</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span><span class="op">,</span> <span class="st">&quot;test&quot;</span>] </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1 -&gt; grandchild_1 -&gt; great_grandchild_1</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span><span class="op">,</span> <span class="st">&quot;test&quot;</span><span class="op">,</span> <span class="st">&quot;and&quot;</span>] </span></code></pre></div>
+<p>The algorithm is just 3 steps that repeat many times:</p>
+<ol type="1">
+<li>Pick a promising starting path</li>
+<li>Roll out fully to see where it could end</li>
+<li>Tally up the results</li>
+</ol>
+<p>Let’s take everything we’ve learned, using <code>infer</code>,
+<code>sample</code>, <code>render</code>, and <code>score</code> to
+implement MCTS.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// pick a path in the tree</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>nodes <span class="op">=</span> <span class="fu">pick_path</span>(<span class="bu">root</span>)  <span class="co">// UCB</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">// grow the tree by 1 node</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> nodes[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(_x <span class="kw">=&gt;</span> _x<span class="op">.</span><span class="fu">startsWith</span>(n<span class="op">.</span><span class="at">prefix</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (D<span class="op">==</span><span class="kw">null</span>) <span class="cf">continue</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> D<span class="op">.</span><span class="fu">sample</span>()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fu">nextToken</span>(G<span class="op">.</span><span class="fu">render</span>(p)<span class="op">,</span> n<span class="op">.</span><span class="at">prefix</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>n2 <span class="op">=</span> n<span class="op">.</span><span class="fu">childOrCreate</span>(t)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">// back prop</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(_x <span class="kw">=&gt;</span> _x<span class="op">.</span><span class="fu">startsWith</span>(n2<span class="op">.</span><span class="at">prefix</span>))<span class="op">.</span><span class="fu">sample</span>()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p2<span class="op">,</span> x)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">backprop</span>(path<span class="op">+</span>[n2]<span class="op">,</span> s)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>best<span class="op">=</span><span class="fu">max</span>(best<span class="op">,</span>(s<span class="op">,</span>p2))</span></code></pre></div>
+<h2 id="example"><a href="#example"
+class="header-anchor">#</a>Example</h2>
+<p>The beauty of a grammar model is that you can run forward to generate
+output, or run background to explain output.</p>
+<p>Here’s a naive sandwich-making model that appears straightforward at
+first sight.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>init<span class="op">:</span> <span class="fu">and</span>(spread<span class="op">-</span>pb<span class="op">-</span>on<span class="op">-</span>bread<span class="op">,</span> spread<span class="op">-</span>jelly<span class="op">-</span>on<span class="op">-</span>bread)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>spread<span class="op">-</span>pb<span class="op">-</span>on<span class="op">-</span>bread<span class="op">:</span> <span class="fu">and</span>(bread<span class="op">,</span> pb)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>spread<span class="op">-</span>jelly<span class="op">-</span>on<span class="op">-</span>bread<span class="op">:</span> <span class="fu">and</span>(bread<span class="op">,</span> jelly)</span></code></pre></div>
+<p>You get the sample <code>bread pb bread jelly</code>.</p>
+<p>Notice how the structure is lost.</p>
+<p>Here’s a cool magic trick. Let’s make actions like
+<code>spread</code> and <code>stack</code> into terminals.</p>
+<p>Samples may look like this
+<code>bread pb spread bread jelly spread stack</code>.</p>
+<p>You may argue there is still no structure here; it’s just a flat list
+of words.</p>
+<p>The good news is that if we identify “spread” and “stack” as
+functions, then we can actually represent this sequence of words as a
+valid Forth program.</p>
+<p>Moreover, a static validator can prove the grammar only produces
+valid Forth, guaranteeing correctness by construction.</p>
+<h2 id="monte-carlo-tree-search"><a href="#monte-carlo-tree-search"
+class="header-anchor">#</a>Monte-Carlo Tree Search</h2>
+<h2 class="unnumbered" id="references"><a href="#references"
+class="header-anchor">#</a>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="list">
+<div id="ref-earley" class="csl-entry" role="listitem">
+Earley, Jay. 1968. <span>“An Efficient Context-Free Parsing
+Algorithm.”</span> PhD thesis, Carnegie Mellon University.
+</div>
+<div id="ref-lang-glr" class="csl-entry" role="listitem">
+Lang, Bernard. 1974. <span>“Deterministic Techniques for Efficient
+Non-Deterministic Parsers.”</span> <em>Automata, Languages and
+Programming</em>, Lecture notes in computer science, 14: 255–69.
+</div>
+<div id="ref-mastra-state-machine" class="csl-entry" role="listitem">
+Mastra Team. 2025. <span>“State-Machine Grammar for Agent
+Behavior.”</span> May 2025. <a
+href="https://mastra.ai/blog/changelog-2025-05-07">https://mastra.ai/blog/changelog-2025-05-07</a>.
+</div>
+<div id="ref-llama-grammar" class="csl-entry" role="listitem">
+Maurer, Iwan. 2023. <span>“Grammar-Constrained Decoding for Local
+LLMs.”</span> 2023. <a
+href="https://www.imaurer.com">https://www.imaurer.com</a>.
+</div>
+<div id="ref-openai-cfg" class="csl-entry" role="listitem">
+OpenAI. 2025. <span>“GPT-5 New Parameters and Tools: Context-Free
+Grammar Support.”</span> August 2025. <a
+href="https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools">https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools</a>.
+</div>
+<div id="ref-tomita-glr" class="csl-entry" role="listitem">
+Tomita, Masaru. 1986. <em>Efficient Parsing for Natural Language: A Fast
+Algorithm for Practical Systems</em>. Kluwer Academic Publishers.
+</div>
+<div id="ref-cyk" class="csl-entry" role="listitem">
+Younger, Daniel H. 1967. <span>“Recognition and Parsing of Context-Free
+Languages in Time n<sup>3</sup>.”</span> <em>Information and
+Control</em> 10 (2): 189–208.
+</div>
+</div>
+</body>
+</html>

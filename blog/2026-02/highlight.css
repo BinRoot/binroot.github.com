@@ -1,0 +1,30 @@
+/* Pandoc syntax highlighting - dark mode friendly */
+code span.al { color: #ff6b6b; font-weight: bold; } /* Alert */
+code span.an { color: #87ceeb; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #b8bb26; } /* Attribute */
+code span.bn { color: #8ec07c; } /* BaseN */
+code span.bu { color: #8ec07c; } /* BuiltIn */
+code span.cf { color: #fb4934; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #b8bb26; } /* Char */
+code span.cn { color: #fe8019; } /* Constant */
+code span.co { color: #928374; font-style: italic; } /* Comment */
+code span.cv { color: #87ceeb; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #87ceeb; font-style: italic; } /* Documentation */
+code span.dt { color: #fabd2f; } /* DataType */
+code span.dv { color: #d3869b; } /* DecVal */
+code span.er { color: #ff6b6b; font-weight: bold; } /* Error */
+code span.ex { color: #8ec07c; } /* Extension */
+code span.fl { color: #d3869b; } /* Float */
+code span.fu { color: #83a598; } /* Function - light blue */
+code span.im { color: #8ec07c; font-weight: bold; } /* Import */
+code span.in { color: #87ceeb; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #fb4934; font-weight: bold; } /* Keyword */
+code span.op { color: #a89984; } /* Operator */
+code span.ot { color: #83a598; } /* Other */
+code span.pp { color: #fe8019; } /* Preprocessor */
+code span.sc { color: #b8bb26; } /* SpecialChar */
+code span.ss { color: #d3869b; } /* SpecialString */
+code span.st { color: #b8bb26; } /* String */
+code span.va { color: #83a598; } /* Variable */
+code span.vs { color: #b8bb26; } /* VerbatimString */
+code span.wa { color: #fabd2f; font-weight: bold; font-style: italic; } /* Warning */
