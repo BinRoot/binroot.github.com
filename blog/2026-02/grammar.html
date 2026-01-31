@@ -105,19 +105,997 @@
       margin-left: 2em;
     }  </style>
   <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
-  <link rel="stylesheet" href="timeline.css" />
-  <link rel="stylesheet" href="highlight.css" />
-  <link rel="stylesheet" href="grammar-viz.css" />
-  <link rel="stylesheet" href="header.css" />
-  <link rel="stylesheet" href="anchor.css" />
-  <link rel="stylesheet" href="scfg-interactive.css" />
+  
+<!-- inlined timeline.css -->
+<style data-href="timeline.css">
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: calc(0.5rem + 5px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent, #0066cc), var(--accent-hover, #004499));
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 0.35rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg, #fff);
+  border: 2px solid var(--accent, #0066cc);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.timeline-item:hover::before {
+  transform: scale(1.3);
+  background: var(--accent, #0066cc);
+}
+
+.timeline-year {
+  display: inline-block;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent, #0066cc);
+  min-width: 5ch;
+}
+
+.timeline-era {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-skip {
+  color: var(--text-light, #666);
+  font-style: italic;
+}
+
+/* Hide the circle bullet for skip items */
+.timeline-skip::before {
+  display: none;
+}
+
+/* Cover the straight line and draw zig-zag */
+.timeline-skip::after {
+  content: '';
+  position: absolute;
+  left: calc(-1.5rem + 5px - 7px);
+  top: -0.5rem;
+  width: 16px;
+  height: calc(100% + 1rem);
+  background-color: var(--bg, #fff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='48' viewBox='0 0 16 48' preserveAspectRatio='none'%3E%3Cpath d='M8 0 L8 8 L12 16 L4 24 L12 32 L4 40 L8 48' stroke='%23ffb300' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 100%;
+  background-position: center;
+}
+
+.timeline-subitem {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: 0.75rem;
+  margin-left: 0.5rem;
+  border-left: 1px dashed var(--border, #ccc);
+}
+
+.timeline-subitem:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-subitem::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0.45rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border, #ccc);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .timeline {
+    padding-left: 1.5rem;
+  }
+
+  .timeline::before {
+    left: calc(0.25rem + 4px);
+  }
+
+  .timeline-item {
+    padding-left: 1rem;
+  }
+
+  .timeline-item::before {
+    left: -1.25rem;
+    width: 10px;
+    height: 10px;
+  }
+
+  .timeline-year {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+}
+
+</style>
+
+  
+<!-- inlined highlight.css -->
+<style data-href="highlight.css">
+:root {
+  --link-color: #83a598;
+}
+
+/* Pandoc syntax highlighting - dark mode friendly */
+code span.al { color: #ff6b6b; font-weight: bold; } /* Alert */
+code span.an { color: #87ceeb; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #b8bb26; } /* Attribute */
+code span.bn { color: #8ec07c; } /* BaseN */
+code span.bu { color: #8ec07c; } /* BuiltIn */
+code span.cf { color: #fb4934; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #b8bb26; } /* Char */
+code span.cn { color: #fe8019; } /* Constant */
+code span.co { color: #928374; font-style: italic; } /* Comment */
+code span.cv { color: #87ceeb; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #87ceeb; font-style: italic; } /* Documentation */
+code span.dt { color: #fabd2f; } /* DataType */
+code span.dv { color: #d3869b; } /* DecVal */
+code span.er { color: #ff6b6b; font-weight: bold; } /* Error */
+code span.ex { color: #8ec07c; } /* Extension */
+code span.fl { color: #d3869b; } /* Float */
+code span.fu { color: #83a598; } /* Function - light blue */
+code span.im { color: #8ec07c; font-weight: bold; } /* Import */
+code span.in { color: #87ceeb; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #fb4934; font-weight: bold; } /* Keyword */
+code span.op { color: #a89984; } /* Operator */
+code span.ot { color: #83a598; } /* Other */
+code span.pp { color: #fe8019; } /* Preprocessor */
+code span.sc { color: #b8bb26; } /* SpecialChar */
+code span.ss { color: #d3869b; } /* SpecialString */
+code span.st { color: #b8bb26; } /* String */
+code span.va { color: #83a598; } /* Variable */
+code span.vs { color: #b8bb26; } /* VerbatimString */
+code span.wa { color: #fabd2f; font-weight: bold; font-style: italic; } /* Warning */
+
+/* Keyword highlighting in code blocks */
+mark.keyword-highlight {
+  background: rgba(131, 165, 152, 0.35);
+  color: inherit;
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: 0 -1px;
+  box-shadow: 0 0 0 1px rgba(131, 165, 152, 0.6);
+}
+
+/* Bibliography citation links */
+.citation a,
+.citation a:visited,
+a[role="doc-biblioref"],
+a[role="doc-biblioref"]:visited {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.citation a:hover,
+a[role="doc-biblioref"]:hover {
+  text-decoration: underline;
+}
+
+/* Reduce gap between paragraph and following list */
+p + ul,
+p + ol {
+  margin-top: -0.5em;
+}
+
+</style>
+
+  
+<!-- inlined grammar-viz.css -->
+<style data-href="grammar-viz.css">
+/* Visualization label */
+.viz-label {
+  display: block;
+  font-family: monospace;
+  font-size: 0.75em;
+  color: #a89984;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75em;
+}
+
+/* Grammar rule visualization */
+.grammar-graph {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grammar-rule {
+  display: flex;
+  align-items: flex-start;
+  margin: 0.5em 0;
+  font-family: monospace;
+  font-size: 1.1em;
+}
+
+.grammar-lhs {
+  color: #83a598;
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.grammar-arrow {
+  color: #a89984;
+  margin: 0 0.5em;
+}
+
+.grammar-rhs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.grammar-alt {
+  display: flex;
+  gap: 0.4em;
+}
+
+.grammar-pipe {
+  color: #fe8019;
+  margin: 0 0.3em;
+  font-weight: bold;
+}
+
+.grammar-terminal {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.grammar-nonterminal {
+  background: #458588;
+  color: #ebdbb2;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+/* Parse tree visualization */
+.parse-tree {
+  margin: 1.5em 0;
+  padding: 1.5em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.parse-tree-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+}
+
+/* Render yield visualization */
+.render-yield {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-items: center;
+  font-family: monospace;
+}
+
+.render-yield .viz-label {
+  flex-basis: 100%;
+}
+
+.yield-token {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.25em 0.6em;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Distribution histogram */
+.distribution {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.distribution-svg {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.dist-bar {
+  fill: #83a598;
+}
+
+.dist-bar-zero {
+  fill: #504945;
+}
+
+.dist-label {
+  font-family: monospace;
+  font-size: 12px;
+  fill: #a89984;
+}
+
+</style>
+
+  
+<!-- inlined header.css -->
+<style data-href="header.css">
+/* Header title spacing */
+#title-block-header {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  background: none;
+  border: none;
+}
+
+#title-block-header .title {
+  margin-bottom: 0.5rem;
+}
+
+/* Header meta row: home left, author/date right */
+.header-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-link,
+.home-link:visited {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
+
+.header-meta {
+  color: var(--text-light);
+}
+
+.meta-sep {
+  opacity: 0.5;
+  margin: 0 0.35rem;
+}
+
+/* References section */
+#refs {
+  padding-bottom: 4rem;
+}
+
+</style>
+
+  
+<!-- inlined anchor.css -->
+<style data-href="anchor.css">
+/* Header anchor links */
+.header-anchor {
+  opacity: 0;
+  text-decoration: none;
+  color: var(--text-light);
+  font-weight: normal;
+  transition: opacity 0.15s ease;
+  margin-right: 0.4em;
+}
+
+h1:hover .header-anchor,
+h2:hover .header-anchor,
+h3:hover .header-anchor,
+h4:hover .header-anchor,
+h5:hover .header-anchor,
+h6:hover .header-anchor {
+  opacity: 1;
+}
+
+.header-anchor:hover {
+  color: var(--accent);
+}
+
+</style>
+
+  
+<!-- inlined scfg-interactive.css -->
+<style data-href="scfg-interactive.css">
+/* SCFG Interactive Editor Styles */
+
+/* Override simple.css button styles */
+.scfg-editor button {
+  background: #3c3836;
+  color: #ebdbb2;
+  border: 1px solid #665c54;
+  box-shadow: none;
+}
+
+.scfg-editor button:hover {
+  background: #504945;
+  color: #ebdbb2;
+  border-color: #83a598;
+}
+
+.scfg-editor button:active {
+  background: #504945;
+  color: #ebdbb2;
+}
+
+.scfg-editor {
+  margin: 1.5em 0;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scfg-editor-title {
+  font-size: 0.75em;
+  color: #a89984;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1em;
+}
+
+/* Grammar display */
+.scfg-grammar {
+  font-family: monospace;
+  font-size: 1.1em;
+  margin-bottom: 1em;
+  padding: 1em;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.scfg-rule {
+  margin: 0.5em 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.scfg-rule-init .scfg-lhs {
+  color: #fabd2f;
+  font-weight: bold;
+}
+
+.scfg-lhs {
+  color: #83a598;
+  font-weight: bold;
+  min-width: 60px;
+}
+
+.scfg-arrow {
+  color: #a89984;
+}
+
+.scfg-rhs {
+  flex: 1;
+}
+
+.scfg-terminal {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.scfg-nonterminal {
+  background: #458588;
+  color: #ebdbb2;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  font-style: italic;
+}
+
+.scfg-epsilon {
+  color: #928374;
+  font-style: italic;
+}
+
+.scfg-pipe {
+  color: #fe8019;
+  margin: 0 0.3em;
+  font-weight: bold;
+}
+
+.scfg-weight {
+  color: #928374;
+  font-size: 0.8em;
+  margin-left: 0.2em;
+}
+
+.scfg-maybe-p {
+  color: #d3869b;
+  font-size: 0.85em;
+}
+
+.scfg-and, .scfg-or, .scfg-maybe {
+  display: inline;
+}
+
+/* History controls */
+.scfg-history {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  flex-wrap: wrap;
+}
+
+.scfg-history-label {
+  color: #a89984;
+  font-size: 0.9em;
+  margin-right: 0.5em;
+}
+
+.scfg-btn {
+  padding: 0.3em 0.7em;
+  border: 1px solid #665c54;
+  background: #3c3836;
+  color: #ebdbb2;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: all 0.15s ease;
+}
+
+.scfg-btn:hover {
+  background: #504945;
+  border-color: #83a598;
+}
+
+.scfg-btn-reset {
+  margin-left: auto;
+  border-color: #cc241d;
+  color: #fb4934;
+}
+
+.scfg-btn-reset:hover {
+  background: #cc241d;
+  color: #1d2021;
+}
+
+/* Category filter */
+.scfg-category-filter {
+  display: flex;
+  gap: 0.3em;
+  margin-bottom: 0.75em;
+  flex-wrap: wrap;
+}
+
+.scfg-category-btn {
+  padding: 0.25em 0.6em;
+  border: 1px solid #504945;
+  background: transparent;
+  color: #a89984;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8em;
+  text-transform: capitalize;
+  transition: all 0.15s ease;
+}
+
+.scfg-category-btn:hover {
+  border-color: #83a598;
+  color: #ebdbb2;
+}
+
+.scfg-category-btn.active {
+  background: #83a598;
+  color: #1d2021;
+  border-color: #83a598;
+}
+
+/* Edit buttons */
+.scfg-edits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scfg-edit-btn {
+  padding: 0.5em 0.8em;
+  border: 1px solid #504945;
+  background: #282828;
+  color: #ebdbb2;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+}
+
+.scfg-edit-btn:hover {
+  background: #3c3836;
+  border-color: #83a598;
+  color: #ebdbb2;
+}
+
+/* Edit category colors */
+.scfg-edit-wrap {
+  border-left: 3px solid #d3869b;
+}
+
+.scfg-edit-extend {
+  border-left: 3px solid #b8bb26;
+}
+
+.scfg-edit-choice {
+  border-left: 3px solid #fe8019;
+}
+
+.scfg-edit-replace {
+  border-left: 3px solid #83a598;
+}
+
+.scfg-edit-delete {
+  border-left: 3px solid #fb4934;
+}
+
+.scfg-edit-unwrap {
+  border-left: 3px solid #928374;
+}
+
+.scfg-edit-rule {
+  border-left: 3px solid #fabd2f;
+}
+
+.scfg-more {
+  color: #928374;
+  font-size: 0.85em;
+  font-style: italic;
+  padding: 0.5em;
+}
+
+/* Sample section */
+.scfg-sample {
+  margin-bottom: 1em;
+  padding: 0.75em;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+
+.scfg-btn-sample {
+  background: #458588;
+  border-color: #458588;
+  color: #ebdbb2;
+  margin-right: 0.5em;
+}
+
+.scfg-btn-sample:hover {
+  background: #83a598;
+  border-color: #83a598;
+  color: #1d2021;
+}
+
+.scfg-btn-clear-samples {
+  background: transparent;
+  border-color: #665c54;
+  color: #a89984;
+}
+
+.scfg-btn-clear-samples:hover {
+  border-color: #928374;
+  color: #ebdbb2;
+}
+
+.scfg-sample-output {
+  margin-top: 0.75em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.scfg-sample-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+  padding: 0.4em 0.6em;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.scfg-sample-num {
+  color: #665c54;
+  font-size: 0.8em;
+  min-width: 2em;
+}
+
+.scfg-sample-token {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.scfg-sample-empty {
+  color: #928374;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+.scfg-btn-exec {
+  margin-left: auto;
+  padding: 0.2em 0.5em;
+  font-size: 0.8em;
+  background: transparent;
+  border-color: #665c54;
+}
+
+.scfg-btn-exec:hover {
+  background: #458588;
+  border-color: #458588;
+}
+
+/* Execution animation */
+.scfg-execution {
+  margin-top: 1em;
+  padding: 1em;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid #458588;
+}
+
+.scfg-exec-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin-bottom: 1em;
+  padding: 0.75em;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.scfg-exec-token {
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+  background: #504945;
+  color: #a89984;
+  font-size: 0.9em;
+  transition: all 0.3s ease;
+}
+
+.scfg-exec-token.consumed {
+  background: #3c3836;
+  color: #665c54;
+  text-decoration: line-through;
+}
+
+.scfg-exec-token.current {
+  background: #fabd2f;
+  color: #1d2021;
+  font-weight: bold;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(250, 189, 47, 0.5);
+}
+
+.scfg-exec-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin-bottom: 1em;
+}
+
+.scfg-exec-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.75em;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 3px solid #665c54;
+  transition: all 0.3s ease;
+}
+
+.scfg-exec-step.current {
+  background: rgba(131, 165, 152, 0.2);
+  border-left-color: #83a598;
+}
+
+.scfg-exec-step-num {
+  color: #665c54;
+  font-size: 0.85em;
+  min-width: 1.5em;
+}
+
+.scfg-exec-step-desc {
+  color: #ebdbb2;
+  font-size: 0.95em;
+}
+
+.scfg-exec-step.current .scfg-exec-step-desc {
+  color: #83a598;
+  font-weight: 500;
+}
+
+.scfg-exec-result {
+  padding: 0.75em 1em;
+  background: rgba(184, 187, 38, 0.15);
+  border: 1px solid #b8bb26;
+  border-radius: 4px;
+  color: #b8bb26;
+  font-family: monospace;
+  font-size: 0.9em;
+  margin-bottom: 1em;
+  word-break: break-all;
+}
+
+.scfg-exec-result strong {
+  color: #ebdbb2;
+}
+
+.scfg-exec-controls {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+/* Scrollbar styling */
+.scfg-edits::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scfg-edits::-webkit-scrollbar-track {
+  background: #282828;
+  border-radius: 3px;
+}
+
+.scfg-edits::-webkit-scrollbar-thumb {
+  background: #504945;
+  border-radius: 3px;
+}
+
+.scfg-edits::-webkit-scrollbar-thumb:hover {
+  background: #665c54;
+}
+
+/* Infer mode styles */
+.scfg-targets-label,
+.scfg-samples-label,
+.scfg-grammar-label {
+  font-size: 0.75em;
+  color: #a89984;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5em;
+}
+
+.scfg-target-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+  padding: 0.4em 0.6em;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  margin-bottom: 0.3em;
+  font-family: monospace;
+}
+
+.scfg-target-num {
+  color: #83a598;
+  font-weight: bold;
+  min-width: 1.5em;
+}
+
+/* Progress bar */
+.scfg-progress-container {
+  margin-bottom: 1em;
+}
+
+.scfg-progress-bar {
+  height: 8px;
+  background: #3c3836;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5em;
+}
+
+.scfg-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #458588, #83a598);
+  border-radius: 4px;
+  transition: width 0.1s ease;
+}
+
+.scfg-progress-text {
+  font-size: 0.85em;
+  color: #a89984;
+}
+
+.scfg-progress-text strong {
+  color: #ebdbb2;
+}
+
+.scfg-infer-controls {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.scfg-novel-runner {
+  margin-top: 1.2em;
+}
+
+/* Match highlighting */
+.scfg-sample-match {
+  background: rgba(184, 187, 38, 0.15) !important;
+  border: 1px solid rgba(184, 187, 38, 0.3);
+}
+
+.scfg-match-badge {
+  background: #b8bb26;
+  color: #1d2021;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  font-size: 0.75em;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+</style>
+
   <script
     src="https://cdn.counter.dev/script.js"
     data-id="476c224d-08f5-44d4-a25a-005e5c890f79"
     data-utcoffset="-7"
     defer
   ></script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
   type="text/javascript"></script>
@@ -727,7 +1705,2104 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
   <div class="scfg-category-filter"></div>
   <div class="scfg-edits"></div>
 </div>
-<script src="scfg-interactive.js"></script>
+
+<!-- inlined scfg-interactive.js -->
+<script>
+// scfg-interactive.js
+// Interactive SCFG editor for the blog post
+
+(function() {
+  'use strict';
+
+  // ===== SCFG Types & Helpers =====
+
+  function and(...parts) {
+    return { kind: 'and', parts };
+  }
+
+  function or(...args) {
+    const last = args[args.length - 1];
+    const hasWeights = Array.isArray(last) && last.every(x => typeof x === 'number');
+    if (hasWeights) {
+      const weights = last;
+      const alts = args.slice(0, -1);
+      return { kind: 'or', alts, weights };
+    }
+    return { kind: 'or', alts: args };
+  }
+
+  function maybe(expr, p) {
+    return { kind: 'maybe', expr, p };
+  }
+
+  function isAnd(x) {
+    return x && typeof x === 'object' && x.kind === 'and' && Array.isArray(x.parts);
+  }
+
+  function isOr(x) {
+    return x && typeof x === 'object' && x.kind === 'or' && Array.isArray(x.alts);
+  }
+
+  function isMaybe(x) {
+    return x && typeof x === 'object' && x.kind === 'maybe' && 'expr' in x;
+  }
+
+  function clone(v) {
+    // Faster and more correct than JSON cloning (handles undefined, Dates, etc).
+    // Supported in modern browsers; keep JSON fallback for older ones.
+    if (typeof structuredClone === 'function') return structuredClone(v);
+    return JSON.parse(JSON.stringify(v));
+  }
+
+  function epsilon() {
+    return and();
+  }
+
+  // ===== Rendering =====
+
+  function renderExpr(expr, ruleNames, depth = 0) {
+    if (typeof expr === 'string') {
+      const isNonTerminal = ruleNames.has(expr);
+      const cls = isNonTerminal ? 'scfg-nonterminal' : 'scfg-terminal';
+      return `<span class="${cls}">${escapeHtml(expr)}</span>`;
+    }
+
+    if (isAnd(expr)) {
+      if (expr.parts.length === 0) {
+        return `<span class="scfg-epsilon">ε</span>`;
+      }
+      const parts = expr.parts.map(p => renderExpr(p, ruleNames, depth + 1)).join(' ');
+      return depth > 0 ? `<span class="scfg-and">(${parts})</span>` : `<span class="scfg-and">${parts}</span>`;
+    }
+
+    if (isOr(expr)) {
+      if (expr.alts.length === 0) {
+        return `<span class="scfg-epsilon">ε</span>`;
+      }
+      const alts = expr.alts.map((a, i) => {
+        const w = expr.weights ? expr.weights[i] : null;
+        const wStr = w !== null ? `<span class="scfg-weight">[${(w * 100).toFixed(0)}%]</span>` : '';
+        return renderExpr(a, ruleNames, depth + 1) + wStr;
+      }).join(' <span class="scfg-pipe">|</span> ');
+      return `<span class="scfg-or">(${alts})</span>`;
+    }
+
+    if (isMaybe(expr)) {
+      const inner = renderExpr(expr.expr, ruleNames, depth + 1);
+      return `<span class="scfg-maybe">${inner}<span class="scfg-maybe-p">?<sub>${(expr.p * 100).toFixed(0)}%</sub></span></span>`;
+    }
+
+    return `<span class="scfg-unknown">?</span>`;
+  }
+
+  function renderGrammar(model) {
+    const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+    let html = '';
+    for (const [name, expr] of Object.entries(model)) {
+      const isInit = name === 'init';
+      html += `<div class="scfg-rule${isInit ? ' scfg-rule-init' : ''}">`;
+      html += `<span class="scfg-lhs">${escapeHtml(name)}</span>`;
+      html += `<span class="scfg-arrow">→</span>`;
+      html += `<span class="scfg-rhs">${renderExpr(expr, ruleNames)}</span>`;
+      html += `</div>`;
+    }
+    return html;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ===== Forth Interpreter with Animation =====
+
+  const forthWords = {
+    spread: {
+      arity: 2,
+      execute: (stack) => {
+        const topping = stack.pop();
+        const base = stack.pop();
+        return { result: `(${base} + ${topping})`, description: `spread ${topping} on ${base}` };
+      }
+    },
+    stack: {
+      arity: 2,
+      execute: (stack) => {
+        const top = stack.pop();
+        const bottom = stack.pop();
+        return { result: `[${bottom} | ${top}]`, description: `stack ${top} on top of ${bottom}` };
+      }
+    },
+    cut: {
+      arity: 1,
+      execute: (stack) => {
+        const sandwich = stack.pop();
+        return { result: `${sandwich} / cut`, description: `cut the sandwich` };
+      }
+    },
+    'cut-diagonal': {
+      arity: 1,
+      execute: (stack) => {
+        const sandwich = stack.pop();
+        return { result: `${sandwich} \\ cut`, description: `cut diagonally` };
+      }
+    },
+    'cut-horizontal': {
+      arity: 1,
+      execute: (stack) => {
+        const sandwich = stack.pop();
+        return { result: `${sandwich} - cut`, description: `cut horizontally` };
+      }
+    },
+    'no-cut': {
+      arity: 0,
+      execute: () => {
+        return { result: null, description: `leave whole (no cut)` };
+      }
+    }
+  };
+
+  // Pretty names for ingredients
+  const prettyNames = {
+    'bread': 'bread',
+    'crunchy': 'crunchy peanut butter',
+    'smooth': 'smooth peanut butter',
+    'grape': 'grape jelly',
+    'strawberry': 'strawberry jelly',
+  };
+
+  function getPrettyName(token) {
+    return prettyNames[token] || token;
+  }
+
+  function executeForthSteps(tokens) {
+    const steps = [];
+    const stack = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      const word = forthWords[token];
+
+      if (word) {
+        // It's a function
+        if (stack.length >= word.arity) {
+          const { result, description } = word.execute(stack);
+          if (result !== null) {
+            stack.push(result);
+          }
+          steps.push({
+            type: 'execute',
+            token,
+            description,
+            stackBefore: [...stack.slice(0, -1), '...'],
+            stackAfter: [...stack],
+            consumed: tokens.slice(0, i + 1),
+            remaining: tokens.slice(i + 1)
+          });
+        }
+      } else {
+        // It's a value - push to stack
+        stack.push(getPrettyName(token));
+        steps.push({
+          type: 'push',
+          token,
+          description: `get ${getPrettyName(token)}`,
+          stackAfter: [...stack],
+          consumed: tokens.slice(0, i + 1),
+          remaining: tokens.slice(i + 1)
+        });
+      }
+    }
+
+    return { steps, finalStack: stack };
+  }
+
+  // ===== Sampling =====
+
+  function sample(model) {
+    const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+    const MAX_EXPAND_DEPTH = 200;
+
+    function normalizeWeights(ws, n) {
+      if (!ws || ws.length !== n) return Array.from({ length: n }, () => 1 / n);
+      const clipped = ws.map(w => Number.isFinite(w) ? Math.max(0, w) : 0);
+      const sum = clipped.reduce((a, b) => a + b, 0);
+      if (sum <= 0) return Array.from({ length: n }, () => 1 / n);
+      return clipped.map(w => w / sum);
+    }
+
+    function pickIndex(weights) {
+      const r = Math.random();
+      let acc = 0;
+      for (let i = 0; i < weights.length; i++) {
+        acc += weights[i];
+        if (r <= acc) return i;
+      }
+      return weights.length - 1;
+    }
+
+    function expand(expr, depthLeft, callStack) {
+      if (depthLeft <= 0) return [];
+      if (typeof expr === 'string') {
+        if (ruleNames.has(expr)) {
+          // Prevent infinite recursion / stack overflows if the model becomes cyclic.
+          if (callStack.has(expr)) return [];
+          callStack.add(expr);
+          const out = expand(model[expr], depthLeft - 1, callStack);
+          callStack.delete(expr);
+          return out;
+        }
+        return [expr];
+      }
+
+      if (isAnd(expr)) {
+        const out = [];
+        for (const part of expr.parts) out.push(...expand(part, depthLeft - 1, callStack));
+        return out;
+      }
+
+      if (isOr(expr)) {
+        if (expr.alts.length === 0) return [];
+        if (expr.alts.length === 1) return expand(expr.alts[0], depthLeft - 1, callStack);
+        const weights = normalizeWeights(expr.weights, expr.alts.length);
+        const choice = pickIndex(weights);
+        return expand(expr.alts[choice], depthLeft - 1, callStack);
+      }
+
+      if (isMaybe(expr)) {
+        const p = Math.max(0, Math.min(1, expr.p));
+        if (Math.random() > p) return [];
+        return expand(expr.expr, depthLeft - 1, callStack);
+      }
+
+      return [];
+    }
+
+    return expand(model.init, MAX_EXPAND_DEPTH, new Set());
+  }
+
+  // ===== Edit Operations (simplified from successors.ts) =====
+
+  function getAtPath(root, path) {
+    let cur = root;
+    for (const seg of path) cur = cur[seg];
+    return cur;
+  }
+
+  function setAtPath(root, path, value) {
+    if (path.length === 0) throw new Error('Empty path');
+    let cur = root;
+    for (let i = 0; i < path.length - 1; i++) cur = cur[path[i]];
+    cur[path[path.length - 1]] = value;
+  }
+
+  function* walkExpr(node, path = []) {
+    yield { node, path };
+    if (typeof node === 'string') return;
+    if (isAnd(node)) {
+      for (let i = 0; i < node.parts.length; i++) {
+        yield* walkExpr(node.parts[i], [...path, 'parts', i]);
+      }
+    } else if (isOr(node)) {
+      for (let i = 0; i < node.alts.length; i++) {
+        yield* walkExpr(node.alts[i], [...path, 'alts', i]);
+      }
+    } else if (isMaybe(node)) {
+      yield* walkExpr(node.expr, [...path, 'expr']);
+    }
+  }
+
+  function normalizeWeights(ws) {
+    if (ws.length === 0) return [];
+    const sum = ws.reduce((a, b) => a + Math.max(0, b), 0);
+    if (sum <= 0) return ws.map(() => 1 / ws.length);
+    return ws.map(w => Math.max(0, w) / sum);
+  }
+
+  function deleteAndChild(node, index) {
+    const parts = node.parts.slice();
+    parts.splice(index, 1);
+    if (parts.length === 0) return epsilon();
+    if (parts.length === 1) return parts[0];
+    return { kind: 'and', parts };
+  }
+
+  function deleteOrAlt(node, index) {
+    const alts = node.alts.slice();
+    alts.splice(index, 1);
+    if (alts.length === 0) return epsilon();
+    if (alts.length === 1) return alts[0];
+    const ws = (node.weights || alts.map(() => 1)).slice();
+    ws.splice(index, 1);
+    return { kind: 'or', alts, weights: normalizeWeights(ws) };
+  }
+
+  // Generate a curated list of interesting edits for the UI
+  function generateEdits(model, symbolPool) {
+    const edits = [];
+    const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+
+    for (const rule of Object.keys(model)) {
+      const rhs = model[rule];
+
+      for (const { node, path } of walkExpr(rhs)) {
+        // Wrap with maybe (make optional)
+        edits.push({
+          label: `Make "${pathToString(rule, path, node)}" optional`,
+          category: 'wrap',
+          apply: () => {
+            const next = clone(model);
+            const wrapped = maybe(clone(node), 0.5);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          }
+        });
+
+        // Wrap with and (add sibling)
+        for (const atom of symbolPool.slice(0, 5)) {
+          edits.push({
+            label: `Add "${atom}" after "${pathToString(rule, path, node)}"`,
+            category: 'extend',
+            apply: () => {
+              const next = clone(model);
+              const wrapped = and(clone(node), atom);
+              if (path.length === 0) next[rule] = wrapped;
+              else setAtPath(next[rule], path, wrapped);
+              return next;
+            }
+          });
+        }
+
+        // Wrap with or (add alternative)
+        for (const atom of symbolPool.slice(0, 3)) {
+          edits.push({
+            label: `Add "${atom}" as alternative to "${pathToString(rule, path, node)}"`,
+            category: 'choice',
+            apply: () => {
+              const next = clone(model);
+              const wrapped = or(clone(node), atom);
+              if (path.length === 0) next[rule] = wrapped;
+              else setAtPath(next[rule], path, wrapped);
+              return next;
+            }
+          });
+        }
+
+        // Replace atom
+        if (typeof node === 'string') {
+          // Include both symbols and existing rule names as replacement options
+          const ruleNamesForReplace = Object.keys(model).filter(k => k !== 'init' && k !== node);
+          const allReplacements = [...new Set([...symbolPool, ...ruleNamesForReplace])].filter(s => s !== node);
+
+          for (const sym of allReplacements) {
+            const isRuleRef = ruleNames.has(sym);
+            edits.push({
+              label: `Replace "${node}" with "${sym}"${isRuleRef ? ' (rule)' : ''} in ${rule}`,
+              category: 'replace',
+              apply: () => {
+                const next = clone(model);
+                if (path.length === 0) next[rule] = sym;
+                else setAtPath(next[rule], path, sym);
+                return next;
+              }
+            });
+          }
+        }
+
+        // Unwrap maybe
+        if (isMaybe(node)) {
+          edits.push({
+            label: `Make "${pathToString(rule, path, node)}" required`,
+            category: 'unwrap',
+            apply: () => {
+              const next = clone(model);
+              if (path.length === 0) next[rule] = node.expr;
+              else setAtPath(next[rule], path, node.expr);
+              return next;
+            }
+          });
+        }
+
+        // Delete from and
+        if (isAnd(node) && node.parts.length > 1) {
+          for (let i = 0; i < node.parts.length; i++) {
+            const child = node.parts[i];
+            const childStr = typeof child === 'string' ? child : '(...)';
+            edits.push({
+              label: `Remove "${childStr}" from sequence in ${rule}`,
+              category: 'delete',
+              apply: () => {
+                const next = clone(model);
+                const replaced = deleteAndChild(clone(node), i);
+                if (path.length === 0) next[rule] = replaced;
+                else setAtPath(next[rule], path, replaced);
+                return next;
+              }
+            });
+          }
+        }
+
+        // Delete from or
+        if (isOr(node) && node.alts.length > 1) {
+          for (let i = 0; i < node.alts.length; i++) {
+            const alt = node.alts[i];
+            const altStr = typeof alt === 'string' ? alt : '(...)';
+            edits.push({
+              label: `Remove "${altStr}" alternative from ${rule}`,
+              category: 'delete',
+              apply: () => {
+                const next = clone(model);
+                const replaced = deleteOrAlt(clone(node), i);
+                if (path.length === 0) next[rule] = replaced;
+                else setAtPath(next[rule], path, replaced);
+                return next;
+              }
+            });
+          }
+        }
+      }
+    }
+
+    // Add new rule
+    const newRuleName = findNewRuleName(model);
+    for (const atom of symbolPool.slice(0, 3)) {
+      edits.push({
+        label: `Create new rule "${newRuleName}" → ${atom}`,
+        category: 'rule',
+        apply: () => {
+          const next = clone(model);
+          next[newRuleName] = atom;
+          return next;
+        }
+      });
+    }
+
+    return edits;
+  }
+
+  function findNewRuleName(model) {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (const letter of letters) {
+      if (!(letter in model)) return letter;
+    }
+    return 'X' + Date.now();
+  }
+
+  function pathToString(rule, path, node) {
+    if (typeof node === 'string') return node;
+    if (isAnd(node)) return '(' + node.parts.map(p => typeof p === 'string' ? p : '...').join(' ') + ')';
+    if (isOr(node)) return '(' + node.alts.map(a => typeof a === 'string' ? a : '...').join('|') + ')';
+    if (isMaybe(node)) return (typeof node.expr === 'string' ? node.expr : '...') + '?';
+    return '?';
+  }
+
+  // ===== Interactive Component =====
+
+  function initSCFGEditor(container, initialModel, symbolPool, mode) {
+    let model = clone(initialModel);
+    let history = [clone(model)];
+    let historyIndex = 0;
+    let samples = [];
+
+    const canEdit = mode === 'edit' || mode === 'both';
+    const canRun = mode === 'run' || mode === 'both';
+
+    const grammarEl = container.querySelector('.scfg-grammar');
+    const editsEl = container.querySelector('.scfg-edits');
+    const historyEl = container.querySelector('.scfg-history');
+    const categoryFilter = container.querySelector('.scfg-category-filter');
+    const sampleEl = container.querySelector('.scfg-sample');
+
+    let selectedCategory = 'all';
+
+    function render() {
+      // Render grammar
+      grammarEl.innerHTML = renderGrammar(model);
+
+      // Render history (only in edit mode)
+      if (canEdit) {
+        historyEl.style.display = '';
+        historyEl.innerHTML = `<span class="scfg-history-label">Edit ${historyIndex}/${history.length - 1}</span>`;
+        if (historyIndex > 0) {
+          const undoBtn = document.createElement('button');
+          undoBtn.className = 'scfg-btn scfg-btn-undo';
+          undoBtn.textContent = '← Undo';
+          undoBtn.onclick = undo;
+          historyEl.appendChild(undoBtn);
+        }
+        if (historyIndex < history.length - 1) {
+          const redoBtn = document.createElement('button');
+          redoBtn.className = 'scfg-btn scfg-btn-redo';
+          redoBtn.textContent = 'Redo →';
+          redoBtn.onclick = redo;
+          historyEl.appendChild(redoBtn);
+        }
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'scfg-btn scfg-btn-reset';
+        resetBtn.textContent = 'Reset';
+        resetBtn.onclick = reset;
+        historyEl.appendChild(resetBtn);
+
+        // Generate and render edits
+        const edits = generateEdits(model, symbolPool);
+        const categories = ['all', ...new Set(edits.map(e => e.category))];
+
+        // Category filter
+        categoryFilter.style.display = '';
+        categoryFilter.innerHTML = categories.map(cat =>
+          `<button class="scfg-category-btn${cat === selectedCategory ? ' active' : ''}" data-category="${cat}">${cat}</button>`
+        ).join('');
+
+        categoryFilter.querySelectorAll('.scfg-category-btn').forEach(btn => {
+          btn.onclick = () => {
+            selectedCategory = btn.dataset.category;
+            render();
+          };
+        });
+
+        // Filter edits
+        const filteredEdits = selectedCategory === 'all'
+          ? edits
+          : edits.filter(e => e.category === selectedCategory);
+
+        editsEl.style.display = '';
+        editsEl.innerHTML = '';
+        for (const edit of filteredEdits) {
+          const btn = document.createElement('button');
+          btn.className = `scfg-edit-btn scfg-edit-${edit.category}`;
+          btn.textContent = edit.label;
+          btn.onclick = () => applyEdit(edit);
+          editsEl.appendChild(btn);
+        }
+      } else {
+        historyEl.style.display = 'none';
+        categoryFilter.style.display = 'none';
+        editsEl.style.display = 'none';
+      }
+
+      // Render sample section (only in run mode)
+      if (canRun) {
+        sampleEl.style.display = '';
+        renderSampleSection();
+      } else {
+        sampleEl.style.display = 'none';
+      }
+    }
+
+    let currentExecution = null;
+    let executionInterval = null;
+
+    function renderSampleSection() {
+      sampleEl.innerHTML = '';
+
+      // Sample & Execute button
+      const sampleExecBtn = document.createElement('button');
+      sampleExecBtn.className = 'scfg-btn scfg-btn-sample';
+      sampleExecBtn.textContent = '▶ Sample & Run';
+      sampleExecBtn.onclick = doSampleAndExecute;
+      sampleEl.appendChild(sampleExecBtn);
+
+      // Clear button
+      if (samples.length > 0 || currentExecution) {
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'scfg-btn scfg-btn-clear-samples';
+        clearBtn.textContent = 'Clear';
+        clearBtn.onclick = () => {
+          samples = [];
+          currentExecution = null;
+          if (executionInterval) {
+            clearInterval(executionInterval);
+            executionInterval = null;
+          }
+          renderSampleSection();
+        };
+        sampleEl.appendChild(clearBtn);
+      }
+
+      // Execution animation
+      if (currentExecution) {
+        renderExecutionAnimation();
+      }
+
+      // Sample output
+      if (samples.length > 0 && !currentExecution) {
+        const outputEl = document.createElement('div');
+        outputEl.className = 'scfg-sample-output';
+
+        for (let i = samples.length - 1; i >= 0; i--) {
+          const s = samples[i];
+          const sampleRow = document.createElement('div');
+          sampleRow.className = 'scfg-sample-row';
+
+          const numEl = document.createElement('span');
+          numEl.className = 'scfg-sample-num';
+          numEl.textContent = `#${i + 1}`;
+          sampleRow.appendChild(numEl);
+
+          if (s.length === 0) {
+            const emptyEl = document.createElement('span');
+            emptyEl.className = 'scfg-sample-empty';
+            emptyEl.textContent = '(empty - ε)';
+            sampleRow.appendChild(emptyEl);
+          } else {
+            for (const token of s) {
+              const tokenEl = document.createElement('span');
+              tokenEl.className = 'scfg-sample-token';
+              tokenEl.textContent = token;
+              sampleRow.appendChild(tokenEl);
+            }
+          }
+
+          outputEl.appendChild(sampleRow);
+        }
+
+        sampleEl.appendChild(outputEl);
+      }
+    }
+
+    function renderExecutionAnimation() {
+      const exec = currentExecution;
+      const animEl = document.createElement('div');
+      animEl.className = 'scfg-execution';
+
+      // Token sequence with highlighting
+      const tokensEl = document.createElement('div');
+      tokensEl.className = 'scfg-exec-tokens';
+
+      for (let i = 0; i < exec.tokens.length; i++) {
+        const tokenEl = document.createElement('span');
+        tokenEl.className = 'scfg-exec-token';
+        if (i < exec.currentStep) {
+          tokenEl.classList.add('consumed');
+        } else if (i === exec.currentStep) {
+          tokenEl.classList.add('current');
+        }
+        tokenEl.textContent = exec.tokens[i];
+        tokensEl.appendChild(tokenEl);
+      }
+      animEl.appendChild(tokensEl);
+
+      // Steps log
+      const stepsEl = document.createElement('div');
+      stepsEl.className = 'scfg-exec-steps';
+
+      for (let i = 0; i <= Math.min(exec.stepIndex, exec.steps.length - 1); i++) {
+        const step = exec.steps[i];
+        const stepEl = document.createElement('div');
+        stepEl.className = 'scfg-exec-step';
+        if (i === exec.stepIndex) {
+          stepEl.classList.add('current');
+        }
+
+        const numEl = document.createElement('span');
+        numEl.className = 'scfg-exec-step-num';
+        numEl.textContent = `${i + 1}.`;
+        stepEl.appendChild(numEl);
+
+        const descEl = document.createElement('span');
+        descEl.className = 'scfg-exec-step-desc';
+        descEl.textContent = step.description;
+        stepEl.appendChild(descEl);
+
+        stepsEl.appendChild(stepEl);
+      }
+      animEl.appendChild(stepsEl);
+
+      // Controls - only show when finished
+      if (exec.stepIndex >= exec.steps.length) {
+        const controlsEl = document.createElement('div');
+        controlsEl.className = 'scfg-exec-controls';
+
+        const againBtn = document.createElement('button');
+        againBtn.className = 'scfg-btn scfg-btn-sample';
+        againBtn.textContent = '▶ Sample & Run Again';
+        againBtn.onclick = doSampleAndExecute;
+        controlsEl.appendChild(againBtn);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'scfg-btn scfg-btn-clear-samples';
+        closeBtn.textContent = 'Close';
+        closeBtn.onclick = () => {
+          currentExecution = null;
+          if (executionInterval) {
+            clearInterval(executionInterval);
+            executionInterval = null;
+          }
+          renderSampleSection();
+        };
+        controlsEl.appendChild(closeBtn);
+
+        animEl.appendChild(controlsEl);
+      }
+
+      sampleEl.appendChild(animEl);
+    }
+
+    function startExecution(tokens) {
+      if (executionInterval) {
+        clearInterval(executionInterval);
+        executionInterval = null;
+      }
+
+      const { steps, finalStack } = executeForthSteps(tokens);
+      currentExecution = {
+        tokens,
+        steps,
+        finalStack,
+        stepIndex: 0,
+        currentStep: 0
+      };
+      renderSampleSection();
+
+      // Auto-run the execution
+      executionInterval = setInterval(() => {
+        if (!currentExecution || currentExecution.stepIndex >= currentExecution.steps.length) {
+          clearInterval(executionInterval);
+          executionInterval = null;
+          renderSampleSection();
+          return;
+        }
+        stepExecution();
+      }, 600);
+    }
+
+    function stepExecution() {
+      if (!currentExecution || currentExecution.stepIndex >= currentExecution.steps.length) return;
+
+      const step = currentExecution.steps[currentExecution.stepIndex];
+      currentExecution.currentStep = currentExecution.tokens.indexOf(step.token, currentExecution.currentStep) + 1;
+      currentExecution.stepIndex++;
+      renderSampleSection();
+    }
+
+    function doSampleAndExecute() {
+      const result = sample(model);
+      if (result.length > 0) {
+        samples.push(result);
+        if (samples.length > 10) samples.shift();
+        startExecution(result);
+      } else {
+        samples.push(result);
+        if (samples.length > 10) samples.shift();
+        renderSampleSection();
+      }
+    }
+
+    function applyEdit(edit) {
+      model = edit.apply();
+      // Truncate future history if we're not at the end
+      history = history.slice(0, historyIndex + 1);
+      history.push(clone(model));
+      historyIndex = history.length - 1;
+      render();
+    }
+
+    function undo() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        model = clone(history[historyIndex]);
+        render();
+      }
+    }
+
+    function redo() {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        model = clone(history[historyIndex]);
+        render();
+      }
+    }
+
+    function reset() {
+      model = clone(initialModel);
+      history = [clone(model)];
+      historyIndex = 0;
+      render();
+    }
+
+    render();
+  }
+
+  // ===== Grammar Search (Hill Climbing) =====
+
+  function generateSuccessors(model, symbolPool, maxSuccessors = 50, macroSeqs = null) {
+    const successors = [];
+    const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+    const newRuleNames = ['A','B','C','D','E','F','G','H','I','J'];
+    const macros = Array.isArray(macroSeqs) ? macroSeqs : [];
+
+    // Precompute rule-body keys so we can cheaply reuse existing nonterminals
+    // when we see an identical subtree. This encourages factoring / readability.
+    const bodyKeyToRules = new Map();
+    for (const name of Object.keys(model)) {
+      if (name === 'init') continue;
+      const k = stableStringify(model[name]);
+      const arr = bodyKeyToRules.get(k);
+      if (arr) arr.push(name);
+      else bodyKeyToRules.set(k, [name]);
+    }
+
+    function partEq(a, b) {
+      if (a === b) return true;
+      const ao = (a && typeof a === 'object');
+      const bo = (b && typeof b === 'object');
+      if (ao || bo) return stableStringify(a) === stableStringify(b);
+      return false;
+    }
+
+    function replaceAllAndSpansInExpr(expr, spanParts, ruleName) {
+      if (typeof expr === 'string') return expr;
+      if (isMaybe(expr)) {
+        const inner = replaceAllAndSpansInExpr(expr.expr, spanParts, ruleName);
+        if (inner === expr.expr) return expr;
+        return { kind: 'maybe', expr: inner, p: expr.p };
+      }
+      if (isOr(expr)) {
+        let changed = false;
+        const alts = expr.alts.map(a => {
+          const na = replaceAllAndSpansInExpr(a, spanParts, ruleName);
+          if (na !== a) changed = true;
+          return na;
+        });
+        if (!changed) return expr;
+        return { kind: 'or', alts, weights: expr.weights ? expr.weights.slice() : undefined };
+      }
+      if (isAnd(expr)) {
+        // First recurse into children
+        let changedChild = false;
+        let parts = expr.parts.map(p => {
+          const np = replaceAllAndSpansInExpr(p, spanParts, ruleName);
+          if (np !== p) changedChild = true;
+          return np;
+        });
+
+        // Then replace any contiguous span matches
+        const n = spanParts.length;
+        if (n >= 2 && parts.length >= n) {
+          const out = [];
+          for (let i = 0; i < parts.length;) {
+            let ok = true;
+            if (i + n <= parts.length) {
+              for (let j = 0; j < n; j++) {
+                if (!partEq(parts[i + j], spanParts[j])) { ok = false; break; }
+              }
+            } else {
+              ok = false;
+            }
+            if (ok) {
+              out.push(ruleName);
+              i += n;
+              changedChild = true;
+            } else {
+              out.push(parts[i]);
+              i++;
+            }
+          }
+          parts = out;
+        }
+
+        if (!changedChild) return expr;
+        if (parts.length === 0) return epsilon();
+        if (parts.length === 1) return parts[0];
+        return { kind: 'and', parts };
+      }
+      return expr;
+    }
+
+    function replaceAllTokenInExpr(expr, token, ruleName) {
+      if (typeof expr === 'string') return expr === token ? ruleName : expr;
+      if (isMaybe(expr)) {
+        const inner = replaceAllTokenInExpr(expr.expr, token, ruleName);
+        if (inner === expr.expr) return expr;
+        return { kind: 'maybe', expr: inner, p: expr.p };
+      }
+      if (isOr(expr)) {
+        let changed = false;
+        const alts = expr.alts.map(a => {
+          const na = replaceAllTokenInExpr(a, token, ruleName);
+          if (na !== a) changed = true;
+          return na;
+        });
+        if (!changed) return expr;
+        return { kind: 'or', alts, weights: expr.weights ? expr.weights.slice() : undefined };
+      }
+      if (isAnd(expr)) {
+        let changed = false;
+        const parts = expr.parts.map(p => {
+          const np = replaceAllTokenInExpr(p, token, ruleName);
+          if (np !== p) changed = true;
+          return np;
+        });
+        if (!changed) return expr;
+        if (parts.length === 0) return epsilon();
+        if (parts.length === 1) return parts[0];
+        return { kind: 'and', parts };
+      }
+      return expr;
+    }
+
+    for (const rule of Object.keys(model)) {
+      const rhs = model[rule];
+
+      for (const { node, path } of walkExpr(rhs)) {
+        // ---- Terminal factoring (CRITICAL for the terminals-only prior) ----
+        // If we see a terminal token, allow introducing a free nonterminal for it:
+        //   X -> token
+        // and then replace that token everywhere. This is language-preserving and
+        // directly reduces the terminal-count prior when tokens repeat.
+        if (typeof node === 'string' && !ruleNames.has(node)) {
+          for (const newRule of newRuleNames) {
+            if (successors.length >= maxSuccessors) break;
+            if (model[newRule] !== undefined) continue;
+            successors.push(() => {
+              const next = clone(model);
+              next[newRule] = node;
+              for (const r of Object.keys(next)) {
+                if (r === newRule) continue;
+                next[r] = replaceAllTokenInExpr(next[r], node, newRule);
+              }
+              return next;
+            });
+          }
+        }
+
+        // ---- Readability/factoring moves (intentionally EARLY so they don't get starved) ----
+        // If this subtree matches an existing rule body, replace it with that nonterminal.
+        // This is the key "reuse" move that makes extracted rules actually get used.
+        if (typeof node !== 'string') {
+          const nodeKey = stableStringify(node);
+          const matchingRules = bodyKeyToRules.get(nodeKey);
+          if (matchingRules && matchingRules.length) {
+            for (const name of matchingRules) {
+              if (successors.length >= maxSuccessors) break;
+              // Avoid trivial self-recursion (rule -> ... rule ...).
+              if (name === rule) continue;
+              successors.push(() => {
+                const next = clone(model);
+                if (path.length === 0) next[rule] = name;
+                else setAtPath(next[rule], path, name);
+                return next;
+              });
+            }
+          }
+
+          // Extract-rule: create a new nonterminal for the selected subtree.
+          // Avoid extracting the entire RHS of init when it is already a large OR;
+          // this tends to create unreadable wrappers like `init -> B; B -> (huge OR ...)`.
+          for (const newRule of newRuleNames) {
+            if (successors.length >= maxSuccessors) break;
+            if (model[newRule] !== undefined) continue;
+            if (rule === 'init' && path.length === 0 && isOr(node) && node.alts.length > 3) continue;
+            successors.push(() => {
+              const next = clone(model);
+              next[newRule] = clone(node);
+              if (path.length === 0) next[rule] = newRule;
+              else setAtPath(next[rule], path, newRule);
+              return next;
+            });
+          }
+        }
+
+        // Span-extract: factor a contiguous slice of an AND sequence into a named rule,
+        // and replace ALL identical spans throughout the grammar (creates immediate reuse).
+        if (isAnd(node) && node.parts.length >= 3) {
+          const L = node.parts.length;
+          const maxSpan = Math.min(4, L);
+          for (const newRule of newRuleNames) {
+            if (successors.length >= maxSuccessors) break;
+            if (model[newRule] !== undefined) continue;
+            for (let spanLen = 2; spanLen <= maxSpan; spanLen++) {
+              if (successors.length >= maxSuccessors) break;
+              for (let start = 0; start + spanLen <= L; start++) {
+                if (successors.length >= maxSuccessors) break;
+                const s0 = start, n0 = spanLen;
+                successors.push(() => {
+                  const next = clone(model);
+                  const cur = clone(node);
+                  const spanParts = cur.parts.slice(s0, s0 + n0).map(clone);
+                  next[newRule] = and(...spanParts);
+
+                  // Replace the span at this location
+                  const newParts = cur.parts.slice(0, s0).concat([newRule], cur.parts.slice(s0 + n0));
+                  const replacedHere = (newParts.length === 1) ? newParts[0] : { kind: 'and', parts: newParts };
+                  if (path.length === 0) next[rule] = replacedHere;
+                  else setAtPath(next[rule], path, replacedHere);
+
+                  // Replace identical spans elsewhere too (helps make the rule genuinely multi-use)
+                  for (const r of Object.keys(next)) {
+                    if (r === newRule) continue;
+                    next[r] = replaceAllAndSpansInExpr(next[r], spanParts, newRule);
+                  }
+                  return next;
+                });
+              }
+            }
+          }
+        }
+
+        // Wrap with or (add alternative) - allow both left/right insertion for better locality
+        for (const atom of symbolPool) {
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = or(clone(node), atom, [0.5, 0.5]);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = or(atom, clone(node), [0.5, 0.5]);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+        }
+
+        // Macro OR: allow adding a whole target-derived sequence as one alternative (dramatically improves search).
+        for (const seq of macros) {
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = or(clone(node), and(...seq), [0.5, 0.5]);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = or(and(...seq), clone(node), [0.5, 0.5]);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+        }
+
+        // Wrap with and (extend sequence) - allow both left/right insertion
+        for (const atom of symbolPool) {
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = and(clone(node), atom);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = and(atom, clone(node));
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+        }
+
+        // Macro AND: allow appending a short target-derived sequence (helps reach length quickly).
+        for (const seq of macros) {
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = and(clone(node), ...seq);
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+          if (successors.length >= maxSuccessors) break;
+          successors.push(() => {
+            const next = clone(model);
+            const wrapped = and(...seq, clone(node));
+            if (path.length === 0) next[rule] = wrapped;
+            else setAtPath(next[rule], path, wrapped);
+            return next;
+          });
+        }
+
+        // Replace atom
+        if (typeof node === 'string') {
+          // Allow replacement with existing rule refs too (enables structured alternatives).
+          const existingRuleNames = Object.keys(model).filter(k => k !== 'init');
+          const pool = [...new Set([...symbolPool, ...existingRuleNames])];
+          for (const sym of pool) {
+            if (sym === node) continue;
+            // Avoid trivially introducing self-recursion (rule -> ... rule ...).
+            if (sym === rule) continue;
+            if (successors.length >= maxSuccessors) break;
+            successors.push(() => {
+              const next = clone(model);
+              if (path.length === 0) next[rule] = sym;
+              else setAtPath(next[rule], path, sym);
+              return next;
+            });
+          }
+        }
+
+        // Delete from and
+        if (isAnd(node) && node.parts.length > 1) {
+          for (let i = 0; i < node.parts.length; i++) {
+            if (successors.length >= maxSuccessors) break;
+            const idx = i;
+            successors.push(() => {
+              const next = clone(model);
+              const replaced = deleteAndChild(clone(node), idx);
+              if (path.length === 0) next[rule] = replaced;
+              else setAtPath(next[rule], path, replaced);
+              return next;
+            });
+          }
+        }
+
+        // Delete from or
+        if (isOr(node) && node.alts.length > 1) {
+          for (let i = 0; i < node.alts.length; i++) {
+            if (successors.length >= maxSuccessors) break;
+            const idx = i;
+            successors.push(() => {
+              const next = clone(model);
+              const replaced = deleteOrAlt(clone(node), idx);
+              if (path.length === 0) next[rule] = replaced;
+              else setAtPath(next[rule], path, replaced);
+              return next;
+            });
+          }
+        }
+      }
+    }
+
+    // Shuffle for variety
+    for (let i = successors.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [successors[i], successors[j]] = [successors[j], successors[i]];
+    }
+
+    return successors.slice(0, maxSuccessors);
+  }
+
+  function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
+  function stableStringify(value) {
+    if (value === null || value === undefined) return JSON.stringify(value);
+    if (typeof value !== "object") return JSON.stringify(value);
+    if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
+    const keys = Object.keys(value).sort();
+    return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(",")}}`;
+  }
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function tokensToNgrams(tokens, maxN, out, weight) {
+    const L = tokens.length;
+    for (let n = 1; n <= maxN; n++) {
+      for (let i = 0; i + n <= L; i++) {
+        const key = tokens.slice(i, i + n).join(" ");
+        out[key] = (out[key] || 0) + weight;
+      }
+    }
+  }
+
+  function buildTargetStats(targets) {
+    // Using full-length n-grams makes the reward extremely sparse.
+    // For interactive search, cap to trigrams for a dense, informative signal.
+    const maxLen = Math.max(1, ...targets.map(t => t.length));
+    const maxN = Math.min(3, maxLen);
+    const counts = Object.create(null);
+    for (const t of targets) tokensToNgrams(t, maxN, counts, 1);
+    const keys = Object.keys(counts).filter(k => (counts[k] || 0) > 0);
+    const total = keys.reduce((s, k) => s + (counts[k] || 0), 0);
+    const prob = Object.create(null);
+    for (const k of keys) prob[k] = (counts[k] || 0) / total;
+    const seqSet = new Set(targets.map(t => t.join(" ")));
+    return { maxN, keys, prob, seqSet };
+  }
+
+  // Enumerate all outputs for small, non-recursive grammars to get a deterministic, low-variance score.
+  // Falls back to sampling if enumeration explodes or recursion is detected.
+  function enumerateOutputs(model, limits) {
+    const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+    const maxDepth = limits.maxDepth ?? 50;
+    const maxOutputs = limits.maxOutputs ?? 5000;
+    const seenStack = new Set();
+
+    function mergeDist(dist) {
+      // Merge duplicate sequences by string key.
+      const m = new Map();
+      for (const { seq, p } of dist) {
+        const k = seq.join(" ");
+        m.set(k, (m.get(k) || 0) + p);
+      }
+      return Array.from(m.entries()).map(([k, p]) => ({ seq: k === "" ? [] : k.split(" "), p }));
+    }
+
+    function enumExpr(expr, depthLeft) {
+      if (depthLeft <= 0) return null;
+      if (typeof expr === 'string') {
+        if (ruleNames.has(expr)) {
+          // Detect recursion quickly.
+          if (seenStack.has(expr)) return null;
+          seenStack.add(expr);
+          const out = enumExpr(model[expr], depthLeft - 1);
+          seenStack.delete(expr);
+          return out;
+        }
+        return [{ seq: [expr], p: 1 }];
+      }
+      if (isAnd(expr)) {
+        let dist = [{ seq: [], p: 1 }];
+        for (const part of expr.parts) {
+          const right = enumExpr(part, depthLeft - 1);
+          if (!right) return null;
+          const next = [];
+          for (const a of dist) {
+            for (const b of right) {
+              next.push({ seq: a.seq.concat(b.seq), p: a.p * b.p });
+              if (next.length > maxOutputs) return null;
+            }
+          }
+          dist = next;
+        }
+        return mergeDist(dist);
+      }
+      if (isOr(expr)) {
+        if (expr.alts.length === 0) return [{ seq: [], p: 1 }];
+        const weights = normalizeWeights(expr.weights || expr.alts.map(() => 1));
+        let out = [];
+        for (let i = 0; i < expr.alts.length; i++) {
+          const sub = enumExpr(expr.alts[i], depthLeft - 1);
+          if (!sub) return null;
+          const w = weights[i] ?? (1 / expr.alts.length);
+          for (const s of sub) {
+            out.push({ seq: s.seq, p: s.p * w });
+            if (out.length > maxOutputs) return null;
+          }
+        }
+        return mergeDist(out);
+      }
+      if (isMaybe(expr)) {
+        const p = Math.max(0, Math.min(1, expr.p));
+        const sub = enumExpr(expr.expr, depthLeft - 1);
+        if (!sub) return null;
+        const out = [{ seq: [], p: 1 - p }];
+        for (const s of sub) out.push({ seq: s.seq, p: s.p * p });
+        return mergeDist(out);
+      }
+      return null;
+    }
+
+    return enumExpr(model.init, maxDepth);
+  }
+
+  function makeEvaluator(targetSamples) {
+    const target = buildTargetStats(targetSamples);
+    const targetStrings = targetSamples.map(t => t.join(" "));
+    const numTargets = targetSamples.length;
+    const avgTargetLen =
+      targetSamples.reduce((s, t) => s + t.length, 0) / Math.max(1, numTargets);
+    const alpha = 1e-3;
+    const cache = new Map();
+
+    // ---- Grammar prior (complexity penalty) ----
+    //
+    // We treat "yellow nodes" (terminals) as the only source of grammar complexity.
+    // Nonterminals are free, so the search can factor aggressively without paying
+    // a size cost for introducing structure.
+    //
+    // Score = FitScore - PriorPenalty, where:
+    //   PriorPenalty = terminalCost * (#terminals in all rules)
+    const PRIOR = {
+      // Tune this one number.
+      terminalCost: 0.0025,
+    };
+
+    function grammarStats(model) {
+      const ruleNames = new Set(Object.keys(model).filter(k => k !== 'init'));
+      const useCounts = Object.create(null);
+      for (const k of Object.keys(model)) useCounts[k] = 0;
+
+      const stats = {
+        rules: 0,
+        nodes: 0,            // total nodes including terminals/nonterminals and operator nodes
+        terminals: 0,
+        nonTerminalRefs: 0,
+        andNodes: 0,
+        orNodes: 0,
+        maybeNodes: 0,
+        totalOrAlts: 0,
+        maxOrAlts: 0,
+        largeOrExcessQuad: 0, // sum over OR nodes of excess^2 beyond threshold
+        maxAndParts: 0,
+        andExcessQuad: 0,     // sum over AND nodes of excess^2 beyond threshold
+        unusedRules: 0,
+        singleUseRules: 0,
+        multiUseRules: 0,
+        aliasRules: 0,
+        singleUseBigOrExcessQuad: 0,
+        maxDepth: 0,
+      };
+
+      function walk(expr, depth) {
+        stats.nodes++;
+        if (depth > stats.maxDepth) stats.maxDepth = depth;
+
+        if (typeof expr === 'string') {
+          if (ruleNames.has(expr)) {
+            stats.nonTerminalRefs++;
+            useCounts[expr] = (useCounts[expr] || 0) + 1;
+          }
+          else stats.terminals++;
+          return;
+        }
+
+        if (isAnd(expr)) {
+          stats.andNodes++;
+          const k = expr.parts.length;
+          if (k > stats.maxAndParts) stats.maxAndParts = k;
+          const excess = Math.max(0, k - PRIOR.andSeqThreshold);
+          stats.andExcessQuad += excess * excess;
+          for (const p of expr.parts) walk(p, depth + 1);
+          return;
+        }
+
+        if (isOr(expr)) {
+          stats.orNodes++;
+          const k = expr.alts.length;
+          stats.totalOrAlts += k;
+          if (k > stats.maxOrAlts) stats.maxOrAlts = k;
+          const excess = Math.max(0, k - PRIOR.largeOrThreshold);
+          stats.largeOrExcessQuad += excess * excess;
+          for (const a of expr.alts) walk(a, depth + 1);
+          return;
+        }
+
+        if (isMaybe(expr)) {
+          stats.maybeNodes++;
+          walk(expr.expr, depth + 1);
+        }
+      }
+
+      const keys = Object.keys(model);
+      stats.rules = keys.length;
+      for (const k of keys) walk(model[k], 1);
+
+      // Count unused/single-use rules (exclude init)
+      for (const name of keys) {
+        if (name === 'init') continue;
+        const c = useCounts[name] || 0;
+        if (c === 0) stats.unusedRules++;
+        else if (c === 1) stats.singleUseRules++;
+        else stats.multiUseRules++;
+      }
+
+      // Count alias rules (including init if it just points at a nonterminal).
+      for (const name of keys) {
+        const rhs = model[name];
+        if (typeof rhs === 'string' && ruleNames.has(rhs)) {
+          stats.aliasRules++;
+        }
+      }
+
+      // Penalize single-use rules whose RHS is a large OR (a common "hide the blob" trick).
+      for (const name of keys) {
+        if (name === 'init') continue;
+        const c = useCounts[name] || 0;
+        if (c !== 1) continue;
+        const rhs = model[name];
+        if (isOr(rhs)) {
+          const excess = Math.max(0, rhs.alts.length - PRIOR.singleUseBigOrThreshold);
+          stats.singleUseBigOrExcessQuad += excess * excess;
+        }
+      }
+
+      return stats;
+    }
+
+    function priorPenaltyFromStats(s) {
+      const pen = PRIOR.terminalCost * (s.terminals || 0);
+
+      // Keep penalty in a sane range for UI (fit is in [0,1]).
+      // If penalty dominates, search can still compare grammars but UI stays bounded.
+      return Math.max(0, Math.min(0.95, pen));
+    }
+
+    function klFromCounts(counts) {
+      let supportTotal = 0;
+      for (const k of target.keys) supportTotal += counts[k] || 0;
+      const denom = supportTotal + alpha * target.keys.length;
+      if (denom <= 0) return Number.POSITIVE_INFINITY;
+      let kl = 0;
+      for (const k of target.keys) {
+        const pt = target.prob[k] || 0;
+        if (pt <= 0) continue;
+        const pm = ((counts[k] || 0) + alpha) / denom;
+        kl += pt * Math.log(pt / pm);
+      }
+      return kl;
+    }
+
+    function evalFromDistribution(dist) {
+      const counts = Object.create(null);
+      const targetsHit = new Set();
+      let exactMass = 0;
+      let expectedLen = 0;
+      for (const { seq, p } of dist) {
+        const seqStr = seq.join(" ");
+        tokensToNgrams(seq, target.maxN, counts, p);
+        if (target.seqSet.has(seqStr)) {
+          exactMass += p;
+          // Track which specific target was hit
+          const idx = targetStrings.indexOf(seqStr);
+          if (idx >= 0) targetsHit.add(idx);
+        }
+        expectedLen += p * seq.length;
+      }
+      const coverage = numTargets > 0 ? targetsHit.size / numTargets : 0;
+      const kl = klFromCounts(counts);
+      const klScore = Number.isFinite(kl) ? (1 / (1 + kl)) : 0;
+      // Score: coverage is primary (must hit all targets), then exactness, then n-gram fit
+      const value = Math.max(0, Math.min(1, 0.5 * coverage + 0.3 * exactMass + 0.2 * klScore));
+      return { value, exactMass, kl, coverage, targetsHit: targetsHit.size };
+    }
+
+    function evalFromSamples(samples) {
+      const counts = Object.create(null);
+      const targetsHit = new Set();
+      let exact = 0;
+      let sumLen = 0;
+      for (const s of samples) {
+        const seqStr = s.join(" ");
+        tokensToNgrams(s, target.maxN, counts, 1);
+        if (target.seqSet.has(seqStr)) {
+          exact++;
+          const idx = targetStrings.indexOf(seqStr);
+          if (idx >= 0) targetsHit.add(idx);
+        }
+        sumLen += s.length;
+      }
+      const exactMass = samples.length ? exact / samples.length : 0;
+      const coverage = numTargets > 0 ? targetsHit.size / numTargets : 0;
+      const kl = klFromCounts(counts);
+      const klScore = Number.isFinite(kl) ? (1 / (1 + kl)) : 0;
+      const value = Math.max(0, Math.min(1, 0.5 * coverage + 0.3 * exactMass + 0.2 * klScore));
+      return { value, exactMass, kl, coverage, targetsHit: targetsHit.size };
+    }
+
+    return function evaluateGrammar(grammar, samplesForUi = 4) {
+      const key = stableStringify(grammar);
+      const cached = cache.get(key);
+      if (cached) return cached;
+
+      const dist = enumerateOutputs(grammar, { maxDepth: 60, maxOutputs: 4000 });
+      let result;
+      if (dist) {
+        const { value, exactMass, kl, coverage, targetsHit } = evalFromDistribution(dist);
+        const samples = [];
+        for (let i = 0; i < samplesForUi; i++) samples.push(sample(grammar));
+        const stats = grammarStats(grammar);
+        const priorPenalty = priorPenaltyFromStats(stats);
+        result = {
+          score: Math.max(0, Math.min(1, value - priorPenalty)),
+          fitScore: value,
+          priorPenalty,
+          grammarStats: stats,
+          exactRate: exactMass,
+          coverage,
+          targetsHit,
+          kl,
+          samples
+        };
+      } else {
+        const numSamples = 60;
+        const samples = [];
+        for (let i = 0; i < numSamples; i++) samples.push(sample(grammar));
+        const { value, exactMass, kl, coverage, targetsHit } = evalFromSamples(samples);
+        const stats = grammarStats(grammar);
+        const priorPenalty = priorPenaltyFromStats(stats);
+        result = {
+          score: Math.max(0, Math.min(1, value - priorPenalty)),
+          fitScore: value,
+          priorPenalty,
+          grammarStats: stats,
+          exactRate: exactMass,
+          coverage,
+          targetsHit,
+          kl,
+          samples: samples.slice(0, samplesForUi)
+        };
+      }
+      cache.set(key, result);
+      return result;
+    };
+  }
+
+  // ===== Infer Mode Component =====
+
+  function initInferEditor(container, initialModel, symbolPool, targetSamples) {
+    console.log('initInferEditor called with', { initialModel, symbolPool, targetSamples });
+
+    let currentModel = clone(initialModel);
+    let bestModel = clone(initialModel);
+    let bestScore = 0;
+    let isRunning = false;
+    let iteration = 0; // MCTS iterations
+    const maxIterations = 20_000;
+    const evaluateGrammar = makeEvaluator(targetSamples);
+    // Macro-actions derived from targets (tails are especially useful for completing sequences).
+    const macroSeqs = (function buildMacros() {
+      const out = [];
+      for (const t of targetSamples) {
+        if (Array.isArray(t) && t.length) {
+          out.push(t.slice());
+          if (t.length > 1) out.push(t.slice(1));
+          if (t.length > 2) out.push(t.slice(2));
+        }
+      }
+      // Deduplicate by string form, and cap to keep branching reasonable.
+      const seen = new Set();
+      const uniq = [];
+      for (const s of out) {
+        const k = s.join(" ");
+        if (k === "" || seen.has(k)) continue;
+        seen.add(k);
+        uniq.push(s);
+      }
+      // Prefer shorter macros first (less destructive).
+      uniq.sort((a, b) => a.length - b.length);
+      return uniq.slice(0, 12);
+    })();
+
+    const grammarEl = container.querySelector('.scfg-grammar');
+    const sampleEl = container.querySelector('.scfg-sample');
+    const editsEl = container.querySelector('.scfg-edits');
+    const historyEl = container.querySelector('.scfg-history');
+    const categoryFilter = container.querySelector('.scfg-category-filter');
+
+    // Hide category filter in infer mode
+    if (categoryFilter) categoryFilter.style.display = 'none';
+
+    console.log('Elements found:', { grammarEl, sampleEl, editsEl, historyEl });
+
+    function render() {
+      console.log('Infer render() called, iteration:', iteration, 'bestScore:', bestScore);
+      try {
+      // Render targets
+      historyEl.style.display = '';
+      historyEl.innerHTML = '<div class="scfg-targets-label">Target sequences:</div>';
+      for (let i = 0; i < targetSamples.length; i++) {
+        const row = document.createElement('div');
+        row.className = 'scfg-target-row';
+        row.innerHTML = `<span class="scfg-target-num">${i + 1}.</span> ` +
+          targetSamples[i].map(t => `<span class="scfg-sample-token">${escapeHtml(t)}</span>`).join(' ');
+        historyEl.appendChild(row);
+      }
+
+      // Progress bar and controls
+      editsEl.style.display = '';
+      editsEl.innerHTML = '';
+
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'scfg-progress-container';
+
+      const progressBar = document.createElement('div');
+      progressBar.className = 'scfg-progress-bar';
+      const progressFill = document.createElement('div');
+      progressFill.className = 'scfg-progress-fill';
+      progressFill.style.width = `${(iteration / maxIterations) * 100}%`;
+      progressBar.appendChild(progressFill);
+      progressContainer.appendChild(progressBar);
+
+      const progressText = document.createElement('div');
+      progressText.className = 'scfg-progress-text';
+      const bestEval = container.__mcts ? container.__mcts.best.eval : {
+        coverage: 0,
+        targetsHit: 0,
+        exactRate: 0,
+        fitScore: 0,
+        priorPenalty: 0,
+        grammarStats: { nodes: 0, rules: 0, maxOrAlts: 0, maxAndParts: 0, unusedRules: 0, singleUseRules: 0 }
+      };
+      const numTargets = targetSamples.length;
+      const gs = bestEval.grammarStats || {};
+      const nodes = gs.nodes || 0;
+      const rules = gs.rules || 0;
+      const terminals = gs.terminals || 0;
+      const maxOrAlts = gs.maxOrAlts || 0;
+      const maxAndParts = gs.maxAndParts || 0;
+      const unusedRules = gs.unusedRules || 0;
+      const singleUseRules = gs.singleUseRules || 0;
+      const multiUseRules = gs.multiUseRules || 0;
+      const aliasRules = gs.aliasRules || 0;
+      const fitScore = (typeof bestEval.fitScore === 'number') ? bestEval.fitScore : (bestEval.score || 0);
+      const priorPenalty = (typeof bestEval.priorPenalty === 'number') ? bestEval.priorPenalty : 0;
+      progressText.innerHTML = `Iteration: <strong>${iteration}</strong>/${maxIterations} | ` +
+        `Targets: <strong>${bestEval.targetsHit || 0}/${numTargets}</strong> | ` +
+        `Exact: <strong>${(bestEval.exactRate * 100).toFixed(0)}%</strong> | ` +
+        `Fit: <strong>${(fitScore * 100).toFixed(0)}%</strong>`;
+      progressContainer.appendChild(progressText);
+
+      editsEl.appendChild(progressContainer);
+
+      // Control buttons
+      const controls = document.createElement('div');
+      controls.className = 'scfg-infer-controls';
+
+      const startBtn = document.createElement('button');
+      startBtn.className = 'scfg-btn scfg-btn-sample';
+      startBtn.textContent = isRunning ? '⏸ Pause' : '▶ Start Search';
+      startBtn.onclick = () => {
+        if (isRunning) {
+          isRunning = false;
+        } else {
+          isRunning = true;
+          runSearchStep();
+        }
+        render();
+      };
+      controls.appendChild(startBtn);
+
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'scfg-btn scfg-btn-reset';
+      resetBtn.textContent = 'Reset';
+      resetBtn.onclick = () => {
+        isRunning = false;
+        // Drop any search tree state so the next run starts fresh.
+        try { delete container.__mcts; } catch (_) {}
+        currentModel = clone(initialModel);
+        bestModel = clone(initialModel);
+        bestScore = 0;
+        iteration = 0;
+        render();
+      };
+      controls.appendChild(resetBtn);
+
+      editsEl.appendChild(controls);
+
+      // Current best grammar
+      grammarEl.innerHTML = '<div class="scfg-grammar-label">Current best grammar:</div>' +
+        renderGrammar(bestModel);
+
+      // Sample outputs - only show after search has started
+      if (iteration === 0) {
+        sampleEl.style.display = 'none';
+        sampleEl.innerHTML = '';
+      } else {
+        sampleEl.style.display = '';
+        sampleEl.innerHTML = '<div class="scfg-samples-label">Samples from current grammar:</div>';
+      }
+      const sampleOutput = document.createElement('div');
+      sampleOutput.className = 'scfg-sample-output';
+
+      // Cache sampled rows so rerenders (e.g. during execution animation) don't reshuffle the UI.
+      const bestKey = stableStringify(bestModel);
+      if (!container.__inferSampleCache) {
+        container.__inferSampleCache = { bestKey: null, samples: [], longestNovel: { seq: null, len: 0 } };
+      }
+      const cache = container.__inferSampleCache;
+      const shouldResample = cache.bestKey !== bestKey;
+      if (shouldResample) {
+        cache.bestKey = bestKey;
+        cache.samples = [];
+      }
+      const longestNovel = cache.longestNovel;
+
+      function targetIndex(seq) {
+        for (let j = 0; j < targetSamples.length; j++) {
+          if (arraysEqual(seq, targetSamples[j])) return j;
+        }
+        return -1;
+      }
+
+      // Show a few ordinary samples (we don't label novel here).
+      if (shouldResample) {
+        for (let i = 0; i < 4; i++) cache.samples.push(sample(bestModel));
+      }
+      for (let i = 0; i < cache.samples.length; i++) {
+        const s = cache.samples[i];
+        const row = document.createElement('div');
+        row.className = 'scfg-sample-row';
+
+        const matchIdx = targetIndex(s);
+        if (matchIdx >= 0) row.classList.add('scfg-sample-match');
+
+        row.innerHTML = s.map(t => `<span class="scfg-sample-token">${escapeHtml(t)}</span>`).join(' ');
+        if (matchIdx >= 0) {
+          row.innerHTML += ` <span class="scfg-match-badge">✓ Target ${matchIdx + 1}</span>`;
+        }
+        sampleOutput.appendChild(row);
+      }
+
+      // Update longest novel with a bounded budget (only when the best grammar changed).
+      if (shouldResample) {
+        // Reset the cache for the new grammar.
+        longestNovel.seq = null;
+        longestNovel.len = 0;
+        for (let t = 0; t < 220; t++) {
+          const s = sample(bestModel);
+          if (targetIndex(s) >= 0) continue;
+          if (s.length > (longestNovel.len || 0)) {
+            longestNovel.seq = s;
+            longestNovel.len = s.length;
+          }
+        }
+      }
+
+      sampleEl.appendChild(sampleOutput);
+
+      // Longest novel sample + runnable Forth animation
+      if (!container.__inferExec) container.__inferExec = { current: null, interval: null };
+      const execState = container.__inferExec;
+
+      function stopExecution() {
+        if (execState.interval) {
+          clearInterval(execState.interval);
+          execState.interval = null;
+        }
+        execState.current = null;
+      }
+
+      function renderExecutionAnimation() {
+        const exec = execState.current;
+        if (!exec) return;
+
+        const animEl = document.createElement('div');
+        animEl.className = 'scfg-execution';
+
+        const tokensEl = document.createElement('div');
+        tokensEl.className = 'scfg-exec-tokens';
+        for (let i = 0; i < exec.tokens.length; i++) {
+          const tokenEl = document.createElement('span');
+          tokenEl.className = 'scfg-exec-token';
+          if (i < exec.currentTokenIndex) tokenEl.classList.add('consumed');
+          else if (i === exec.currentTokenIndex) tokenEl.classList.add('current');
+          tokenEl.textContent = exec.tokens[i];
+          tokensEl.appendChild(tokenEl);
+        }
+        animEl.appendChild(tokensEl);
+
+        const stepsEl = document.createElement('div');
+        stepsEl.className = 'scfg-exec-steps';
+        for (let i = 0; i <= Math.min(exec.stepIndex, exec.steps.length - 1); i++) {
+          const step = exec.steps[i];
+          const stepEl = document.createElement('div');
+          stepEl.className = 'scfg-exec-step';
+          if (i === exec.stepIndex) stepEl.classList.add('current');
+
+          const numEl = document.createElement('span');
+          numEl.className = 'scfg-exec-step-num';
+          numEl.textContent = `${i + 1}.`;
+          stepEl.appendChild(numEl);
+
+          const descEl = document.createElement('span');
+          descEl.className = 'scfg-exec-step-desc';
+          descEl.textContent = step.description;
+          stepEl.appendChild(descEl);
+
+          stepsEl.appendChild(stepEl);
+        }
+        animEl.appendChild(stepsEl);
+
+        if (exec.stepIndex >= exec.steps.length) {
+          const controlsEl = document.createElement('div');
+          controlsEl.className = 'scfg-exec-controls';
+
+          const closeBtn = document.createElement('button');
+          closeBtn.className = 'scfg-btn scfg-btn-clear-samples';
+          closeBtn.textContent = 'Close';
+          closeBtn.onclick = () => { stopExecution(); render(); };
+          controlsEl.appendChild(closeBtn);
+
+          animEl.appendChild(controlsEl);
+        }
+
+        sampleEl.appendChild(animEl);
+      }
+
+      function startExecution(tokens) {
+        if (execState.interval) clearInterval(execState.interval);
+        const { steps, finalStack } = executeForthSteps(tokens);
+        execState.current = {
+          tokens,
+          steps,
+          finalStack,
+          stepIndex: 0,
+          currentTokenIndex: 0,
+        };
+
+        // Auto-step
+        execState.interval = setInterval(() => {
+          const ex = execState.current;
+          if (!ex || ex.stepIndex >= ex.steps.length) {
+            if (execState.interval) {
+              clearInterval(execState.interval);
+              execState.interval = null;
+            }
+            render();
+            return;
+          }
+          // Advance one step; approximate token consumption position by searching forward.
+          const step = ex.steps[ex.stepIndex];
+          let nextPos = ex.currentTokenIndex;
+          for (; nextPos < ex.tokens.length; nextPos++) {
+            if (ex.tokens[nextPos] === step.token) { nextPos++; break; }
+          }
+          ex.currentTokenIndex = nextPos;
+          ex.stepIndex++;
+          render();
+        }, 600);
+      }
+
+      // Only show longest non-target sample section after search has started
+      if (iteration > 0) {
+        const novelWrap = document.createElement('div');
+        novelWrap.className = 'scfg-novel-runner';
+        novelWrap.innerHTML = '<div class="scfg-samples-label">Novel idea:</div>';
+
+        const novelRow = document.createElement('div');
+        novelRow.className = 'scfg-sample-row';
+        if (longestNovel.seq && longestNovel.seq.length) {
+          novelRow.innerHTML = longestNovel.seq.map(t => `<span class="scfg-sample-token">${escapeHtml(t)}</span>`).join(' ');
+        } else {
+          novelRow.innerHTML = '<span class="scfg-sample-empty">(none found yet)</span>';
+        }
+
+        // Only show run button after search has completed
+        if (!isRunning && longestNovel.seq && longestNovel.seq.length) {
+          const runBtn = document.createElement('button');
+          runBtn.className = 'scfg-btn scfg-btn-exec';
+          runBtn.textContent = '▶ Run';
+          runBtn.onclick = () => {
+            if (!longestNovel.seq) return;
+            startExecution(longestNovel.seq);
+            // Rerender to show the animation, but sampling is cached so the list won't reshuffle.
+            render();
+          };
+          novelRow.appendChild(runBtn);
+        }
+        novelWrap.appendChild(novelRow);
+        sampleEl.appendChild(novelWrap);
+      }
+
+      if (execState.current) renderExecutionAnimation();
+      } catch (e) {
+        console.error('Infer render error:', e);
+        container.innerHTML = '<div style="color:red;padding:1em;">Render error: ' + e.message + '</div>';
+      }
+    }
+
+    function runSearchStep() {
+      if (!isRunning || iteration >= maxIterations) {
+        isRunning = false;
+        render();
+        return;
+      }
+
+      // ---- MCTS state (lazy init) ----
+      if (!container.__mcts) {
+        container.__mcts = (function initMctsState() {
+          function makeNode(grammar, parent) {
+            return {
+              grammar,
+              key: stableStringify(grammar),
+              parent,
+              children: [],
+              unexpanded: null,
+              visits: 0,
+              totalValue: 0,
+            };
+          }
+          return {
+            root: makeNode(clone(initialModel), null),
+            best: { grammar: clone(initialModel), eval: evaluateGrammar(initialModel) },
+          };
+        })();
+      }
+
+      const state = container.__mcts;
+      const explorationC = 1.6;
+      const maxDepth = 12;
+      const progressiveWideningC = 2.0;
+      const progressiveWideningAlpha = 0.5;
+      const rolloutDepth = 4;
+
+      function ucbScore(parent, child) {
+        const mean = child.visits > 0 ? (child.totalValue / child.visits) : 0;
+        const bonus = explorationC * Math.sqrt(Math.log(parent.visits + 1) / (child.visits + 1));
+        return mean + bonus;
+      }
+
+      function selectChild(node) {
+        let best = node.children[0];
+        let bestU = -Infinity;
+        for (const ch of node.children) {
+          const u = ucbScore(node, ch);
+          if (u > bestU) { bestU = u; best = ch; }
+        }
+        return best;
+      }
+
+      function expandOne(node) {
+        if (node.unexpanded === null) {
+          node.unexpanded = generateSuccessors(node.grammar, symbolPool, 220, macroSeqs);
+          shuffleArray(node.unexpanded);
+        }
+        while (node.unexpanded.length > 0) {
+          const fn = node.unexpanded.pop();
+          const childGrammar = fn();
+          const key = stableStringify(childGrammar);
+          // Avoid duplicate children
+          if (node.children.some(c => c.key === key)) continue;
+          const child = {
+            grammar: childGrammar,
+            key,
+            parent: node,
+            children: [],
+            unexpanded: null,
+            visits: 0,
+            totalValue: 0,
+          };
+          node.children.push(child);
+          return child;
+        }
+        return node;
+      }
+
+      function rollout(grammar) {
+        let g = grammar;
+        for (let d = 0; d < rolloutDepth; d++) {
+          const succ = generateSuccessors(g, symbolPool, 60, macroSeqs);
+          if (!succ.length) break;
+          g = succ[Math.floor(Math.random() * succ.length)]();
+        }
+        return g;
+      }
+
+      function oneMctsIteration() {
+        let node = state.root;
+        let depth = 0;
+
+        // Selection + (progressive) expansion
+        while (depth < maxDepth) {
+          const allowedChildren = Math.floor(progressiveWideningC * Math.pow(node.visits + 1, progressiveWideningAlpha));
+          if (node.unexpanded === null || (node.unexpanded && node.unexpanded.length > 0 && node.children.length < allowedChildren)) {
+            node = expandOne(node);
+            break;
+          }
+          if (!node.children.length) break;
+          node = selectChild(node);
+          depth++;
+        }
+
+        // Rollout/evaluation
+        const leaf = rollout(node.grammar);
+        const ev = evaluateGrammar(leaf);
+        const value = ev.score;
+
+        // Track best based primarily on coverage (distinct targets hit), then exactRate, then score.
+        const bestEv = state.best.eval;
+        const evCov = ev.coverage || 0;
+        const bestCov = bestEv.coverage || 0;
+        const isBetter = evCov > bestCov + 1e-9 ||
+          (Math.abs(evCov - bestCov) < 1e-9 && ev.exactRate > bestEv.exactRate + 1e-9) ||
+          (Math.abs(evCov - bestCov) < 1e-9 && Math.abs(ev.exactRate - bestEv.exactRate) < 1e-9 && ev.score > bestEv.score);
+        if (isBetter) {
+          state.best = { grammar: clone(leaf), eval: ev };
+          bestModel = clone(leaf);
+          bestScore = ev.score;
+          currentModel = clone(leaf);
+        }
+
+        // Backprop
+        let cur = node;
+        while (cur) {
+          cur.visits++;
+          cur.totalValue += value;
+          cur = cur.parent;
+        }
+      }
+
+      // Run a time-budgeted batch so it feels snappy but stays responsive.
+      const start = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      const budgetMs = 16;
+      let iters = 0;
+      while (iteration < maxIterations) {
+        oneMctsIteration();
+        iteration++;
+        iters++;
+        const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        if ((now - start) >= budgetMs) break;
+      }
+
+      // Keep UI in sync with the true best.
+      bestModel = clone(state.best.grammar);
+      bestScore = state.best.eval.score;
+      currentModel = clone(state.best.grammar);
+
+      render();
+
+      if (isRunning && iteration < maxIterations) {
+        setTimeout(runSearchStep, 30);
+      } else {
+        isRunning = false;
+        render();
+      }
+    }
+
+    render();
+  }
+
+  // ===== Initialize all SCFG editors on the page =====
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.scfg-editor').forEach(container => {
+      const initialModelStr = container.dataset.initialModel || '{"init":"start"}';
+      const symbolPoolStr = container.dataset.symbolPool || '["a","b","c"]';
+      const mode = container.dataset.mode || 'both';  // "edit", "run", "both", or "infer"
+      const targetsStr = container.dataset.targets || '[]';
+
+      let initialModel, symbolPool, targets;
+      try {
+        initialModel = JSON.parse(initialModelStr);
+        symbolPool = JSON.parse(symbolPoolStr);
+        targets = JSON.parse(targetsStr);
+      } catch (e) {
+        console.error('Failed to parse SCFG config:', e);
+        initialModel = { init: 'start' };
+        symbolPool = ['a', 'b', 'c'];
+        targets = [];
+      }
+
+      console.log('SCFG init:', { mode, targetsLength: targets.length });
+      try {
+        if (mode === 'infer' && targets.length > 0) {
+          console.log('Initializing infer editor');
+          initInferEditor(container, initialModel, symbolPool, targets);
+        } else {
+          console.log('Initializing standard editor');
+          initSCFGEditor(container, initialModel, symbolPool, mode);
+        }
+      } catch (e) {
+        console.error('SCFG init error:', e);
+        container.innerHTML = '<div style="color:red;">Error: ' + e.message + '</div>';
+      }
+    });
+  });
+
+})();
+
+//# sourceURL=scfg-interactive.js
+</script>
+
 
 <p>Sampling from that grammar will produce a sequence of words that
 maybe at first glance sound like gibberish, but I’ve been careful to
