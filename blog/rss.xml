@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 11 Jan 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 01 Feb 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Grammar models are back, baby!</title>
+      <link>https://shukla.io/blog/2026-02/grammar.html</link>
+      <guid>https://shukla.io/blog/2026-02/grammar.html</guid>
+      <pubDate>Sun, 01 Feb 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      A framework for grammar generation, inference, and scoring with applications to MCTS and grammar synthesis
+      ]]></description>
+    </item>
 
     <item>
       <title>Nano Governments</title>
