@@ -19,8 +19,9 @@
   margin-bottom: 1.5rem;
 }
 
-.home-link {
-  color: var(--accent);
+.home-link,
+.home-link:visited {
+  color: var(--link-color);
   text-decoration: none;
 }
 
@@ -35,4 +36,9 @@
 .meta-sep {
   opacity: 0.5;
   margin: 0 0.35rem;
+}
+
+/* References section */
+#refs {
+  padding-bottom: 4rem;
 }

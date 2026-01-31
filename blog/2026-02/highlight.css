@@ -1,3 +1,7 @@
+:root {
+  --link-color: #83a598;
+}
+
 /* Pandoc syntax highlighting - dark mode friendly */
 code span.al { color: #ff6b6b; font-weight: bold; } /* Alert */
 code span.an { color: #87ceeb; font-weight: bold; font-style: italic; } /* Annotation */
@@ -28,3 +32,33 @@ code span.st { color: #b8bb26; } /* String */
 code span.va { color: #83a598; } /* Variable */
 code span.vs { color: #b8bb26; } /* VerbatimString */
 code span.wa { color: #fabd2f; font-weight: bold; font-style: italic; } /* Warning */
+
+/* Keyword highlighting in code blocks */
+mark.keyword-highlight {
+  background: rgba(131, 165, 152, 0.35);
+  color: inherit;
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: 0 -1px;
+  box-shadow: 0 0 0 1px rgba(131, 165, 152, 0.6);
+}
+
+/* Bibliography citation links */
+.citation a,
+.citation a:visited,
+a[role="doc-biblioref"],
+a[role="doc-biblioref"]:visited {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.citation a:hover,
+a[role="doc-biblioref"]:hover {
+  text-decoration: underline;
+}
+
+/* Reduce gap between paragraph and following list */
+p + ul,
+p + ol {
+  margin-top: -0.5em;
+}

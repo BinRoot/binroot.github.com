@@ -9,7 +9,82 @@ function Div(el)
     return render_yield(el)
   elseif el.classes:includes("distribution") then
     return render_distribution(el)
+  elseif el.classes:includes("code") then
+    return render_code_with_keywords(el)
+  elseif el.classes:includes("scfg") then
+    return render_scfg_editor(el)
   end
+end
+
+function render_code_with_keywords(el)
+  -- Parse keywords from attribute (format: "word1,word2,word3")
+  local keywords_attr = el.attributes["keywords"] or ""
+  local keywords = {}
+  for kw in keywords_attr:gmatch("[^,]+") do
+    kw = kw:match("^%s*(.-)%s*$")  -- trim whitespace
+    if kw ~= "" then
+      table.insert(keywords, kw)
+    end
+  end
+
+  -- Find the CodeBlock inside the div
+  local code_block = nil
+  for _, block in ipairs(el.content) do
+    if block.t == "CodeBlock" then
+      code_block = block
+      break
+    end
+  end
+
+  if not code_block then
+    return el  -- No code block found, return unchanged
+  end
+
+  -- Let pandoc render the code block to HTML with syntax highlighting
+  local highlighted = pandoc.write(pandoc.Pandoc({code_block}), "html")
+
+  -- Wrap keywords in highlight spans
+  -- We match keywords that appear as the sole content of a span (from syntax highlighting)
+  for _, kw in ipairs(keywords) do
+    -- Match keyword as the complete text content of a span element
+    highlighted = highlighted:gsub(
+      "(<span[^>]*>)(" .. kw .. ")(</span>)",
+      '%1<mark class="keyword-highlight">%2</mark>%3'
+    )
+  end
+
+  -- Wrap in a container div
+  local html = '<div class="code-with-keywords">\n' .. highlighted .. '</div>'
+  return pandoc.RawBlock("html", html)
+end
+
+-- Track if we've already included the SCFG script
+local scfg_script_included = false
+
+function render_scfg_editor(el)
+  -- Parse attributes for initial model and symbol pool
+  local initial_model = el.attributes["model"] or '{"init":"start"}'
+  local symbol_pool = el.attributes["symbols"] or '["a","b","c"]'
+  local title = el.attributes["title"] or "Interactive SCFG Editor"
+  local mode = el.attributes["mode"] or "both"  -- "edit", "run", "both", or "infer"
+  local targets = el.attributes["targets"] or '[]'
+
+  local html = '<div class="scfg-editor" data-initial-model=\'' .. initial_model .. '\' data-symbol-pool=\'' .. symbol_pool .. '\' data-mode=\'' .. mode .. '\' data-targets=\'' .. targets .. '\'>\n'
+  html = html .. '  <div class="scfg-editor-title">' .. title .. '</div>\n'
+  html = html .. '  <div class="scfg-grammar"></div>\n'
+  html = html .. '  <div class="scfg-sample"></div>\n'
+  html = html .. '  <div class="scfg-history"></div>\n'
+  html = html .. '  <div class="scfg-category-filter"></div>\n'
+  html = html .. '  <div class="scfg-edits"></div>\n'
+  html = html .. '</div>\n'
+
+  -- Include the script only once (on first scfg block)
+  if not scfg_script_included then
+    html = html .. '<script src="scfg-interactive.js"></script>\n'
+    scfg_script_included = true
+  end
+
+  return pandoc.RawBlock("html", html)
 end
 
 function render_grammar(el)
@@ -119,7 +194,7 @@ function render_yield(el)
   end
 
   local html = '<div class="render-yield">\n'
-  html = html .. '<span class="viz-label">render</span>\n'
+  html = html .. '<span class="viz-label">observation</span>\n'
   for _, token in ipairs(tokens) do
     html = html .. string.format('<span class="yield-token">%s</span>\n', token)
   end
@@ -141,7 +216,7 @@ function render_parse(el)
   -- Assign positions to all nodes
   layout_tree(tree, node_width, h_spacing)
   local total_width = tree.width
-  local total_height = get_tree_depth(tree) * v_spacing + node_height
+  local total_height = (get_tree_depth(tree) - 1) * v_spacing + node_height
 
   -- Generate SVG (no fixed width/height - let CSS handle sizing)
   local svg = string.format('<svg class="parse-tree-svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet">\n',

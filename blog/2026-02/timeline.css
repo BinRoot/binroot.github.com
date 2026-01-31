@@ -48,7 +48,6 @@
   font-variant-numeric: tabular-nums;
   color: var(--accent, #0066cc);
   min-width: 5ch;
-  margin-right: 0.5rem;
 }
 
 .timeline-era {

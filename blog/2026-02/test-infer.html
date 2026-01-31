@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Infer Mode</title>
+  <link rel="stylesheet" href="scfg-interactive.css">
+  <style>
+    body { background: #1d2021; color: #ebdbb2; font-family: sans-serif; padding: 2em; }
+  </style>
+</head>
+<body>
+  <h1>Test Grammar Search</h1>
+
+  <div class="scfg-editor"
+       data-initial-model='{"init":"bread"}'
+       data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]'
+       data-mode='infer'
+       data-targets='[["bread","crunchy","spread","grape","spread","bread","stack"],["bread","smooth","spread","strawberry","spread","bread","stack"],["bread","crunchy","spread","bread","strawberry","spread","stack"]]'>
+    <div class="scfg-editor-title">Grammar Search Test</div>
+    <div class="scfg-grammar"></div>
+    <div class="scfg-sample"></div>
+    <div class="scfg-history"></div>
+    <div class="scfg-category-filter"></div>
+    <div class="scfg-edits"></div>
+  </div>
+
+  <script src="scfg-interactive.js"></script>
+</body>
+</html>

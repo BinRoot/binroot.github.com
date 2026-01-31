@@ -101,6 +101,10 @@
   font-family: monospace;
 }
 
+.render-yield .viz-label {
+  flex-basis: 100%;
+}
+
 .yield-token {
   background: #b8bb26;
   color: #1d2021;

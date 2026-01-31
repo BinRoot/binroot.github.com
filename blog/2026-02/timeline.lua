@@ -62,7 +62,7 @@ function process_timeline_item(item)
 
     if year then
       return string.format(
-        '<div class="timeline-item"><span class="timeline-year">%s</span>%s</div>',
+        '<div class="timeline-item"><span class="timeline-year">%s</span> %s</div>',
         year, rest
       )
     else
@@ -89,7 +89,7 @@ function process_subitem(item)
 
   if year then
     return string.format(
-      '<div class="timeline-subitem"><span class="timeline-year">%s</span>%s</div>',
+      '<div class="timeline-subitem"><span class="timeline-year">%s</span> %s</div>',
       year, rest
     )
   else

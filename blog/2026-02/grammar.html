@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Grammar Models are back, baby!</title>
+  <title>Grammar models are back, baby!</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -110,6 +110,7 @@
   <link rel="stylesheet" href="grammar-viz.css" />
   <link rel="stylesheet" href="header.css" />
   <link rel="stylesheet" href="anchor.css" />
+  <link rel="stylesheet" href="scfg-interactive.css" />
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -117,10 +118,10 @@
 </head>
 <body>
 <header id="title-block-header">
-  <h1 class="title">Grammar Models are back, baby!</h1>
+  <h1 class="title">Grammar models are back, baby!</h1>
 </header>
 <div class="header-meta-row">
-  <a href="/" class="home-link">← Home</a>
+  <a href="/" class="home-link">‹ Home</a>
   <span class="header-meta">
     <span class="author">Nishant Shukla</span>
     <span class="meta-sep">·</span>
@@ -128,47 +129,51 @@
   </span>
 </div>
 
-<p>Grammar models are back, baby!</p>
+<p>Let’s gooooooo!</p>
 <div class="timeline">
 <div class="timeline-item"><div class="timeline-era">From the <span class="timeline-year">60s-80s</span>, we saw fundamental contributions to the study of
 context-free grammar:</div>
-<div class="timeline-subitem"><span class="timeline-year">1961</span>the CYK parsing algorithm was published <span class="citation"
+<div class="timeline-subitem"><span class="timeline-year">1961</span> the CYK parsing algorithm was published <span class="citation"
 data-cites="cyk">(<a href="#ref-cyk" role="doc-biblioref">Younger
 1967</a>)</span></div>
-<div class="timeline-subitem"><span class="timeline-year">1968</span>the Earley parser was published <span class="citation"
+<div class="timeline-subitem"><span class="timeline-year">1968</span> the Earley parser was published <span class="citation"
 data-cites="earley">(<a href="#ref-earley" role="doc-biblioref">Earley
 1968</a>)</span></div>
-<div class="timeline-subitem"><span class="timeline-year">1974</span>the GLR parser was formulated <span class="citation"
+<div class="timeline-subitem"><span class="timeline-year">1974</span> the GLR parser was formulated <span class="citation"
 data-cites="lang-glr">(<a href="#ref-lang-glr" role="doc-biblioref">Lang
 1974</a>)</span>, and then in 1984 it was implemented <span
 class="citation" data-cites="tomita-glr">(<a href="#ref-tomita-glr"
 role="doc-biblioref">Tomita 1986</a>)</span></div></div>
 <div class="timeline-item timeline-skip">(… skipping a bunch of other things …)</div>
-<div class="timeline-item"><span class="timeline-year">2023</span>llama.cpp popularized grammar-constrained decoding for local
+<div class="timeline-item"><span class="timeline-year">2023</span> llama.cpp popularized grammar-constrained decoding for local
 LLMs <span class="citation" data-cites="llama-grammar">(<a
 href="#ref-llama-grammar" role="doc-biblioref">Maurer 2023</a>)</span>.</div>
-<div class="timeline-item"><span class="timeline-year">2025</span>we begin to see state-machine grammars become mainstream <span
-class="citation" data-cites="mastra-state-machine">(<a
-href="#ref-mastra-state-machine" role="doc-biblioref">Mastra Team
-2025</a>)</span>. Around this time, I built a context-free grammar
-system to constrain function calls in the multi-agent framework at my
-current employer.</div>
-<div class="timeline-item"><span class="timeline-year">2025</span>OpenAI introduced native support for constraining LLM outputs
-with context-free grammar production rules, making grammars a first-call
-tool for controlling generation <span class="citation"
+<div class="timeline-item"><span class="timeline-year">2023</span> JSON mode finally returns valid JSON <span class="citation"
+data-cites="openai-devday-2023">(<a href="#ref-openai-devday-2023"
+role="doc-biblioref">OpenAI 2023</a>)</span></div>
+<div class="timeline-item"><span class="timeline-year">2025</span> state-machine grammars become mainstream <span class="citation"
+data-cites="mastra-state-machine">(<a href="#ref-mastra-state-machine"
+role="doc-biblioref">Mastra Team 2025</a>)</span>. Context-Free Grammars
+(CFG) too: I built a CFG parser to constrain agentic function calls at
+my current employer.</div>
+<div class="timeline-item"><span class="timeline-year">2025</span> OpenAI introduced native support for constraining LLM outputs
+with context-free grammar production rules <span class="citation"
 data-cites="openai-cfg">(<a href="#ref-openai-cfg"
 role="doc-biblioref">OpenAI 2025</a>)</span>.</div>
+<div class="timeline-item"><span class="timeline-year">2026</span> world models have been generating some buzz <span
+class="citation" data-cites="maloo2026worldmodels">(<a
+href="#ref-maloo2026worldmodels" role="doc-biblioref">Maloo
+2026</a>)</span></div>
 </div>
-<p>Structure is fashionable again, but this is February 2026 and I hear
-crickets.</p>
+<p>Structure is fashionable again. It feels like we’re one good
+abstraction away from grammars having their moment, and I think that
+abstraction is finally obvious.</p>
 <p>The purpose of this post is to outline a framework to talk about
 grammar generation, inference, and scoring all at once in a clean
 interface, with the hope that this explanation will simplify future
 research efforts on this topic.</p>
-<p>It feels like we’re one good abstraction away from grammars having
-their moment, and I think that abstraction is finally obvious.</p>
 <h2 id="a-clean-interface"><a href="#a-clean-interface"
-class="header-anchor">#</a>A Clean Interface</h2>
+class="header-anchor">#</a>A clean interface</h2>
 <p>Think of a grammar as a strongly-typed object.</p>
 <p>For example, this is <code>G</code>:</p>
 <div class="grammar-graph">
@@ -203,10 +208,10 @@ class="header-anchor">#</a>Top-down generation</h3>
 production choices):</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> G<span class="op">.</span><span class="fu">sample</span>()  <span class="co">// returns a Parse</span></span></code></pre></div>
-<p>You may get a parse that looks like this:</p>
+<p>You may get a parse that looks a bit like this:</p>
 <div class="parse-tree">
 <span class="viz-label">parse</span>
-<svg class="parse-tree-svg" viewBox="0 0 429 196" preserveAspectRatio="xMidYMid meet">
+<svg class="parse-tree-svg" viewBox="0 0 429 146" preserveAspectRatio="xMidYMid meet">
 <style>
   .tree-text { font-family: monospace; font-size: 14px; }
   .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
@@ -244,19 +249,20 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-
 <p>Then, you can render data from the parse:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> G<span class="op">.</span><span class="fu">render</span>(p)  <span class="co">// returns an Observation</span></span></code></pre></div>
+<p>Rendering drops the latent structure.</p>
 <div class="render-yield">
-<span class="viz-label">render</span>
+<span class="viz-label">observation</span>
 <span class="yield-token">setup</span>
 <span class="yield-token">test</span>
 <span class="yield-token">test</span>
 <span class="yield-token">test</span>
 <span class="yield-token">teardown</span>
 </div>
-<p>A sample is not usually deterministic.</p>
+<p>Sampling is stochastic.</p>
 <p>So, who knows, you may instead get a parse that looks like this:</p>
 <div class="parse-tree">
 <span class="viz-label">parse</span>
-<svg class="parse-tree-svg" viewBox="0 0 909 196" preserveAspectRatio="xMidYMid meet">
+<svg class="parse-tree-svg" viewBox="0 0 909 146" preserveAspectRatio="xMidYMid meet">
 <style>
   .tree-text { font-family: monospace; font-size: 14px; }
   .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
@@ -367,7 +373,7 @@ one that introduces the concept of running tests in parallel.</p>
 </div>
 <p>Try parsing this observation:</p>
 <div class="render-yield">
-<span class="viz-label">render</span>
+<span class="viz-label">observation</span>
 <span class="yield-token">setup</span>
 <span class="yield-token">test</span>
 <span class="yield-token">then</span>
@@ -379,12 +385,12 @@ one that introduces the concept of running tests in parallel.</p>
 <p>We can call <code>infer</code> to discover which parses can explain
 this data:</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(obs <span class="kw">=&gt;</span> x <span class="op">==</span> obs)  <span class="co">// returns Dist&lt;Parse&gt; | null</span></span></code></pre></div>
-<p>There are two potential parses for the same sequence:</p>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(obs <span class="kw">=&gt;</span> obs <span class="op">==</span> x)  <span class="co">// returns Dist&lt;Parse&gt; | null</span></span></code></pre></div>
+<p>There are two potential parses for the same sequence.</p>
 <p>Candidate 1:</p>
 <div class="parse-tree">
 <span class="viz-label">parse</span>
-<svg class="parse-tree-svg" viewBox="0 0 589 246" preserveAspectRatio="xMidYMid meet">
+<svg class="parse-tree-svg" viewBox="0 0 589 196" preserveAspectRatio="xMidYMid meet">
 <style>
   .tree-text { font-family: monospace; font-size: 14px; }
   .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
@@ -433,7 +439,7 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-
 <p>Candidate 2:</p>
 <div class="parse-tree">
 <span class="viz-label">parse</span>
-<svg class="parse-tree-svg" viewBox="0 0 589 246" preserveAspectRatio="xMidYMid meet">
+<svg class="parse-tree-svg" viewBox="0 0 589 196" preserveAspectRatio="xMidYMid meet">
 <style>
   .tree-text { font-family: monospace; font-size: 14px; }
   .tree-text.nonterminal { fill: #ebdbb2; font-style: italic; }
@@ -486,17 +492,17 @@ this:</p>
 <div class="distribution">
 <span class="viz-label">distribution</span>
 <svg class="distribution-svg" viewBox="0 0 510 155" preserveAspectRatio="xMidYMid meet">
-<rect class="dist-bar-zero" x="10" y="128" width="40" height="2" rx="1"/>
+<rect class="dist-bar" x="10" y="10" width="40" height="120" rx="2"/>
 <text class="dist-label" x="30" y="148" text-anchor="middle">1</text>
-<rect class="dist-bar-zero" x="60" y="128" width="40" height="2" rx="1"/>
+<rect class="dist-bar" x="60" y="10" width="40" height="120" rx="2"/>
 <text class="dist-label" x="80" y="148" text-anchor="middle">2</text>
-<rect class="dist-bar" x="110" y="10" width="40" height="120" rx="2"/>
+<rect class="dist-bar-zero" x="110" y="128" width="40" height="2" rx="1"/>
 <text class="dist-label" x="130" y="148" text-anchor="middle">3</text>
 <rect class="dist-bar-zero" x="160" y="128" width="40" height="2" rx="1"/>
 <text class="dist-label" x="180" y="148" text-anchor="middle">4</text>
 <rect class="dist-bar-zero" x="210" y="128" width="40" height="2" rx="1"/>
 <text class="dist-label" x="230" y="148" text-anchor="middle">5</text>
-<rect class="dist-bar" x="260" y="10" width="40" height="120" rx="2"/>
+<rect class="dist-bar-zero" x="260" y="128" width="40" height="2" rx="1"/>
 <text class="dist-label" x="280" y="148" text-anchor="middle">6</text>
 <rect class="dist-bar-zero" x="310" y="128" width="40" height="2" rx="1"/>
 <text class="dist-label" x="330" y="148" text-anchor="middle">7</text>
@@ -510,22 +516,21 @@ this:</p>
 </div>
 <p>Abstracted away is the fact that <code>infer</code> is performing a
 complicated parsing algorithm. It’s giving you access to the
-posterier:</p>
+posterior:</p>
 <p><span class="math display">\[
 P(p | x) \propto P(x | p) P(p)
 \]</span></p>
-<p>Is one more likely than the other? We can compare two likihoods using
-<code>score</code>:</p>
+<p>And lastly, we can compute a score using <code>score</code>:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p1<span class="op">,</span> x1)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p2<span class="op">,</span> x2)</span></code></pre></div>
-<h2 id="monte-carlo-tree-search-mcts"><a
-href="#monte-carlo-tree-search-mcts" class="header-anchor">#</a>Monte
-Carlo Tree Search (MCTS)</h2>
-<p><code>G.infer(...)</code> only tells you the next <em>possible
-moves</em>.</p>
-<p>MCTS, on the other hand, finds you the approx. <em>best
-move</em>.</p>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p<span class="op">,</span> x)  <span class="co">// log P(x | p) + log P(p)</span></span></code></pre></div>
+<h2 id="searching-in-observation-space"><a
+href="#searching-in-observation-space"
+class="header-anchor">#</a>Searching in observation space</h2>
+<p><code>G.infer(...)</code> can parse partial data, like a prefix of a
+sequence, or the list of moves made so far in a game. In other words, it
+describes the next <em>possible moves</em>.</p>
+<p>Monte Carlo Tree Search (MCTS), on the other hand, finds you the
+approx. <em>best move</em>.</p>
 <p>Don’t get stuck on the name, though.</p>
 <p><span class="math display">\[
 \underbrace{
@@ -540,70 +545,227 @@ move</em>.</p>
 \]</span></p>
 <p>In the algorithm, you construct a tree from scratch, where each path
 from the root represents the sequence of actions you may take.</p>
-<p>Example:</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// root</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span>]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1 -&gt; grandchild_1</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span><span class="op">,</span> <span class="st">&quot;test&quot;</span>] </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">// root -&gt; child_1 -&gt; grandchild_1 -&gt; great_grandchild_1</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>[<span class="st">&quot;setup&quot;</span><span class="op">,</span> <span class="st">&quot;test&quot;</span><span class="op">,</span> <span class="st">&quot;and&quot;</span>] </span></code></pre></div>
-<p>The algorithm is just 3 steps that repeat many times:</p>
+<p>Example</p>
+<div class="mermaid-diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612.8 562" width="612.8" height="562" style="--bg:#1d2021;--fg:#ebdbb2;--line:#665c54;--accent:#83a598;--muted:#a89984;--surface:#3c3836;--border:#504945">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="40" y="40" width="108.99999999999997" height="297" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="40" width="108.99999999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Iteration 1</text>
+<rect x="169" y="40" width="193.15" height="297" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="169" y="40" width="193.15" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="181" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Iteration 2</text>
+<rect x="382.15" y="40" width="190.64999999999998" height="482" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="382.15" y="40" width="190.64999999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="394.15" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Iteration 3</text>
+<polyline points="94.49999999999997,132 94.49999999999997,252" fill="none" stroke="#83a598" stroke-width="3px" marker-end="url(#arrowhead)" />
+<polyline points="264.4,132 264.4,152 221.14999999999998,152 221.14999999999998,266.5" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="264.4,132 264.4,152 307.65,152 307.65,252" fill="none" stroke="#83a598" stroke-width="3px" marker-end="url(#arrowhead)" />
+<polyline points="478.65,132 478.65,152 436.65,152 436.65,266.5" fill="none" stroke="#83a598" stroke-width="3px" marker-end="url(#arrowhead)" />
+<polyline points="478.65,132 478.65,152 520.65,152 520.65,266.5" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="436.65,302.5 436.65,437" fill="none" stroke="#83a598" stroke-width="3px" marker-end="url(#arrowhead)" />
+<rect x="64.19999999999997" y="96" width="60.6" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<circle cx="94.49999999999997" cy="284.5" r="32.5" fill="#83a598" stroke="#458588" stroke-width="2px" />
+<rect x="234.09999999999997" y="96" width="60.6" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<rect x="191.14999999999998" y="266.5" width="60" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<circle cx="307.65" cy="284.5" r="32.5" fill="#83a598" stroke="#458588" stroke-width="2px" />
+<rect x="448.34999999999997" y="96" width="60.6" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<rect x="406.65" y="266.5" width="60" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<rect x="490.65" y="266.5" width="60" height="36" rx="0" ry="0" fill="#3c3836" stroke="#665c54" stroke-width="1px" />
+<circle cx="436.65" cy="469.5" r="32.5" fill="#83a598" stroke="#458588" stroke-width="2px" />
+<text x="94.49999999999997" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">Root</text>
+<text x="94.49999999999997" y="284.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#1d2021">n1</text>
+<text x="264.4" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">Root</text>
+<text x="221.14999999999998" y="284.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">n1</text>
+<text x="307.65" y="284.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#1d2021">n2</text>
+<text x="478.65" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">Root</text>
+<text x="436.65" y="284.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">n1</text>
+<text x="520.65" y="284.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ebdbb2">n1</text>
+<text x="436.65" y="469.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#1d2021">n3</text>
+</svg>
+</div>
+<p>The algorithm iterates many times. In each iteration, we build up the
+tree:</p>
 <ol type="1">
 <li>Pick a promising starting path</li>
 <li>Roll out fully to see where it could end</li>
 <li>Tally up the results</li>
 </ol>
+<p>So, to get started, we’ll initialize a bare-bones tree.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// start with just the root node</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> <span class="fu">Tree</span>([</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Node</span>({</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// initial trivial partial parse</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">parse</span><span class="op">:</span> p0<span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// observation</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">obs</span><span class="op">:</span> <span class="st">&quot;&quot;</span><span class="op">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// frequency of usage (will be updated by `backprop`)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">visits</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// mean utility estimate (will be updated by `backprop`)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">value</span><span class="op">:</span> <span class="fl">0.0</span><span class="op">,</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div>
 <p>Let’s take everything we’ve learned, using <code>infer</code>,
 <code>sample</code>, <code>render</code>, and <code>score</code> to
-implement MCTS.</p>
+implement MCTS. The following code will be repeated in a loop many
+times:</p>
+<div class="code-with-keywords">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// === 1. pick a promising starting path ===</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">// tree selects a path (using UCB and prior)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> tree<span class="op">.</span><span class="fu">select</span>(node <span class="kw">=&gt;</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">score</mark></span>(node<span class="op">.</span><span class="at">parse</span><span class="op">,</span> node<span class="op">.</span><span class="at">obs</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// the last node is our frontier</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> path<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">// === 2. roll out fully to see where it could end ===</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">infer</mark></span>(obs <span class="kw">=&gt;</span> obs<span class="op">.</span><span class="fu">startsWith</span>(node<span class="op">.</span><span class="at">obs</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> P<span class="op">.</span><span class="fu"><mark class="keyword-highlight">sample</mark></span>({ <span class="dt">reject</span><span class="op">:</span> node<span class="op">.</span><span class="at">children</span><span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c<span class="op">.</span><span class="at">parse</span>) })</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">render</mark></span>(p)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>nextMove <span class="op">=</span> x<span class="op">.</span><span class="fu">at</span>(node<span class="op">.</span><span class="at">obs</span><span class="op">.</span><span class="at">length</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>child <span class="op">=</span> tree<span class="op">.</span><span class="fu">add</span>(node<span class="op">,</span> <span class="bu">Node</span>(p<span class="op">,</span> [<span class="op">...</span>node<span class="op">.</span><span class="at">obs</span><span class="op">,</span> nextMove]))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">// === 3. Tally up the results ===</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">utility</span>(x)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>tree<span class="op">.</span><span class="fu">backprop</span>(path<span class="op">,</span> child<span class="op">,</span> u)</span></code></pre></div></div>
+<p>I know, I threw in a bunch of undefined things in there, such as
+<code>tree.select</code> and <code>tree.backprop</code>, but you can
+imagine an API that lets you vibe-mcts. For clarity, I must explain:</p>
+<ul>
+<li><code>tree.select</code> builds a path from the root by repeatedly
+choosing a child using a policy known as UCB/PUCT, with
+<code>G.score</code> acting as a prior.</li>
+<li><code>utility(x)</code> is the value of that state, defined ad-hoc
+based on the context.</li>
+<li><code>tree.backprop</code> walks back up the path, incrementing
+<code>node.visits</code> and updating the running
+<code>node.value</code> estimate.</li>
+</ul>
+<p>But c’mon, isn’t that so cool!? You’re basically 80% there with just
+this interface!</p>
+<h2 id="searching-in-grammar-space"><a
+href="#searching-in-grammar-space" class="header-anchor">#</a>Searching
+in grammar space</h2>
+<p>Given a grammar model:</p>
+<ul>
+<li><code>G.infer(...)</code> reveals candidate next moves</li>
+<li>The MCTS algorithm above finds the best move</li>
+</ul>
+<p>But, how do you learn a grammar in the first place?</p>
+<p>Similar to the algorithm above, let’s start with a root node:</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// pick a path in the tree</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>nodes <span class="op">=</span> <span class="fu">pick_path</span>(<span class="bu">root</span>)  <span class="co">// UCB</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">// grow the tree by 1 node</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> nodes[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(_x <span class="kw">=&gt;</span> _x<span class="op">.</span><span class="fu">startsWith</span>(n<span class="op">.</span><span class="at">prefix</span>))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (D<span class="op">==</span><span class="kw">null</span>) <span class="cf">continue</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> D<span class="op">.</span><span class="fu">sample</span>()</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fu">nextToken</span>(G<span class="op">.</span><span class="fu">render</span>(p)<span class="op">,</span> n<span class="op">.</span><span class="at">prefix</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>n2 <span class="op">=</span> n<span class="op">.</span><span class="fu">childOrCreate</span>(t)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">// back prop</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">=</span> G<span class="op">.</span><span class="fu">infer</span>(_x <span class="kw">=&gt;</span> _x<span class="op">.</span><span class="fu">startsWith</span>(n2<span class="op">.</span><span class="at">prefix</span>))<span class="op">.</span><span class="fu">sample</span>()</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p2<span class="op">,</span> x)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">backprop</span>(path<span class="op">+</span>[n2]<span class="op">,</span> s)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>best<span class="op">=</span><span class="fu">max</span>(best<span class="op">,</span>(s<span class="op">,</span>p2))</span></code></pre></div>
-<h2 id="example"><a href="#example"
-class="header-anchor">#</a>Example</h2>
-<p>The beauty of a grammar model is that you can run forward to generate
-output, or run background to explain output.</p>
-<p>Here’s a naive sandwich-making model that appears straightforward at
-first sight.</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>init<span class="op">:</span> <span class="fu">and</span>(spread<span class="op">-</span>pb<span class="op">-</span>on<span class="op">-</span>bread<span class="op">,</span> spread<span class="op">-</span>jelly<span class="op">-</span>on<span class="op">-</span>bread)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>spread<span class="op">-</span>pb<span class="op">-</span>on<span class="op">-</span>bread<span class="op">:</span> <span class="fu">and</span>(bread<span class="op">,</span> pb)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>spread<span class="op">-</span>jelly<span class="op">-</span>on<span class="op">-</span>bread<span class="op">:</span> <span class="fu">and</span>(bread<span class="op">,</span> jelly)</span></code></pre></div>
-<p>You get the sample <code>bread pb bread jelly</code>.</p>
-<p>Notice how the structure is lost.</p>
-<p>Here’s a cool magic trick. Let’s make actions like
-<code>spread</code> and <code>stack</code> into terminals.</p>
-<p>Samples may look like this
-<code>bread pb spread bread jelly spread stack</code>.</p>
-<p>You may argue there is still no structure here; it’s just a flat list
-of words.</p>
-<p>The good news is that if we identify “spread” and “stack” as
-functions, then we can actually represent this sequence of words as a
-valid Forth program.</p>
-<p>Moreover, a static validator can prove the grammar only produces
-valid Forth, guaranteeing correctness by construction.</p>
-<h2 id="monte-carlo-tree-search"><a href="#monte-carlo-tree-search"
-class="header-anchor">#</a>Monte-Carlo Tree Search</h2>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// start with just the root node</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> <span class="fu">Tree</span>([</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Node</span>({</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// initial trivial partial parse</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">parse</span><span class="op">:</span> p0<span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// observation, trivial grammar object</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">obs</span><span class="op">:</span> G0<span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// frequency of usage (will be updated by `backprop`)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">visits</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// mean utility estimate (will be updated by `backprop`)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">value</span><span class="op">:</span> <span class="fl">0.0</span><span class="op">,</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div>
+<p>Define a set of edit actions one can perform on grammars.</p>
+<p>Do you see where I’m going with this?</p>
+<p>Run the same MCTS algorithm above, but instead of searching through
+the space of observations constrained by grammar actions, search through
+the space of grammar objects constrained by grammar-edit actions.</p>
+<p>For example, let’s say you’d like to learn how to make a peanut
+butter and jelly sandwich. Let’s establish some atomic concepts:</p>
+<ul>
+<li>nouns:
+<ul>
+<li><code>bread</code></li>
+<li>Jelly (<code>strawberry</code>, <code>grape</code>)</li>
+<li>Peanut butter (<code>crunchy</code>, <code>smooth</code>)</li>
+</ul></li>
+<li>verbs:
+<ul>
+<li><code>spread</code> (for spreading things on bread)</li>
+<li><code>stack</code> (for stacking slices of bread)</li>
+</ul></li>
+</ul>
+<div class="scfg-editor" data-initial-model='{"init":{"kind":"or","alts":["single-method","two-slice"]},"single-method":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread",{"kind":"or","alts":["grape","strawberry"]},"spread","bread","stack"]},"two-slice":{"kind":"and","parts":["pb-slice","jelly-slice","stack"]},"pb-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread"]},"jelly-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["grape","strawberry"]},"spread"]}}' data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' data-mode='run' data-targets='[]'>
+  <div class="scfg-editor-title">PB&J Grammar</div>
+  <div class="scfg-grammar"></div>
+  <div class="scfg-sample"></div>
+  <div class="scfg-history"></div>
+  <div class="scfg-category-filter"></div>
+  <div class="scfg-edits"></div>
+</div>
+<script src="scfg-interactive.js"></script>
+
+<p>Sampling from that grammar will produce a sequence of words that
+maybe at first glance sound like gibberish, but I’ve been careful to
+ensure it compiles to valid Forth <span class="citation"
+data-cites="forth">(<a href="#ref-forth" role="doc-biblioref">Moore
+1970</a>)</span> code. Hit the “Sample &amp; Run” button to see for
+yourself!</p>
+<p>Searching in grammar space means starting from a trivial grammar, and
+performing a sequence of edits to discover an optimal grammar. And, it’s
+harder than it sounds.</p>
+<p>Can you edit this grammar below into the one above?</p>
+<div class="scfg-editor" data-initial-model='{"init":"bread"}' data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' data-mode='edit' data-targets='[]'>
+  <div class="scfg-editor-title">Build a Grammar</div>
+  <div class="scfg-grammar"></div>
+  <div class="scfg-sample"></div>
+  <div class="scfg-history"></div>
+  <div class="scfg-category-filter"></div>
+  <div class="scfg-edits"></div>
+</div>
+
+<p>Click the edit operations above to transform the grammar. I gave up
+after 20 seconds.</p>
+<p>The goal of the MCTS algorithm is to find the sequence of actions
+that will get us there, by mutating the grammar to maximize a
+pre-defined utility.</p>
+<h3 id="demo"><a href="#demo" class="header-anchor">#</a>Demo</h3>
+<p>In the demo below, click “Start Search” to watch MCTS discover a
+grammar that matches a set of target sequences:</p>
+<div class="scfg-editor" data-initial-model='{"init":"bread"}' data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' data-mode='infer' data-targets='[["bread","crunchy","spread","grape","spread","bread","stack"],["bread","smooth","spread","grape","spread","bread","stack"],["bread","crunchy","spread","bread","grape","spread","stack"],["bread","smooth","spread","bread","grape","spread","stack"],["bread","crunchy","spread","strawberry","spread","bread","stack"]]'>
+  <div class="scfg-editor-title">Grammar Search</div>
+  <div class="scfg-grammar"></div>
+  <div class="scfg-sample"></div>
+  <div class="scfg-history"></div>
+  <div class="scfg-category-filter"></div>
+  <div class="scfg-edits"></div>
+</div>
+
+<p>The search uses MCTS over grammar-edit actions and scores
+candidates.</p>
+<p>After you run the search, pay special attention to the “novel idea”
+section. It’ll show you an observation that doesn’t exist in the
+training data. You can hit run to see the idea in action.</p>
+<p>The beauty of grammar synthesis is that the learned grammar is beyond
+the sum of it’s parts.</p>
 <h2 class="unnumbered" id="references"><a href="#references"
 class="header-anchor">#</a>References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent"
@@ -617,6 +779,11 @@ Lang, Bernard. 1974. <span>“Deterministic Techniques for Efficient
 Non-Deterministic Parsers.”</span> <em>Automata, Languages and
 Programming</em>, Lecture notes in computer science, 14: 255–69.
 </div>
+<div id="ref-maloo2026worldmodels" class="csl-entry" role="listitem">
+Maloo, Ankit. 2026. <span>“World Models.”</span> <a
+href="https://ankitmaloo.com/world-models/"
+class="uri">https://ankitmaloo.com/world-models/</a>.
+</div>
 <div id="ref-mastra-state-machine" class="csl-entry" role="listitem">
 Mastra Team. 2025. <span>“State-Machine Grammar for Agent
 Behavior.”</span> May 2025. <a
@@ -627,9 +794,19 @@ Maurer, Iwan. 2023. <span>“Grammar-Constrained Decoding for Local
 LLMs.”</span> 2023. <a
 href="https://www.imaurer.com">https://www.imaurer.com</a>.
 </div>
+<div id="ref-forth" class="csl-entry" role="listitem">
+Moore, Charles H. 1970. <span>“FORTH: A New Way to Program a
+Mini-Computer.”</span> In <em>Astronomical Society of the Pacific
+Conference Series</em>, 5:8–10.
+</div>
+<div id="ref-openai-devday-2023" class="csl-entry" role="listitem">
+OpenAI. 2023. <span>“New Models and Developer Products Announced at
+DevDay.”</span> November 6, 2023. <a
+href="https://openai.com/index/new-models-and-developer-products-announced-at-devday/">https://openai.com/index/new-models-and-developer-products-announced-at-devday/</a>.
+</div>
 <div id="ref-openai-cfg" class="csl-entry" role="listitem">
-OpenAI. 2025. <span>“GPT-5 New Parameters and Tools: Context-Free
-Grammar Support.”</span> August 2025. <a
+———. 2025. <span>“GPT-5 New Parameters and Tools: Context-Free Grammar
+Support.”</span> August 2025. <a
 href="https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools">https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools</a>.
 </div>
 <div id="ref-tomita-glr" class="csl-entry" role="listitem">

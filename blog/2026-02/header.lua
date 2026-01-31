@@ -13,7 +13,7 @@ function Pandoc(doc)
   <h1 class="title">%s</h1>
 </header>
 <div class="header-meta-row">
-  <a href="/" class="home-link">← Home</a>
+  <a href="/" class="home-link">‹ Home</a>
   <span class="header-meta">
     <span class="author">%s</span>
     <span class="meta-sep">·</span>

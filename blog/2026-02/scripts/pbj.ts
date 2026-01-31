@@ -91,4 +91,7 @@ function main() {
   }
 }
 
-main();
+// Run main only if this is the entry point
+if (import.meta.main) {
+  main();
+}

@@ -1,12 +1,12 @@
 ---
-title: "Grammar Models are back, baby!"
+title: "Grammar models are back, baby!"
 author: Nishant Shukla
 date: February 1, 2026
 bibliography: references.bib
 link-citations: true
 ---
 
-Grammar models are back, baby!
+Let's gooooooo!
 
 ::: timeline
 - From the 60s-80s, we saw fundamental contributions to the study of context-free grammar:
@@ -15,19 +15,18 @@ Grammar models are back, baby!
   - In 1974, the GLR parser was formulated [@lang-glr], and then in 1984 it was implemented [@tomita-glr]
 - (... skipping a bunch of other things ...)
 - In 2023, llama.cpp popularized grammar-constrained decoding for local LLMs [@llama-grammar].
-- In 2025, we begin to see state-machine grammars become mainstream [@mastra-state-machine]. Around this time, I built a context-free grammar system to constrain function calls in the multi-agent framework at my current employer.
-- In 2025, OpenAI introduced native support for constraining LLM outputs with context-free grammar production rules, making grammars a first-call tool for controlling generation [@openai-cfg].
+- In 2023, JSON mode finally returns valid JSON [@openai-devday-2023]
+- In 2025, state-machine grammars become mainstream [@mastra-state-machine]. Context-Free Grammars (CFG) too: I built a CFG parser to constrain agentic function calls at my current employer.
+- In 2025, OpenAI introduced native support for constraining LLM outputs with context-free grammar production rules [@openai-cfg].
+- In 2026, world models have been generating some buzz [@maloo2026worldmodels]
 :::
 
-Structure is fashionable again, but this is February 2026 and I hear crickets.
+Structure is fashionable again. It feels like we're one good abstraction away from grammars having their moment, and I think that abstraction is finally obvious.
 
 The purpose of this post is to outline a framework to talk about grammar generation, inference, and scoring all at once in a clean interface, with the hope that this explanation will simplify future research efforts on this topic.
 
-It feels like we're one good abstraction away from grammars having their moment, and I think that abstraction is finally obvious.
 
-
-
-## A Clean Interface
+## A clean interface
 
 Think of a grammar as a strongly-typed object.
 
@@ -35,7 +34,7 @@ For example, this is `G`:
 
 :::graph
 root: setup tests teardown
-tests: test tests | test 
+tests: test tests | test
 :::
 
 ### Top-down generation
@@ -46,11 +45,11 @@ You can sample from the grammar (assuming uniform distribution over production c
 p = G.sample()  // returns a Parse
 ```
 
-You may get a parse that looks like this:
+You may get a parse that looks a bit like this:
 
 :::parse
 root: setup tests teardown
-tests: test test test 
+tests: test test test
 :::
 
 Then, you can render data from the parse:
@@ -59,12 +58,14 @@ Then, you can render data from the parse:
 x = G.render(p)  // returns an Observation
 ```
 
+Rendering drops the latent structure.
+
 :::render
 setup test test test teardown
 :::
 
 
-A sample is not usually deterministic. 
+Sampling is stochastic.
 
 So, who knows, you may instead get a parse that looks like this:
 
@@ -99,10 +100,10 @@ setup test then test and test teardown
 We can call `infer` to discover which parses can explain this data:
 
 ```javascript
-P = G.infer(obs => x == obs)  // returns Dist<Parse> | null
+P = G.infer(obs => obs == x)  // returns Dist<Parse> | null
 ```
 
-There are two potential parses for the same sequence:
+There are two potential parses for the same sequence.
 
 Candidate 1:
 
@@ -126,41 +127,41 @@ That's why `infer(...)` returns a probability distribution.
 You can imagine the probability distribution looks somewhat like this:
 
 :::distribution
-1: 0
-2: 0
-3: 0.5
+1: 0.5
+2: 0.5
+3: 0
 4: 0
 5: 0
-6: 0.5
+6: 0
 7: 0
 8: 0
 9: 0
 10: 0
 :::
 
-Abstracted away is the fact that `infer` is performing a complicated parsing algorithm. 
-It's giving you access to the posterier:
+Abstracted away is the fact that `infer` is performing a complicated parsing algorithm.
+It's giving you access to the posterior:
 
 $$
 P(p | x) \propto P(x | p) P(p)
 $$
 
 
-Is one more likely than the other? We can compare two likihoods using `score`:
+And lastly, we can compute a score using `score`:
 
 ```javascript
-s1 = G.score(p1, x1)
-s2 = G.score(p2, x2)
+s = G.score(p, x)  // log P(x | p) + log P(p)
 ```
 
 
-## Monte Carlo Tree Search (MCTS)
+## Searching in observation space
 
-`G.infer(...)` only tells you the next _possible moves_.
+`G.infer(...)` can parse partial data, like a prefix of a sequence, or the list of moves made so far in a game.
+In other words, it describes the next _possible moves_.
 
-MCTS, on the other hand, finds you the approx. _best move_.
+Monte Carlo Tree Search (MCTS), on the other hand, finds you the approx. _best move_.
 
-Don't get stuck on the name, though. 
+Don't get stuck on the name, though.
 
 $$
 \underbrace{
@@ -176,74 +177,182 @@ $$
 
 In the algorithm, you construct a tree from scratch, where each path from the root represents the sequence of actions you may take.
 
-Example:
+Example
 
-:::mermaid
+```mermaid
 graph TD
-  A[Start] --> B[Process] --> C[End]
-:::
+
+  classDef new fill:#83a598,stroke:#458588,stroke-width:2px,color:#1d2021;
+  classDef old fill:#3c3836,stroke:#665c54,stroke-width:1px,color:#ebdbb2;
+
+  subgraph S1[Iteration 1]
+    r1[Root] --> n1((n1))
+    class r1 old
+    class n1 new
+  end
+
+  subgraph S2[Iteration 2]
+    r2[Root]
+    r2 --> a2[n1]
+    r2 --> n2((n2))
+    class r2,a2 old
+    class n2 new
+  end
+
+  subgraph S3[Iteration 3]
+    r3[Root]
+    r3 --> a3[n1]
+    r3 --> b3[n1]
+    a3 --> n3((n3))
+    class r3,a3,b3 old
+    class n3 new
+  end
+
+  %% Highlight path edges to the new node in each snapshot
+  linkStyle 0 stroke:#83a598,stroke-width:3px;
+  linkStyle 2 stroke:#83a598,stroke-width:3px;
+  linkStyle 3 stroke:#83a598,stroke-width:3px;
+  linkStyle 5 stroke:#83a598,stroke-width:3px;
 
 
+```
 
-The algorithm is just 3 steps that repeat many times:
+
+The algorithm iterates many times. In each iteration, we build up the tree:
 
 1. Pick a promising starting path
 2. Roll out fully to see where it could end
 3. Tally up the results
 
+So, to get started, we'll initialize a bare-bones tree.
+
+```javascript
+// start with just the root node
+tree = Tree([
+  Node({
+    // initial trivial partial parse
+	parse: p0,
+	// observation
+	obs: "",
+	// frequency of usage (will be updated by `backprop`)
+	visits: 0,
+	// mean utility estimate (will be updated by `backprop`)
+	value: 0.0,
+  })
+])
+```
+
 Let's take everything we've learned, using `infer`, `sample`, `render`, and `score` to implement MCTS.
+The following code will be repeated in a loop many times:
+
+::: {.code keywords="infer,sample,render,score"}
+```javascript
+// === 1. pick a promising starting path ===
+// tree selects a path (using UCB and prior)
+path = tree.select(node => G.score(node.parse, node.obs))
+// the last node is our frontier
+node = path.at(-1)
+
+// === 2. roll out fully to see where it could end ===
+P = G.infer(obs => obs.startsWith(node.obs))
+p = P.sample({ reject: node.children.map(c => c.parse) })
+x = G.render(p)
+nextMove = x.at(node.obs.length)
+child = tree.add(node, Node(p, [...node.obs, nextMove]))
+
+// === 3. Tally up the results ===
+u = utility(x)
+tree.backprop(path, child, u)
+
+```
+:::
+
+I know, I threw in a bunch of undefined things in there, such as `tree.select` and `tree.backprop`, but you can imagine an API that lets you vibe-mcts.
+For clarity, I must explain:
+
+- `tree.select` builds a path from the root by repeatedly choosing a child using a policy known as UCB/PUCT, with `G.score` acting as a prior.
+- `utility(x)` is the value of that state, defined ad-hoc based on the context.
+- `tree.backprop` walks back up the path, incrementing `node.visits` and updating the running `node.value` estimate.
 
 
+But c'mon, isn't that so cool!? You're basically 80% there with just this interface!
+
+## Searching in grammar space
+
+Given a grammar model:
+
+- `G.infer(...)` reveals candidate next moves
+- The MCTS algorithm above finds the best move
+
+But, how do you learn a grammar in the first place?
+
+Similar to the algorithm above, let's start with a root node:
 
 ```javascript
-// pick a path in the tree
-nodes = pick_path(root)  // UCB
-
-// grow the tree by 1 node
-n = nodes[-1]
-D = G.infer(_x => _x.startsWith(n.prefix))
-if (D==null) continue
-p = D.sample()
-t = nextToken(G.render(p), n.prefix)
-n2 = n.childOrCreate(t)
-
-// back prop
-p2 = G.infer(_x => _x.startsWith(n2.prefix)).sample()
-s = G.score(p2, x)
-backprop(path+[n2], s)
-best=max(best,(s,p2))
+// start with just the root node
+tree = Tree([
+  Node({
+    // initial trivial partial parse
+	parse: p0,
+	// observation, trivial grammar object
+	obs: G0,
+	// frequency of usage (will be updated by `backprop`)
+	visits: 0,
+	// mean utility estimate (will be updated by `backprop`)
+	value: 0.0,
+  })
+])
 ```
 
+Define a set of edit actions one can perform on grammars.
+
+Do you see where I'm going with this?
+
+Run the same MCTS algorithm above, but instead of searching through the space of observations constrained by grammar actions, search through the space of grammar objects constrained by grammar-edit actions.
+
+For example, let's say you'd like to learn how to make a peanut butter and jelly sandwich. Let's establish some atomic concepts:
+
+- nouns:
+  - `bread`
+  - Jelly (`strawberry`, `grape`)
+  - Peanut butter (`crunchy`, `smooth`)
+- verbs:
+  - `spread` (for spreading things on bread)
+  - `stack` (for stacking slices of bread)
 
 
-## Example
+::: {.scfg model='{"init":{"kind":"or","alts":["single-method","two-slice"]},"single-method":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread",{"kind":"or","alts":["grape","strawberry"]},"spread","bread","stack"]},"two-slice":{"kind":"and","parts":["pb-slice","jelly-slice","stack"]},"pb-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread"]},"jelly-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["grape","strawberry"]},"spread"]}}' symbols='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' title="PB&J Grammar" mode="run"}
+:::
 
-The beauty of a grammar model is that you can run forward to generate output, or run background to explain output.
+Sampling from that grammar will produce a sequence of words that maybe at first glance sound like gibberish, but I've been careful to ensure it compiles to valid Forth [@forth] code. Hit the "Sample & Run" button to see for yourself!
 
-Here's a naive sandwich-making model that appears straightforward at first sight.
+Searching in grammar space means starting from a trivial grammar, and performing a sequence of edits to discover an optimal grammar. And, it's harder than it sounds.
 
-```javascript
-init: and(spread-pb-on-bread, spread-jelly-on-bread)
-spread-pb-on-bread: and(bread, pb)
-spread-jelly-on-bread: and(bread, jelly)
-```
+Can you edit this grammar below into the one above?
 
-You get the sample `bread pb bread jelly`. 
+::: {.scfg model='{"init":"bread"}' symbols='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' title="Build a Grammar" mode="edit"}
+:::
 
-Notice how the structure is lost. 
+Click the edit operations above to transform the grammar. I gave up after 20 seconds.
 
-Here's a cool magic trick. Let's make actions like `spread` and `stack` into terminals. 
+The goal of the MCTS algorithm is to find the sequence of actions that will get us there, by mutating the grammar to maximize a pre-defined utility.
 
-Samples may look like this `bread pb spread bread jelly spread stack`.
+### Demo
 
-You may argue there is still no structure here; it's just a flat list of words.
+In the demo below, click "Start Search" to watch MCTS discover a grammar that matches a set of target sequences:
 
-The good news is that if we identify "spread" and "stack" as functions, then we can actually represent this sequence of words as a valid Forth program. 
-
-Moreover, a static validator can prove the grammar only produces valid Forth, guaranteeing correctness by construction.
+::: {.scfg model='{"init":"bread"}' symbols='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' targets='[["bread","crunchy","spread","grape","spread","bread","stack"],["bread","smooth","spread","grape","spread","bread","stack"],["bread","crunchy","spread","bread","grape","spread","stack"],["bread","smooth","spread","bread","grape","spread","stack"],["bread","crunchy","spread","strawberry","spread","bread","stack"]]' title="Grammar Search" mode="infer"}
+:::
 
 
-## Monte-Carlo Tree Search
+
+The search uses MCTS over grammar-edit actions and scores candidates.
+
+After you run the search, pay special attention to the "novel idea" section. 
+It'll show you an observation that doesn't exist in the training data.
+You can hit run to see the idea in action.
+
+The beauty of grammar synthesis is that the learned grammar is beyond the sum of its parts.
 
 
 
