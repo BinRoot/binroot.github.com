@@ -151,7 +151,7 @@ And lastly, we can compute a score using `score`:
 s = G.score(p, x)  // log P(x | p) + log P(p)
 ```
 
-This interface is sufficient for some really powerful algorithms, as we'll seen below.
+This interface is sufficient for some really powerful algorithms, as we'll see below.
 
 
 ## Searching in observation space
