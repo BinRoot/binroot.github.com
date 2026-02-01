@@ -2,6 +2,17 @@
   --link-color: #83a598;
 }
 
+/* Prevent global horizontal scrolling */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure main content doesn't overflow */
+body > * {
+  max-width: 100%;
+}
+
 /* Pandoc syntax highlighting - dark mode friendly */
 code span.al { color: #ff6b6b; font-weight: bold; } /* Alert */
 code span.an { color: #87ceeb; font-weight: bold; font-style: italic; } /* Annotation */
@@ -61,4 +72,55 @@ a[role="doc-biblioref"]:hover {
 p + ul,
 p + ol {
   margin-top: -0.5em;
+}
+
+/* Code block overflow fix - keep scrollbar inside rounded border */
+div.sourceCode {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border, #444);
+}
+
+div.sourceCode > pre {
+  overflow-x: auto;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+}
+
+/* For code blocks not wrapped in div.sourceCode */
+pre:not(.sourceCode):not(div.sourceCode > pre) {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+/* Mermaid diagram container - local scrolling */
+.mermaid-diagram {
+  overflow-x: auto;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+.mermaid-diagram svg {
+  display: block;
+  max-width: none;
+}
+
+/* Tables - local scrolling */
+table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Images and figures */
+img, figure {
+  max-width: 100%;
+  height: auto;
+}
+
+/* MathJax equations */
+.MathJax_Display, mjx-container {
+  overflow-x: auto;
+  max-width: 100%;
 }

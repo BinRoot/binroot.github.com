@@ -246,6 +246,17 @@
   --link-color: #83a598;
 }
 
+/* Prevent global horizontal scrolling */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure main content doesn't overflow */
+body > * {
+  max-width: 100%;
+}
+
 /* Pandoc syntax highlighting - dark mode friendly */
 code span.al { color: #ff6b6b; font-weight: bold; } /* Alert */
 code span.an { color: #87ceeb; font-weight: bold; font-style: italic; } /* Annotation */
@@ -307,6 +318,57 @@ p + ol {
   margin-top: -0.5em;
 }
 
+/* Code block overflow fix - keep scrollbar inside rounded border */
+div.sourceCode {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border, #444);
+}
+
+div.sourceCode > pre {
+  overflow-x: auto;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+}
+
+/* For code blocks not wrapped in div.sourceCode */
+pre:not(.sourceCode):not(div.sourceCode > pre) {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+/* Mermaid diagram container - local scrolling */
+.mermaid-diagram {
+  overflow-x: auto;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+.mermaid-diagram svg {
+  display: block;
+  max-width: none;
+}
+
+/* Tables - local scrolling */
+table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Images and figures */
+img, figure {
+  max-width: 100%;
+  height: auto;
+}
+
+/* MathJax equations */
+.MathJax_Display, mjx-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
 </style>
 
   
@@ -330,6 +392,8 @@ p + ol {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .grammar-rule {
@@ -392,6 +456,8 @@ p + ol {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .parse-tree-svg {
@@ -413,6 +479,8 @@ p + ol {
   gap: 0.5em;
   align-items: center;
   font-family: monospace;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .render-yield .viz-label {
@@ -434,6 +502,8 @@ p + ol {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .distribution-svg {
@@ -456,6 +526,30 @@ p + ol {
   font-family: monospace;
   font-size: 12px;
   fill: #a89984;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .grammar-rule {
+    font-size: 0.9em;
+  }
+
+  .grammar-lhs {
+    min-width: 60px;
+  }
+
+  .grammar-terminal,
+  .grammar-nonterminal {
+    padding: 0.1em 0.35em;
+  }
+
+  .render-yield {
+    font-size: 0.9em;
+  }
+
+  .yield-token {
+    padding: 0.15em 0.4em;
+  }
 }
 
 </style>
@@ -568,6 +662,8 @@ h6:hover .header-anchor {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .scfg-editor-title {
@@ -586,6 +682,8 @@ h6:hover .header-anchor {
   padding: 1em;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 6px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .scfg-rule {
@@ -1085,6 +1183,22 @@ h6:hover .header-anchor {
   font-size: 0.75em;
   font-weight: bold;
   margin-left: auto;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .scfg-grammar {
+    font-size: 0.9em;
+  }
+
+  .scfg-lhs {
+    min-width: 50px;
+  }
+
+  .scfg-terminal,
+  .scfg-nonterminal {
+    padding: 0.05em 0.3em;
+  }
 }
 
 </style>

@@ -16,6 +16,8 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .grammar-rule {
@@ -78,6 +80,8 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .parse-tree-svg {
@@ -99,6 +103,8 @@
   gap: 0.5em;
   align-items: center;
   font-family: monospace;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .render-yield .viz-label {
@@ -120,6 +126,8 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .distribution-svg {
@@ -142,4 +150,28 @@
   font-family: monospace;
   font-size: 12px;
   fill: #a89984;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .grammar-rule {
+    font-size: 0.9em;
+  }
+
+  .grammar-lhs {
+    min-width: 60px;
+  }
+
+  .grammar-terminal,
+  .grammar-nonterminal {
+    padding: 0.1em 0.35em;
+  }
+
+  .render-yield {
+    font-size: 0.9em;
+  }
+
+  .yield-token {
+    padding: 0.15em 0.4em;
+  }
 }

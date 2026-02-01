@@ -25,6 +25,8 @@
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .scfg-editor-title {
@@ -43,6 +45,8 @@
   padding: 1em;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 6px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .scfg-rule {
@@ -542,4 +546,20 @@
   font-size: 0.75em;
   font-weight: bold;
   margin-left: auto;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .scfg-grammar {
+    font-size: 0.9em;
+  }
+
+  .scfg-lhs {
+    min-width: 50px;
+  }
+
+  .scfg-terminal,
+  .scfg-nonterminal {
+    padding: 0.05em 0.3em;
+  }
 }
