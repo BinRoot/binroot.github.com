@@ -232,9 +232,8 @@
     height: 10px;
   }
 
-  .timeline-year {
-    display: block;
-    margin-bottom: 0.25rem;
+  .timeline-skip::after {
+    left: calc(-1.25rem + 5px - 8px);
   }
 }
 
@@ -1090,12 +1089,66 @@ h6:hover .header-anchor {
 
 </style>
 
+  
+<!-- inlined citations.css -->
+<style data-href="citations.css">
+/* Highlight bibliography entry when targeted via anchor link */
+.csl-entry:target {
+  position: relative;
+}
+
+.csl-entry:target::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -2.4em;
+  right: -4px;
+  border: 2px solid #6699cc;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Style for back-links */
+.citation-backlinks {
+  font-size: 0.85em;
+  margin-right: 0.5em;
+}
+
+.citation-backlink {
+  display: inline-block;
+  margin-right: 0.25em;
+  color: #e7a811;
+  text-decoration: none;
+}
+
+.citation-backlink:hover {
+  color: #c99200;
+  text-decoration: underline;
+}
+
+</style>
+
   <script
     src="https://cdn.counter.dev/script.js"
     data-id="476c224d-08f5-44d4-a25a-005e5c890f79"
     data-utcoffset="-7"
     defer
   ></script>
+  <meta name="description" content="A framework for grammar-constrained generation, inference, and scoring in LLMs. Covers context-free grammars, stochastic grammars, and structured output generation." />
+  <meta name="author" content="Nishant Shukla" />
+  <meta name="keywords" content="context-free grammar, CFG, LLM, structured output, grammar-constrained decoding, stochastic grammar, SCFG, machine learning" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://shukla.io/blog/2026-02/grammar.html" />
+  <meta property="og:title" content="Grammar models are back, baby!" />
+  <meta property="og:description" content="A framework for grammar-constrained generation, inference, and scoring in LLMs. Covers context-free grammars, stochastic grammars, and structured output generation." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://shukla.io/blog/2026-02/grammar.html" />
+  <meta property="article:author" content="Nishant Shukla" />
+  <meta property="article:published_time" content="2026-02-01" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Grammar models are back, baby!" />
+  <meta name="twitter:description" content="A framework for grammar-constrained generation, inference, and scoring in LLMs. Covers context-free grammars, stochastic grammars, and structured output generation." />
   <script
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
   type="text/javascript"></script>
@@ -3900,5 +3953,67 @@ Languages in Time n<sup>3</sup>.”</span> <em>Information and
 Control</em> 10 (2): 189–208.
 </div>
 </div>
+
+<!-- inlined citations.js -->
+<script>
+// Add back-links to bibliography entries
+document.addEventListener('DOMContentLoaded', function() {
+  // Find all citation links in the document
+  const citations = document.querySelectorAll('a[role="doc-biblioref"]');
+
+  // Group citations by their target reference
+  const refToCitations = new Map();
+
+  citations.forEach((citation, index) => {
+    const href = citation.getAttribute('href');
+    if (!href || !href.startsWith('#ref-')) return;
+
+    const refId = href.slice(1); // Remove leading #
+
+    // Create a unique ID for this citation if it doesn't have one
+    let citationId = citation.id;
+    if (!citationId) {
+      // Find parent span.citation or create ID on the link itself
+      const parentCitation = citation.closest('.citation');
+      if (parentCitation && !parentCitation.id) {
+        parentCitation.id = `cite-${index}`;
+      }
+      citationId = parentCitation ? parentCitation.id : null;
+      if (!citationId) {
+        citation.id = `cite-${index}`;
+        citationId = citation.id;
+      }
+    }
+
+    if (!refToCitations.has(refId)) {
+      refToCitations.set(refId, []);
+    }
+    refToCitations.get(refId).push(citationId);
+  });
+
+  // Add back-links to each bibliography entry
+  refToCitations.forEach((citationIds, refId) => {
+    const refElement = document.getElementById(refId);
+    if (!refElement) return;
+
+    const backlinksSpan = document.createElement('span');
+    backlinksSpan.className = 'citation-backlinks';
+
+    citationIds.forEach((citationId, index) => {
+      const backlink = document.createElement('a');
+      backlink.href = `#${citationId}`;
+      backlink.className = 'citation-backlink';
+      backlink.textContent = `↩${citationIds.length > 1 ? index + 1 : ''}`;
+      backlink.title = `Back to citation ${index + 1}`;
+      backlinksSpan.appendChild(backlink);
+    });
+
+    refElement.prepend(backlinksSpan);
+  });
+});
+
+//# sourceURL=citations.js
+</script>
+
 </body>
 </html>

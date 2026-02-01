@@ -348,7 +348,7 @@ In the demo below, click "Start Search" to watch MCTS discover a grammar that ma
 
 The search uses MCTS over grammar-edit actions and scores candidates.
 
-After you run the search, pay special attention to the "novel idea" section. 
+After you run the search, pay special attention to the "novel idea" section.
 It'll show you an observation that doesn't exist in the training data.
 You can hit run to see the idea in action.
 

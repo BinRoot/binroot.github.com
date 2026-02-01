@@ -122,8 +122,7 @@
     height: 10px;
   }
 
-  .timeline-year {
-    display: block;
-    margin-bottom: 0.25rem;
+  .timeline-skip::after {
+    left: calc(-1.25rem + 5px - 8px);
   }
 }
