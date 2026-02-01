@@ -32,3 +32,12 @@
   color: #c99200;
   text-decoration: underline;
 }
+
+/* Style links in bibliography entries to match citation links */
+.csl-entry a {
+  color: var(--link-color);
+}
+
+.csl-entry a:hover {
+  text-decoration: underline;
+}
