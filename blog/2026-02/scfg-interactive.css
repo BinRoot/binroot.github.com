@@ -148,6 +148,12 @@
   border-color: #83a598;
 }
 
+.scfg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .scfg-btn-reset {
   margin-left: auto;
   border-color: #cc241d;

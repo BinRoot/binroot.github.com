@@ -65,9 +65,7 @@ setup test test test teardown
 :::
 
 
-Sampling is stochastic.
-
-So, who knows, you may instead get a parse that looks like this:
+Sampling is stochastic. So, you may instead get a parse that looks like this:
 
 :::parse
 root: setup tests teardown
@@ -153,15 +151,20 @@ And lastly, we can compute a score using `score`:
 s = G.score(p, x)  // log P(x | p) + log P(p)
 ```
 
+This interface is sufficient for some really powerful algorithms, as we'll seen below.
+
 
 ## Searching in observation space
 
 `G.infer(...)` can parse partial data, like a prefix of a sequence, or the list of moves made so far in a game.
 In other words, it describes the next _possible moves_.
 
-Monte Carlo Tree Search (MCTS), on the other hand, finds you the approx. _best move_.
+Monte Carlo Tree Search (MCTS), on the other hand, is an algorithm that finds you the approx. _best move_.
 
 Don't get stuck on the name, though.
+Maybe a better name would have been "Statistical Tree Search."
+The "Monte Carlo" part is a nod to the city of Monte Carlo in Monaco, which is famous for its casinos.
+In the literature, "Monte Carlo" is a loaded term that also implies sampling, repeated simulations, balancing exploration vs. exploitation, and a few other relevant ideas, so unfortunately the name's here to stay.
 
 $$
 \underbrace{
@@ -279,14 +282,14 @@ But c'mon, isn't that so cool!? You're basically 80% there with just this interf
 
 ## Searching in grammar space
 
-Given a grammar model:
+As mentioned earlier, given a grammar model:
 
 - `G.infer(...)` reveals candidate next moves
 - The MCTS algorithm above finds the best move
 
 But, how do you learn a grammar in the first place?
 
-Similar to the algorithm above, let's start with a root node:
+Similar to the algorithm above, let's start with a root node. This time, `node.obs` will be grammar objects:
 
 ```javascript
 // start with just the root node
@@ -310,7 +313,7 @@ Do you see where I'm going with this?
 
 Run the same MCTS algorithm above, but instead of searching through the space of observations constrained by grammar actions, search through the space of grammar objects constrained by grammar-edit actions.
 
-For example, let's say you'd like to learn how to make a peanut butter and jelly sandwich. Let's establish some atomic concepts:
+For example, let's say you'd like to learn how to make a peanut butter and jelly (PB&J) sandwich. Let's establish some atomic concepts:
 
 - nouns:
   - `bread`
@@ -320,6 +323,7 @@ For example, let's say you'd like to learn how to make a peanut butter and jelly
   - `spread` (for spreading things on bread)
   - `stack` (for stacking slices of bread)
 
+The following grammar generates instructions on making PB&J sandwiches:
 
 ::: {.scfg model='{"init":{"kind":"or","alts":["single-method","two-slice"]},"single-method":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread",{"kind":"or","alts":["grape","strawberry"]},"spread","bread","stack"]},"two-slice":{"kind":"and","parts":["pb-slice","jelly-slice","stack"]},"pb-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread"]},"jelly-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["grape","strawberry"]},"spread"]}}' symbols='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' title="PB&J Grammar" mode="run"}
 :::
@@ -337,7 +341,7 @@ Click the edit operations above to transform the grammar. I gave up after 20 sec
 
 The goal of the MCTS algorithm is to find the sequence of actions that will get us there, by mutating the grammar to maximize a pre-defined utility.
 
-### Demo
+### Grammar synthesis
 
 In the demo below, click "Start Search" to watch MCTS discover a grammar that matches a set of target sequences:
 
@@ -346,13 +350,21 @@ In the demo below, click "Start Search" to watch MCTS discover a grammar that ma
 
 
 
+
 The search uses MCTS over grammar-edit actions and scores candidates.
 
 After you run the search, pay special attention to the "novel idea" section.
 It'll show you an observation that doesn't exist in the training data.
-You can hit run to see the idea in action.
+You can hit run to see the idea play out.
 
-The beauty of grammar synthesis is that the learned grammar is beyond the sum of its parts.
+
+![My model learned that you can make a double jelly sandwich 🤣](novel-pbj.png)
+
+
+The beauty of grammar synthesis is that the learned model's divergence from the training data is a feature not a bug!
+
+
+For a deeper dive into this approach, see my dissertation [@shukla2019utility].
 
 
 

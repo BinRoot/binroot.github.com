@@ -785,6 +785,12 @@ h6:hover .header-anchor {
   border-color: #83a598;
 }
 
+.scfg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .scfg-btn-reset {
   margin-left: auto;
   border-color: #cc241d;
@@ -1409,8 +1415,8 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-
 <span class="yield-token">test</span>
 <span class="yield-token">teardown</span>
 </div>
-<p>Sampling is stochastic.</p>
-<p>So, who knows, you may instead get a parse that looks like this:</p>
+<p>Sampling is stochastic. So, you may instead get a parse that looks
+like this:</p>
 <div class="parse-tree">
 <span class="viz-label">parse</span>
 <svg class="parse-tree-svg" viewBox="0 0 909 146" preserveAspectRatio="xMidYMid meet">
@@ -1674,15 +1680,22 @@ P(p | x) \propto P(x | p) P(p)
 <p>And lastly, we can compute a score using <code>score</code>:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> G<span class="op">.</span><span class="fu">score</span>(p<span class="op">,</span> x)  <span class="co">// log P(x | p) + log P(p)</span></span></code></pre></div>
+<p>This interface is sufficient for some really powerful algorithms, as
+we’ll seen below.</p>
 <h2 id="searching-in-observation-space"><a
 href="#searching-in-observation-space"
 class="header-anchor">#</a>Searching in observation space</h2>
 <p><code>G.infer(...)</code> can parse partial data, like a prefix of a
 sequence, or the list of moves made so far in a game. In other words, it
 describes the next <em>possible moves</em>.</p>
-<p>Monte Carlo Tree Search (MCTS), on the other hand, finds you the
-approx. <em>best move</em>.</p>
-<p>Don’t get stuck on the name, though.</p>
+<p>Monte Carlo Tree Search (MCTS), on the other hand, is an algorithm
+that finds you the approx. <em>best move</em>.</p>
+<p>Don’t get stuck on the name, though. Maybe a better name would have
+been “Statistical Tree Search.” The “Monte Carlo” part is a nod to the
+city of Monte Carlo in Monaco, which is famous for its casinos. In the
+literature, “Monte Carlo” is a loaded term that also implies sampling,
+repeated simulations, balancing exploration vs. exploitation, and a few
+other relevant ideas, so unfortunately the name’s here to stay.</p>
 <p><span class="math display">\[
 \underbrace{
   \text{Monte Carlo}
@@ -1823,13 +1836,14 @@ this interface!</p>
 <h2 id="searching-in-grammar-space"><a
 href="#searching-in-grammar-space" class="header-anchor">#</a>Searching
 in grammar space</h2>
-<p>Given a grammar model:</p>
+<p>As mentioned earlier, given a grammar model:</p>
 <ul>
 <li><code>G.infer(...)</code> reveals candidate next moves</li>
 <li>The MCTS algorithm above finds the best move</li>
 </ul>
 <p>But, how do you learn a grammar in the first place?</p>
-<p>Similar to the algorithm above, let’s start with a root node:</p>
+<p>Similar to the algorithm above, let’s start with a root node. This
+time, <code>node.obs</code> will be grammar objects:</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// start with just the root node</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> <span class="fu">Tree</span>([</span>
@@ -1850,7 +1864,8 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-
 the space of observations constrained by grammar actions, search through
 the space of grammar objects constrained by grammar-edit actions.</p>
 <p>For example, let’s say you’d like to learn how to make a peanut
-butter and jelly sandwich. Let’s establish some atomic concepts:</p>
+butter and jelly (PB&amp;J) sandwich. Let’s establish some atomic
+concepts:</p>
 <ul>
 <li>nouns:
 <ul>
@@ -1864,6 +1879,8 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
 <li><code>stack</code> (for stacking slices of bread)</li>
 </ul></li>
 </ul>
+<p>The following grammar generates instructions on making PB&amp;J
+sandwiches:</p>
 <div class="scfg-editor" data-initial-model='{"init":{"kind":"or","alts":["single-method","two-slice"]},"single-method":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread",{"kind":"or","alts":["grape","strawberry"]},"spread","bread","stack"]},"two-slice":{"kind":"and","parts":["pb-slice","jelly-slice","stack"]},"pb-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["crunchy","smooth"]},"spread"]},"jelly-slice":{"kind":"and","parts":["bread",{"kind":"or","alts":["grape","strawberry"]},"spread"]}}' data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' data-mode='run' data-targets='[]'>
   <div class="scfg-editor-title">PB&J Grammar</div>
   <div class="scfg-grammar"></div>
@@ -3460,6 +3477,52 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
 
     console.log('Elements found:', { grammarEl, sampleEl, editsEl, historyEl });
 
+    // ---- Runtime state helpers (timeouts + novel runner execution) ----
+    function ensureInferRuntime() {
+      if (!container.__inferRuntime) {
+        container.__inferRuntime = { timeoutId: null, runId: 0 };
+      }
+      return container.__inferRuntime;
+    }
+
+    function cancelSearchLoop() {
+      const rt = ensureInferRuntime();
+      if (rt.timeoutId) {
+        clearTimeout(rt.timeoutId);
+        rt.timeoutId = null;
+      }
+    }
+
+    function stopNovelExecution() {
+      const execState = container.__inferExec;
+      if (!execState) return;
+      if (execState.interval) {
+        clearInterval(execState.interval);
+        execState.interval = null;
+      }
+      execState.current = null;
+    }
+
+    function resetInferUiCaches() {
+      // This cache controls "samples from current grammar" and "novel idea".
+      // Resetting it ensures a new run starts visually fresh.
+      try { delete container.__inferSampleCache; } catch (_) { container.__inferSampleCache = null; }
+    }
+
+    function resetSearchState() {
+      // Fully reset the search so Start works after completion and Reset isn't flaky.
+      isRunning = false;
+      cancelSearchLoop();
+      stopNovelExecution();
+      resetInferUiCaches();
+      // Drop any search tree state so the next run starts fresh.
+      try { delete container.__mcts; } catch (_) {}
+      currentModel = clone(initialModel);
+      bestModel = clone(initialModel);
+      bestScore = 0;
+      iteration = 0;
+    }
+
     function render() {
       console.log('Infer render() called, iteration:', iteration, 'bestScore:', bestScore);
       try {
@@ -3526,14 +3589,21 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
 
       const startBtn = document.createElement('button');
       startBtn.className = 'scfg-btn scfg-btn-sample';
-      startBtn.textContent = isRunning ? '⏸ Pause' : '▶ Start Search';
+      startBtn.textContent = isRunning ? '⏳ Running...' : '▶ Start Search';
+      startBtn.disabled = isRunning;
       startBtn.onclick = () => {
-        if (isRunning) {
-          isRunning = false;
-        } else {
-          isRunning = true;
-          runSearchStep();
+        if (isRunning) return; // Shouldn't happen, button is disabled
+        // Collapse any open "Novel idea" run view when a new search begins.
+        stopNovelExecution();
+        // If the previous run finished, reset state for a fresh start.
+        if (iteration >= maxIterations) {
+          resetSearchState();
         }
+        isRunning = true;
+        const rt = ensureInferRuntime();
+        rt.runId++;
+        cancelSearchLoop();
+        runSearchStep(rt.runId);
         render();
       };
       controls.appendChild(startBtn);
@@ -3541,14 +3611,13 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
       const resetBtn = document.createElement('button');
       resetBtn.className = 'scfg-btn scfg-btn-reset';
       resetBtn.textContent = 'Reset';
+      resetBtn.disabled = isRunning;
       resetBtn.onclick = () => {
-        isRunning = false;
-        // Drop any search tree state so the next run starts fresh.
-        try { delete container.__mcts; } catch (_) {}
-        currentModel = clone(initialModel);
-        bestModel = clone(initialModel);
-        bestScore = 0;
-        iteration = 0;
+        if (isRunning) return; // Shouldn't happen, button is disabled
+        resetSearchState();
+        // Invalidate any in-flight scheduled callbacks.
+        const rt = ensureInferRuntime();
+        rt.runId++;
         render();
       };
       controls.appendChild(resetBtn);
@@ -3767,9 +3836,13 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
       }
     }
 
-    function runSearchStep() {
+    function runSearchStep(runId) {
+      const rt = ensureInferRuntime();
+      if (runId !== rt.runId) return; // stale callback from a previous run
+
       if (!isRunning || iteration >= maxIterations) {
         isRunning = false;
+        cancelSearchLoop();
         render();
         return;
       }
@@ -3918,9 +3991,11 @@ butter and jelly sandwich. Let’s establish some atomic concepts:</p>
       render();
 
       if (isRunning && iteration < maxIterations) {
-        setTimeout(runSearchStep, 30);
+        cancelSearchLoop();
+        rt.timeoutId = setTimeout(() => runSearchStep(runId), 30);
       } else {
         isRunning = false;
+        cancelSearchLoop();
         render();
       }
     }
@@ -3995,7 +4070,8 @@ after 20 seconds.</p>
 <p>The goal of the MCTS algorithm is to find the sequence of actions
 that will get us there, by mutating the grammar to maximize a
 pre-defined utility.</p>
-<h3 id="demo"><a href="#demo" class="header-anchor">#</a>Demo</h3>
+<h3 id="grammar-synthesis"><a href="#grammar-synthesis"
+class="header-anchor">#</a>Grammar synthesis</h3>
 <p>In the demo below, click “Start Search” to watch MCTS discover a
 grammar that matches a set of target sequences:</p>
 <div class="scfg-editor" data-initial-model='{"init":"bread"}' data-symbol-pool='["bread","crunchy","smooth","grape","strawberry","spread","stack"]' data-mode='infer' data-targets='[["bread","crunchy","spread","grape","spread","bread","stack"],["bread","smooth","spread","grape","spread","bread","stack"],["bread","crunchy","spread","bread","grape","spread","stack"],["bread","smooth","spread","bread","grape","spread","stack"],["bread","crunchy","spread","strawberry","spread","bread","stack"]]'>
@@ -4011,9 +4087,19 @@ grammar that matches a set of target sequences:</p>
 candidates.</p>
 <p>After you run the search, pay special attention to the “novel idea”
 section. It’ll show you an observation that doesn’t exist in the
-training data. You can hit run to see the idea in action.</p>
-<p>The beauty of grammar synthesis is that the learned grammar is beyond
-the sum of its parts.</p>
+training data. You can hit run to see the idea play out.</p>
+<figure>
+<img src="novel-pbj.png"
+alt="My model learned that you can make a double jelly sandwich 🤣" />
+<figcaption aria-hidden="true">My model learned that you can make a
+double jelly sandwich 🤣</figcaption>
+</figure>
+<p>The beauty of grammar synthesis is that the learned model’s
+divergence from the training data is a feature not a bug!</p>
+<p>For a deeper dive into this approach, see my dissertation <span
+class="citation" data-cites="shukla2019utility">(<a
+href="#ref-shukla2019utility" role="doc-biblioref">Shukla
+2019</a>)</span>.</p>
 <h2 class="unnumbered" id="references"><a href="#references"
 class="header-anchor">#</a>References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent"
@@ -4056,6 +4142,12 @@ href="https://openai.com/index/new-models-and-developer-products-announced-at-de
 ———. 2025. <span>“GPT-5 New Parameters and Tools: Context-Free Grammar
 Support.”</span> August 2025. <a
 href="https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools">https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools</a>.
+</div>
+<div id="ref-shukla2019utility" class="csl-entry" role="listitem">
+Shukla, Nishant. 2019. <span>“Utility Learning, Non-Markovian Planning,
+and Task-Oriented Programming Language.”</span> PhD thesis, University
+of California, Los Angeles. <a
+href="https://escholarship.org/uc/item/2nj5n4f1#page=83">https://escholarship.org/uc/item/2nj5n4f1#page=83</a>.
 </div>
 <div id="ref-tomita-glr" class="csl-entry" role="listitem">
 Tomita, Masaru. 1986. <em>Efficient Parsing for Natural Language: A Fast
