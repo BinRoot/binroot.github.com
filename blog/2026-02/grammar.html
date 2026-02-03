@@ -1236,10 +1236,9 @@ h6:hover .header-anchor {
 }
 
 .citation-backlink {
-  display: inline-block;
-  margin-right: 0.25em;
   color: #e7a811;
   text-decoration: none;
+  margin-right: 0.4em;
 }
 
 .citation-backlink:hover {
@@ -1291,7 +1290,7 @@ h6:hover .header-anchor {
   <span class="header-meta">
     <span class="author">Nishant Shukla</span>
     <span class="meta-sep">·</span>
-    <span class="date">February 1, 2026</span>
+    <span class="date">February 3, 2026</span>
   </span>
 </div>
 
@@ -1798,48 +1797,55 @@ class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// initial trivial partial parse</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">parse</span><span class="op">:</span> p0<span class="op">,</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// observation</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">obs</span><span class="op">:</span> <span class="st">&quot;&quot;</span><span class="op">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">obs</span><span class="op">:</span> []<span class="op">,</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// frequency of usage (will be updated by `backprop`)</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">visits</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// mean utility estimate (will be updated by `backprop`)</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">value</span><span class="op">:</span> <span class="fl">0.0</span><span class="op">,</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  })</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div>
+<p>The tree has some typical methods, like:</p>
+<ul>
+<li><code>add(...)</code> adds a new child node onto an existing
+one</li>
+</ul>
+<p>And some atypical methods, that are only relevant for MCTS, like:</p>
+<ul>
+<li><code>select(...)</code> walks from the root to a leaf by repeatedly
+choosing the child to build a path. It does so using the PUCT/PUCB score
+(using <code>scoreFn</code> as a prior) <span class="citation"
+data-cites="silver2017alphagozero">(<a href="#ref-silver2017alphagozero"
+role="doc-biblioref">Silver et al. 2017</a>)</span>.</li>
+<li><code>backprop(...)</code> updates <code>node.visits</code> and
+<code>node.value</code> for every node up the ancestor chain.</li>
+</ul>
 <p>Let’s take everything we’ve learned, using <code>infer</code>,
 <code>sample</code>, <code>render</code>, and <code>score</code> to
 implement MCTS. The following code will be repeated in a loop many
 times:</p>
 <div class="code-with-keywords">
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// === 1. pick a promising starting path ===</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">// tree selects a path (using UCB and prior)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> tree<span class="op">.</span><span class="fu">select</span>(node <span class="kw">=&gt;</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">score</mark></span>(node<span class="op">.</span><span class="at">parse</span><span class="op">,</span> node<span class="op">.</span><span class="at">obs</span>))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// the last node is our frontier</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> path<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">// === 2. roll out fully to see where it could end ===</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">infer</mark></span>(obs <span class="kw">=&gt;</span> obs<span class="op">.</span><span class="fu">startsWith</span>(node<span class="op">.</span><span class="at">obs</span>))</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> P<span class="op">.</span><span class="fu"><mark class="keyword-highlight">sample</mark></span>({ <span class="dt">reject</span><span class="op">:</span> node<span class="op">.</span><span class="at">children</span><span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c<span class="op">.</span><span class="at">parse</span>) })</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">render</mark></span>(p)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>nextMove <span class="op">=</span> x<span class="op">.</span><span class="fu">at</span>(node<span class="op">.</span><span class="at">obs</span><span class="op">.</span><span class="at">length</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>child <span class="op">=</span> tree<span class="op">.</span><span class="fu">add</span>(node<span class="op">,</span> <span class="bu">Node</span>(p<span class="op">,</span> [<span class="op">...</span>node<span class="op">.</span><span class="at">obs</span><span class="op">,</span> nextMove]))</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">// === 3. Tally up the results ===</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">utility</span>(x)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>tree<span class="op">.</span><span class="fu">backprop</span>(path<span class="op">,</span> child<span class="op">,</span> u)</span></code></pre></div></div>
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. pick a promising starting path</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> tree<span class="op">.</span><span class="fu">select</span>(node <span class="kw">=&gt;</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">score</mark></span>(node<span class="op">.</span><span class="at">parse</span><span class="op">,</span> node<span class="op">.</span><span class="at">obs</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> path<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. roll out fully to see where it could end</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">infer</mark></span>(obs <span class="kw">=&gt;</span> <span class="fu">startsWith</span>(obs<span class="op">,</span> node<span class="op">.</span><span class="at">obs</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> P<span class="op">.</span><span class="fu"><mark class="keyword-highlight">sample</mark></span>({ <span class="dt">reject</span><span class="op">:</span> node<span class="op">.</span><span class="at">children</span><span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c<span class="op">.</span><span class="at">obs</span>) })</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">render</mark></span>(p)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>nextMove <span class="op">=</span> x<span class="op">.</span><span class="fu">at</span>(node<span class="op">.</span><span class="at">obs</span><span class="op">.</span><span class="at">length</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>childObs <span class="op">=</span> [<span class="op">...</span>node<span class="op">.</span><span class="at">obs</span><span class="op">,</span> nextMove]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>child <span class="op">=</span> tree<span class="op">.</span><span class="fu">add</span>(node<span class="op">,</span> <span class="bu">Node</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  G<span class="op">.</span><span class="fu"><mark class="keyword-highlight">infer</mark></span>(obs <span class="kw">=&gt;</span> <span class="fu">startsWith</span>(obs<span class="op">,</span> childObs))<span class="op">.</span><span class="fu"><mark class="keyword-highlight">sample</mark></span>()<span class="op">,</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  childObs</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Tally up the results</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">utility</span>(x)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>tree<span class="op">.</span><span class="fu">backprop</span>(path<span class="op">,</span> node<span class="op">,</span> u)</span></code></pre></div></div>
 <p>I know, I threw in a bunch of undefined things in there, such as
 <code>tree.select</code> and <code>tree.backprop</code>, but you can
-imagine an API that lets you vibe-mcts. For clarity, I must explain:</p>
-<ul>
-<li><code>tree.select</code> builds a path from the root by repeatedly
-choosing a child using a policy known as UCB/PUCT, with
-<code>G.score</code> acting as a prior.</li>
-<li><code>utility(x)</code> is the value of that state, defined ad-hoc
-based on the context.</li>
-<li><code>tree.backprop</code> walks back up the path, incrementing
-<code>node.visits</code> and updating the running
-<code>node.value</code> estimate.</li>
-</ul>
+imagine an API that lets you vibe-mcts 😎.</p>
 <p>But c’mon, isn’t that so cool!? You’re basically 80% there with just
 this interface!</p>
 <h2 id="searching-in-grammar-space"><a
@@ -4158,6 +4164,13 @@ and Task-Oriented Programming Language.”</span> PhD thesis, University
 of California, Los Angeles. <a
 href="https://escholarship.org/uc/item/2nj5n4f1#page=83">https://escholarship.org/uc/item/2nj5n4f1#page=83</a>.
 </div>
+<div id="ref-silver2017alphagozero" class="csl-entry" role="listitem">
+Silver, David, Julian Schrittwieser, Karen Simonyan, Ioannis Antonoglou,
+Aja Huang, Arthur Guez, Thomas Hubert, et al. 2017. <span>“Mastering the
+Game of <span>Go</span> Without Human Knowledge.”</span> <em>Nature</em>
+550: 354–59. <a
+href="https://doi.org/10.1038/nature24270">https://doi.org/10.1038/nature24270</a>.
+</div>
 <div id="ref-tomita-glr" class="csl-entry" role="listitem">
 Tomita, Masaru. 1986. <em>Efficient Parsing for Natural Language: A Fast
 Algorithm for Practical Systems</em>. Kluwer Academic Publishers.
@@ -4218,7 +4231,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const backlink = document.createElement('a');
       backlink.href = `#${citationId}`;
       backlink.className = 'citation-backlink';
-      backlink.textContent = `↩${citationIds.length > 1 ? index + 1 : ''}`;
+      backlink.innerHTML = '↩&#8202;';
       backlink.title = `Back to citation ${index + 1}`;
       backlinksSpan.appendChild(backlink);
     });

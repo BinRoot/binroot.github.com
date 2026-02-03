@@ -1,7 +1,7 @@
 ---
 title: "Grammar models are back, baby!"
 author: Nishant Shukla
-date: February 1, 2026
+date: February 3, 2026
 bibliography: references.bib
 link-citations: true
 ---
@@ -236,7 +236,7 @@ tree = Tree([
     // initial trivial partial parse
 	parse: p0,
 	// observation
-	obs: "",
+	obs: [],
 	// frequency of usage (will be updated by `backprop`)
 	visits: 0,
 	// mean utility estimate (will be updated by `backprop`)
@@ -245,37 +245,43 @@ tree = Tree([
 ])
 ```
 
+The tree has some typical methods, like:
+
+- `add(...)` adds a new child node onto an existing one
+
+And some atypical methods, that are only relevant for MCTS, like:
+
+- `select(...)` walks from the root to a leaf by repeatedly choosing the child to build a path. It does so using the PUCT/PUCB score (using `scoreFn` as a prior) [@silver2017alphagozero]. 
+- `backprop(...)` updates `node.visits` and `node.value` for every node up the ancestor chain.
+
 Let's take everything we've learned, using `infer`, `sample`, `render`, and `score` to implement MCTS.
 The following code will be repeated in a loop many times:
 
 ::: {.code keywords="infer,sample,render,score"}
 ```javascript
-// === 1. pick a promising starting path ===
-// tree selects a path (using UCB and prior)
+// 1. pick a promising starting path
 path = tree.select(node => G.score(node.parse, node.obs))
-// the last node is our frontier
 node = path.at(-1)
 
-// === 2. roll out fully to see where it could end ===
-P = G.infer(obs => obs.startsWith(node.obs))
-p = P.sample({ reject: node.children.map(c => c.parse) })
+// 2. roll out fully to see where it could end
+P = G.infer(obs => startsWith(obs, node.obs))
+p = P.sample({ reject: node.children.map(c => c.obs) })
 x = G.render(p)
 nextMove = x.at(node.obs.length)
-child = tree.add(node, Node(p, [...node.obs, nextMove]))
+childObs = [...node.obs, nextMove]
+child = tree.add(node, Node(
+  G.infer(obs => startsWith(obs, childObs)).sample(),
+  childObs
+))
 
-// === 3. Tally up the results ===
+// 3. Tally up the results
 u = utility(x)
-tree.backprop(path, child, u)
+tree.backprop(path, node, u)
 
 ```
 :::
 
-I know, I threw in a bunch of undefined things in there, such as `tree.select` and `tree.backprop`, but you can imagine an API that lets you vibe-mcts.
-For clarity, I must explain:
-
-- `tree.select` builds a path from the root by repeatedly choosing a child using a policy known as UCB/PUCT, with `G.score` acting as a prior.
-- `utility(x)` is the value of that state, defined ad-hoc based on the context.
-- `tree.backprop` walks back up the path, incrementing `node.visits` and updating the running `node.value` estimate.
+I know, I threw in a bunch of undefined things in there, such as `tree.select` and `tree.backprop`, but you can imagine an API that lets you vibe-mcts 😎.
 
 
 But c'mon, isn't that so cool!? You're basically 80% there with just this interface!

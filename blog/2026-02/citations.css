@@ -22,10 +22,9 @@
 }
 
 .citation-backlink {
-  display: inline-block;
-  margin-right: 0.25em;
   color: #e7a811;
   text-decoration: none;
+  margin-right: 0.4em;
 }
 
 .citation-backlink:hover {
