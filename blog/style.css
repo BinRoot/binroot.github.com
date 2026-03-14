@@ -1,3 +1,5 @@
+/* Blog index styles — consistent with home page (Pavanam / Vidaloka) */
+
 .blog-shell {
   min-height: 100vh;
   display: flex;
@@ -8,67 +10,91 @@
   flex: 1;
 }
 
+/* ---- title ---- */
+.blog-main .title {
+  font-family: 'Vidaloka', serif;
+  font-size: 2.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* ---- nav ---- */
 .blog-nav {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 .blog-nav a {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   color: #7a7a7a;
+  font-size: 0.9rem;
   font-weight: 600;
+  transition: color 150ms;
 }
 
 .blog-nav a:hover {
   color: #363636;
 }
 
+/* ---- post cards (each card is an <a>) ---- */
 .post-card {
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  transition: transform 120ms, box-shadow 120ms, border-color 120ms;
-}
-
-.post-card + .post-card {
-  margin-top: 0.85rem;
-}
-
-.post-card:hover {
-  transform: translateY(-1px);
-  border-color: #e2e2e2;
-  box-shadow: 0 14px 30px -22px rgba(0, 0, 0, 0.45);
-}
-
-.post-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
-.post-link {
-  font-size: 1.15rem;
-  font-weight: 700;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
   color: #363636;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
-.post-link:hover {
+.post-card + .post-card {
+  margin-top: 0.75rem;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  border-color: #ddd;
+  box-shadow:
+    0 8px 24px -12px rgba(0, 0, 0, 0.18),
+    0 16px 32px -18px rgba(0, 0, 0, 0.10);
+}
+
+.post-card:hover .post-title {
   color: #3273dc;
 }
 
+.post-title {
+  font-family: 'Vidaloka', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  transition: color 150ms;
+}
+
 .post-date {
-  color: #7a7a7a;
-  font-size: 0.875rem;
+  color: #999;
+  font-size: 0.85rem;
   white-space: nowrap;
 }
 
+/* ---- footer alignment ---- */
+.footer .subtitle {
+  margin-top: 0.5rem;
+}
+
+/* ---- responsive ---- */
 @media (max-width: 768px) {
+  .blog-main .title {
+    font-size: 1.75rem;
+  }
+
   .post-card {
     padding: 0.9rem 1rem;
   }

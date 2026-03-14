@@ -1,0 +1,47 @@
+<div id="rollout-viz" style="display:flex; flex-direction:column; align-items:center; gap:12px; margin:20px 0; width:100%;">
+
+  <!-- 2×2 grid — always present, other panels hidden initially -->
+  <div id="rollout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:700px;">
+
+    <!-- Top-left: Board -->
+    <div id="rollout-board-cell" style="display:flex; flex-direction:column; align-items:center; gap:4px; grid-column: 1 / -1; transition: all 0.6s ease;">
+      <canvas id="rollout-board" style="border-radius:8px; transition: transform 0.6s ease;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Black to move</div>
+    </div>
+
+    <!-- Top-right: Scatter plot -->
+    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <canvas id="rollout-scatter" width="340" height="260" style="border-radius:8px; background:#f0f0f0; width:100%;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Samples (each dot = one full game)</div>
+    </div>
+
+    <!-- Bottom-left: Move ranking -->
+    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <canvas id="rollout-race" width="340" height="180" style="width:100%; border-radius:8px; background:#f0f0f0;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Each dot is a move. Gap between <span style="color:#E05545;">#1</span> and <span style="color:#5B8DEF;">#2</span> = ε</div>
+    </div>
+
+    <!-- Bottom-right: Budget calculator -->
+    <div class="rollout-reveal" id="rollout-budget" style="background:#f0f0f0; border:1px solid #ddd; border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; justify-content:center; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">Samples</div>
+          <div id="rollout-count" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">0</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">σ²</div>
+          <div id="rollout-sigma2" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">—</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">ε</div>
+          <div id="rollout-eps-val" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">—</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:12px; align-items:flex-end; height:80px;" id="rollout-bars"></div>
+    </div>
+
+  </div>
+
+  <button id="rollout-toggle" style="padding:6px 20px; font-size:0.82rem;">Start sampling</button>
+</div>
+<script type="module" src="rollout-viz.js"></script>

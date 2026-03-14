@@ -1,0 +1,39 @@
+<div id="compute-stack-viz" style="display:flex; justify-content:center; margin:20px 0;">
+<svg id="compute-stack-svg" viewBox="0 0 520 140" width="520" height="140" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs><marker id="cs-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker></defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#cs-arrow)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- GPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">GPU</text>
+  <!-- Grid of small cores -->
+  <g id="cs-cores" transform="translate(220,40)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">massively parallel cores</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('cs-cores');
+  const cols = 14, rows = 3, size = 16, gap = 4;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', c * (size + gap));
+      rect.setAttribute('y', r * (size + gap));
+      rect.setAttribute('width', size);
+      rect.setAttribute('height', size);
+      rect.setAttribute('rx', 2);
+      rect.setAttribute('fill', '#d4e6dc');
+      rect.setAttribute('stroke', '#8cbfa3');
+      rect.setAttribute('stroke-width', '0.8');
+      g.appendChild(rect);
+    }
+  }
+})();
+</script>

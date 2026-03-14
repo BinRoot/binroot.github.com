@@ -1,0 +1,124 @@
+<div id="applications-viz" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:560px; margin:20px auto;">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-0" style="border-radius:6px;"></canvas>
+    <div id="app-title-0" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-0" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-1" style="border-radius:6px;"></canvas>
+    <div id="app-title-1" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-1" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-2" style="border-radius:6px;"></canvas>
+    <div id="app-title-2" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-2" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-3" style="border-radius:6px;"></canvas>
+    <div id="app-title-3" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-3" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+</div>
+<script>
+(function() {
+  var S = window.applications_component_strings || {};
+
+  // Populate text from markdown attributes
+  for (var i = 0; i < 4; i++) {
+    var titleEl = document.getElementById('app-title-' + i);
+    var descEl = document.getElementById('app-desc-' + i);
+    if (titleEl) titleEl.textContent = S['title-' + i] || '';
+    if (descEl) descEl.textContent = S['desc-' + i] || '';
+  }
+
+  var N = 6;
+  var cellPx = 22;
+  var pad = 10;
+  var totalPx = cellPx * N + pad * 2;
+  var dpr = window.devicePixelRatio || 1;
+
+  var themes = [
+    { bg: '#e8d8c4', grid: '#b89f78', a: '#c0392b', aS: '#8e2a1e', b: '#2980b9', bS: '#1a5276' },
+    { bg: '#d4e6dc', grid: '#8cbfa3', a: '#27ae60', aS: '#1a7a40', b: '#e67e22', bS: '#a35a18' },
+    { bg: '#dbd4ee', grid: '#a99bc8', a: '#8e44ad', aS: '#6a2980', b: '#f39c12', bS: '#b87409' },
+    { bg: '#f5d5d5', grid: '#c9a0a0', a: '#e74c3c', aS: '#a93226', b: '#7f8c8d', bS: '#5a6364' },
+  ];
+
+  var boards = [
+    [
+      [2,2,0,0,1,0],
+      [2,2,1,0,0,0],
+      [0,2,0,0,0,1],
+      [0,0,0,1,1,0],
+      [1,0,0,1,1,0],
+      [0,0,1,0,1,1],
+    ],
+    [
+      [0,2,0,0,0,0],
+      [0,0,1,1,0,2],
+      [0,1,1,1,0,0],
+      [0,0,1,1,0,0],
+      [2,0,0,0,0,0],
+      [0,0,0,2,0,2],
+    ],
+    [
+      [2,0,0,0,0,2],
+      [0,0,0,0,0,0],
+      [0,0,2,0,0,0],
+      [0,0,0,0,1,1],
+      [0,0,0,1,1,1],
+      [0,2,0,1,1,0],
+    ],
+    [
+      [0,0,0,2,0,0],
+      [1,1,0,0,0,0],
+      [1,1,1,0,0,2],
+      [0,1,1,0,0,0],
+      [0,0,0,0,2,0],
+      [0,0,0,0,0,0],
+    ],
+  ];
+
+  for (var b = 0; b < 4; b++) {
+    var canvas = document.getElementById('app-board-' + b);
+    canvas.width = totalPx * dpr;
+    canvas.height = totalPx * dpr;
+    canvas.style.width = totalPx + 'px';
+    canvas.style.height = totalPx + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var t = themes[b];
+    var grid = boards[b];
+
+    ctx.fillStyle = t.bg;
+    ctx.fillRect(0, 0, totalPx, totalPx);
+
+    ctx.strokeStyle = t.grid;
+    ctx.lineWidth = 0.8;
+    for (var i = 0; i < N; i++) {
+      var x = pad + i * cellPx + cellPx / 2;
+      ctx.beginPath(); ctx.moveTo(x, pad + cellPx / 2); ctx.lineTo(x, pad + (N-1) * cellPx + cellPx / 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pad + cellPx / 2, x); ctx.lineTo(pad + (N-1) * cellPx + cellPx / 2, x); ctx.stroke();
+    }
+
+    var r = cellPx * 0.36;
+    for (var row = 0; row < N; row++) {
+      for (var col = 0; col < N; col++) {
+        var v = grid[row][col];
+        if (v === 0) continue;
+        var cx = pad + col * cellPx + cellPx / 2;
+        var cy = pad + row * cellPx + cellPx / 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = v === 1 ? t.a : t.b;
+        ctx.fill();
+        ctx.strokeStyle = v === 1 ? t.aS : t.bS;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+    }
+  }
+})();
+</script>

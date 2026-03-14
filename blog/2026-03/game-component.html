@@ -1,0 +1,53 @@
+<!-- Game -->
+<div id="game">
+  <div class="info-bar" style="position:relative;">
+    <span class="score"><span class="dot black"></span> Black: <span id="scoreBlack">0</span></span>
+    <span class="turn-indicator" id="turnLabel">Black's turn</span>
+    <span class="score"><span class="dot white"></span> White: <span id="scoreWhite">0</span></span>
+    <div class="settings-wrap">
+      <button class="cog-btn" id="cogBtn" aria-label="Settings">&#9881;</button>
+      <div class="settings-menu" id="settingsMenu">
+        <label>Grid size
+          <input type="number" id="gridSize" value="8" min="4" max="16">
+        </label>
+        <label>Player 2
+          <select id="p2mode">
+            <option value="human">Human</option>
+            <option value="random">AI: Random</option>
+            <option value="clustery" selected>AI: Clustery</option>
+            <option value="anticluster">AI: Anti-Cluster</option>
+            <option value="fortress">AI: Fortress</option>
+            <option value="destabilizer">AI: Destabilizer</option>
+            <option value="forkbuilder">AI: Fork Builder</option>
+            <option value="minimax">AI: Minimax</option>
+          </select>
+        </label>
+        <label>Play as
+          <select id="humanColor">
+            <option value="black" selected>Black (first)</option>
+            <option value="white">White (second)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="info-bar" style="z-index:auto;">
+    <span id="roundLabel" style="color:#aaa;font-size:0.9rem;">Round 1</span>
+  </div>
+  <div id="board-container">
+    <canvas id="canvas"></canvas>
+  </div>
+  <p class="status-text" id="statusText">Place a stone on an empty cell.</p>
+</div>
+
+<!-- Result overlay -->
+<div id="result-overlay">
+  <div class="result-box">
+    <button class="result-close" id="resultClose">&times;</button>
+    <h2 id="resultTitle">Game Over</h2>
+    <p class="final-scores" id="resultScores"></p>
+    <div class="btn-row">
+      <button onclick="startGame()">Play again</button>
+    </div>
+  </div>
+</div>

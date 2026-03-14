@@ -1,0 +1,2 @@
+index.html: index.md template.html inject.lua game-component.html simulation-component.html sampling-component.html rollout-component.html d20-grid-pieces.html compute-stack-component.html qpu.html applications-component.html footer.html
+	pandoc index.md -o index.html --lua-filter=inject.lua --template=template.html --highlight-style=breezedark --mathjax=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js

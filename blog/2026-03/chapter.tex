@@ -1,0 +1,634 @@
+%%%%%%%%%%%%%%%%%%%%% 08-chapter/chapter.tex %%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Chapter 8 placeholder
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\motto{The riddle does not exist. If a question can be put at all, then it can also be answered. --- Ludwig Wittgenstein~\cite{wittgenstein1961}}
+\chapter{A Problem Worth Accelerating}
+\label{ch:8}
+
+
+
+\abstract{
+A popular philosophy in product/software engineering is that inventing problems to be solved by a technology is antithetical to the user experience.
+Much to the horror of some, this chapter does just that: it starts from the structure of quantum computation and asks what kind of problem benefits from it.
+The answer turns out to be surprisingly narrow.
+A problem must involve irreducible randomness, demand extreme precision to distinguish good decisions from great ones, and have rules simple enough to run efficiently on a quantum processor.
+Most familiar challenges, including Go and the multi-armed bandit, fail at least one of these conditions.
+Sway, a two-player stochastic game introduced in this chapter, satisfies all three by design.
+Its stochastic dynamics compress the value differences between candidate moves exponentially over time, creating the high-precision estimation problem where quantum methods outperform classical sampling.
+The chapter develops a general framework for identifying precision bottlenecks and comparing classical versus quantum evaluation costs, then applies it to Sway as a worked example. Sway's core pattern of local reinforcement, adversarial intervention, and random disruption also shows up in opinion dynamics, market adoption, and cultural competition, suggesting the structure identified here extends well beyond stochastic games.
+}
+
+\section{Introduction}
+\label{sec:8-1}
+Most problems do not need a quantum computer.
+Consider the GPU: it earns its place in a system because certain workloads (matrix multiplications, convolutions, ray tracing) map onto its massively parallel architecture so well that no amount of CPU clock speed can compete. Remove that structural match and the GPU sits idle or, worse, slows things down.
+
+Similarly, a fault-tolerant quantum processing unit (QPU) also has its own strengths and weaknesses.
+Amplitude amplification, amplitude estimation, quantum walks, and a handful of linear-algebra routines let a QPU replace time-consuming sampling as long as the problem already has the combinatorial structure those primitives exploit.
+If it doesn't, the QPU adds overhead for zero gain.
+
+The question we ask is: ``When does quantum mechanics reduce the fundamental work?''
+As Schuld~\cite{schuld2022} argues in the context of quantum machine learning, answering that question requires evaluating quantum advantage claims against strong classical baselines and realistic resource accounting.
+
+This chapter outlines three questions worth asking before building a quantum algorithm for AI search. First, is classical evaluation \emph{inherently sampling-limited}? Second, are the differences between good and great decisions \emph{tiny}, forcing classical methods to draw enormous sample counts? Third, are the underlying dynamics \emph{simple enough} to compile into reversible, coherent transitions without drowning in overhead?
+
+All three conditions must hold at once, and the usual benchmark problems used in AI literature fail at least one.
+Go has complex dynamics that resist coherent compilation.
+Multi-armed bandits have simple dynamics but large value gaps.
+The chapter analyzes these failures before introducing a game called Sway that passes all three.
+
+Sway is a two-player stochastic game with simple rules.
+The rollouts are deep, the value gaps are small, and each transition is locally computable.
+It is a benchmark for quantum algorithms, since the classical evaluation is intractable.
+The game also reflects a computational pattern found in natural systems.
+Opinion dynamics, market adoption, and similar processes share the same interplay of local reinforcement, adversarial intervention, and randomness.
+
+
+\section{The art of offloading across the compute stack}
+
+An effective compute stack uses the strengths of each device on the stack.
+For example, deep learning models benefit from the GPU for massive parallel matrix multiplications and the CPU for data preprocessing, disk I/O, and orchestrating kernel-level operations.
+Identifying what task is handled where requires careful planning.
+
+As the fault-tolerant quantum processor (QPU) begins to enter the picture, careful characterization and analysis of device performance tradeoffs becomes increasingly important.
+A deliberate assignment of tasks to devices can mean the difference between a tractable problem and an intractable one. Depending on the task, what might take weeks to compute on a CPU can be done in minutes on a GPU. The opposite is also true: the CPU outperforms the GPU on tasks that are not well-suited for parallelization.
+
+Similarly, a quantum computer is not a panacea that deprecates the need for other devices on the stack.
+The specific class of problems where the QPU excels is evaluating deep, highly stochastic search spaces.
+While a CPU or GPU parallelize roll-outs trivially, a QPU can prepare a superposition over stochastic trajectories and, via amplitude estimation, use interference to estimate an expectation with quadratically fewer oracle queries than naive sampling.
+
+Table~\ref{tab:compute-stack} summarizes the compute stack tradeoffs, providing a guide for selecting the appropriate device for a given task.
+
+\begin{table}[ht]
+  \centering
+  \setlength{\tabcolsep}{1em}
+  \caption{Compute stack tradeoffs by device.}
+  \label{tab:compute-stack}
+  \begin{tabularx}{\textwidth}{@{}l p{3.8cm} X@{}}
+    \hline\noalign{\smallskip}
+    \textbf{Device} & \textbf{Strength} & \textbf{Examples} \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    CPU & Low latency: immediate computation from input to output & Operating system, sequential branching logic (if-statements), database queries, kernel-level operations \\
+    \noalign{\smallskip}
+    GPU & High throughput: large datasets, massive parallel matrix multiplications & Training deep neural networks, high-resolution 3D graphics, large-scale fluid dynamics simulations \\
+    \noalign{\smallskip}
+    QPU & Sampling speedup: fewer samples to estimate an expectation & Deep stochastic game trees, multi-body molecular chemistry, expected values from massive probability distributions \\
+    \noalign{\smallskip}\hline
+  \end{tabularx}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.55\textwidth]{08-chapter/imgs/qpu}
+  \caption{A quantum processing unit (QPU).}
+  \label{fig:qpu}
+\end{figure}
+
+Just as GPUs unlock speedups in seemingly unrelated fields like video games and machine learning, the QPU provides a combinatorial accelerator for its own class of fields.
+In this book, we focus our attention on the field of AI search.
+This allows us to characterize the conditions that give rise to quantum advantage over the CPU and GPU.
+
+\section{Three conditions for quantum advantage in AI search}
+
+The first condition for quantum advantage is that sampling is inherent to the problem and no classical trick can eliminate the need to average over stochastic outcomes.
+Not all AI search problems have this property.
+In deterministic settings, classical solvers can lean on various techniques to avoid sampling entirely.
+On the other hand, when the objective is to compute an expectation over irreducible randomness, then sampling is no longer optional.
+
+Second, high precision must be necessary.
+The required precision to distinguish marginal advantages between two actions must be high enough that classical methods would need enormous numbers of samples to estimate.
+The types of problems where the sampling cost explodes are precisely where the QPU dominates.
+
+Third, the dynamics must compile into reversible operations without excessive overhead.
+If simulating a single step inflates the cost of building the quantum circuit, then the QPU is not a viable option.
+
+\begin{enumerate}
+  \item Sampling is inherent to the problem.
+  \item Precision is the bottleneck.
+  \item The oracle must be worth building.
+\end{enumerate}
+
+The following sections unfold each condition in more detail.
+
+\subsection{Intrinsic stochasticity}
+
+Problems that can be solved without sampling may not benefit from a quantum computer.
+If the environment is deterministic and perfectly known, classical solvers can lean on:
+
+\begin{itemize}
+  \item minimax structure,
+  \item pruning,
+  \item transposition tables,
+  \item learned value/policy approximators.
+\end{itemize}
+
+These tools frequently solve practical instances without drawing a single sample, even though they do not eliminate exponential worst cases in general.
+
+In contrast, \emph{intrinsic stochasticity} means that even with perfect knowledge of the rules, the correct evaluation of an action is an expectation over irreducible randomness.
+Consider an agent choosing among candidate actions.
+Let $a$ denote a particular action and let $V(a)$ denote the value of taking that action, measured as the expected final outcome averaged over all the randomness that follows:
+\begin{equation}
+V(a) = \mathbb{E}\!\left[\text{final outcome} \mid a\right].
+\end{equation}
+There is no clean minimax tree to fully traverse; the ``tree'' is a probability distribution over futures.
+Classical methods can still help.
+Dynamic programming (Bellman backups) can compute exact expectations if the state space is small enough to enumerate.
+Variance-reduction techniques (importance sampling, control variates) can cut the number of samples needed.
+Deterministic quadrature works in low-dimensional settings.
+And learned value functions can approximate the expectation without sampling at all.
+
+The problem is that these techniques break down as the state space grows and the stochastic branching deepens.
+Bellman backups become intractable when the number of reachable states explodes.
+Quadrature suffers from the curse of dimensionality.
+Learned approximators introduce bias that is hard to bound.
+In that regime, Monte Carlo rollouts remain the last resort: unbiased, general-purpose, and expensive.
+
+Here the QPU has an opening: amplitude estimation can estimate an expectation value with fewer queries than brute-force sampling requires.
+
+\subsection{High precision requirements}
+
+An agent choosing between candidate actions compares their estimated values.
+If two actions differ in expected outcome by a large margin, even a rough estimate suffices to identify the better one.
+But when the gap is small, the agent needs a much more precise estimate to tell them apart.
+
+Concretely, suppose the true values of two actions differ by a gap $g$.
+To reliably distinguish them, the agent must estimate each value to within an error $\varepsilon$ that is smaller than $g$; otherwise the noise in the estimates can make the worse action look better.
+Let $M$ denote the number of independent samples (rollouts) needed to drive the estimation error below $\varepsilon$.
+Classical Monte Carlo requires on the order of
+\begin{equation}
+M_{\text{classical}} = \Theta\!\left(\frac{1}{\varepsilon^2}\right)
+\end{equation}
+independent rollouts~\cite{azar2013}.
+Fault-tolerant quantum amplitude estimation~\cite{brassard2002} reduces the scaling to roughly
+\begin{equation}
+M_{\text{quantum}} = \Theta\!\left(\frac{1}{\varepsilon}\right)
+\end{equation}
+oracle calls, assuming coherent oracle access with no intermediate measurements, at the cost of deeper, more structured circuits.
+
+That reduction is only valuable if small $\varepsilon$ is actually needed.
+If the best move is better than the next-best by, say, 5\%, then classical Monte Carlo can resolve that gap with a few thousand rollouts and parallelize them to near-zero wall time.
+A QPU offers no meaningful benefit in that regime.
+
+The second condition, then, is that the \emph{typical gap between the best action and the runner-up must be tiny}, so that action selection demands extremely high-precision estimates.
+The $1/\varepsilon$ versus $1/\varepsilon^2$ scaling gap becomes decisive in that regime.
+
+\subsection{The oracle must be worth building}
+
+Even if quantum amplitude estimation reduces the number of required samples, each sample must be produced by a quantum oracle: a reversible circuit that coherently simulates one rollout of the environment.
+Building that oracle is not free.
+The simulation logic must be translated into reversible operations, intermediate computations must be cleaned up~\cite{bennett1973}, and randomness must be handled within the quantum circuit.
+
+If simulating a single step of the environment is expensive on its own (for instance, because the rules require checking relationships between distant parts of the board, or because the legal moves depend on the full history of play), then the cost of building and running the oracle circuit grows so large that it cancels out the sample-count savings.
+The QPU ends up spending more time per oracle call than the classical computer would have spent on the extra rollouts.
+
+The third condition is therefore that the \emph{environment dynamics must be simple enough to simulate reversibly without excessive overhead}.
+Games with compact, local rules (where each cell only needs to check its immediate neighbors) are good candidates.
+Games with complex global constraints are not.
+
+These three conditions provide a lens for evaluating specific problems.
+Before applying them, it is worth noting that the algorithmic foundations are already in place.
+Montanaro~\cite{montanaro2015} showed that quantum walks can speed up certain Monte Carlo methods, Peters~\cite{peters2021} extended amplitude estimation to Monte Carlo tree search, and Wang et al.~\cite{wang2021} analyzed quantum speedups for reinforcement learning.
+Quantum algorithms can accelerate stochastic evaluation in principle; the open problem is identifying which settings have the right structure to benefit in practice.
+
+\section{Benchmarking on games}
+
+\subsection{Go}
+
+The game of Go is an important topic in AI search, because it is a perfect information game with a large search space that has been the subject of intense research for decades.
+It is a turn-based game played by two players on a $19 \times 19$ grid.
+Each player takes turns placing a stone of their color on the grid.
+There are a few more important rules such as capturing each other's stones based on liberties of connected groups, legal-move constraints, and a couple other edge cases.
+Simply put, the goal is to claim the most territory.
+
+We evaluate the game on the three conditions outlined earlier.
+
+\begin{itemize}
+  \item Intrinsic stochasticity: Go is not a stochastic game, because there is no inherent randomness; the rules are deterministic. Even though classical solvers may employ randomness for exploration policies, stochastic rollouts, neural policy sampling, and temperature schedules, these are not inherent to the game itself. The randomness lives in the solver, and the game itself remains deterministic.
+  \item Precision is the bottleneck: Go does not demand high precision estimation. In practice, AlphaZero~\cite{silver2017,silver2018} has shown how strong learned priors can narrow the candidate set dramatically, widening the effective gap $g$ between the best move and the runner-up. A large $g$ pushes the problem out of the regime where the QPU's $1/g$ scaling provides a wall-clock advantage. There are a few board states where the gap is small, but these exceptions don't characterize the game.
+  \item The oracle must be worth building: The rules of Go are challenging to implement because they include captures based on counting liberties of connected groups, ko and superko rules, and suicide legality checks. All of those checks are nonlocal and dynamic, making them expensive to compile into reversible circuits. The QPU advantage will be lost.
+\end{itemize}
+
+Go fails all three conditions.
+It's deterministic, typically resolvable without extreme precision, and expensive to make reversible.
+
+Beyond the three conditions, there is a competitive-landscape argument.
+A QPU would have to outperform highly optimized classical code, massively parallel evaluation, and decades of algorithmic improvements combined with deep learning.
+AlphaZero and its successors represent one of the great success stories of classical AI.
+Even if some theoretical quantum speedup applies to Go in principle, the advantage story gets buried under the engineering and heuristics that classical methods have already accumulated.
+
+\subsection{2-arm bandit}
+
+The 2-arm bandit game is perhaps as important and well-known as Go in the AI literature~\cite{sutton2018}.
+It is a single-player game where the player faces two slot machines (arms).
+Pulling an arm yields a random reward drawn from a probability distribution that is not known to the player.
+Depending on the variation of the game, the objective is to identify which arm has the higher expected payout or in general to maximize the cumulative reward over a fixed number of pulls.
+
+The 2-arm bandit passes the first condition because it is inherently stochastic, but fails the remaining two.
+
+\begin{itemize}
+  \item Intrinsic stochasticity: The game is inherently stochastic because each arm produces random outcomes, and the objective requires sampling. A classical solver cannot work around that limitation.
+  \item Precision is the bottleneck: The bandit has no structural mechanism that forces the gap between arms to be small. Some instances are easy to distinguish, some are harder, but tiny gaps are incidental to specific instances rather than an inherent feature of the problem.
+  \item The oracle must be worth building: Each classical sample is a single draw from a distribution, costing near-zero computation. The fixed overhead of fault-tolerant quantum error correction far exceeds that trivial per-sample cost, so the oracle is not worth building.
+\end{itemize}
+
+\begin{table}[ht]
+  \centering
+  \setlength{\tabcolsep}{1em}
+  \caption{Benchmark games evaluated against the three conditions for quantum advantage.}
+  \label{tab:game-conditions}
+  \begin{tabular}{@{}lcc@{}}
+    \hline\noalign{\smallskip}
+    \textbf{Condition} & \textbf{Go} & \textbf{2-Arm Bandit} \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    Intrinsic stochasticity   & \texttimes & \checkmark \\
+    Precision is the bottleneck & \texttimes & \texttimes \\
+    The oracle must be worth building & \texttimes & \texttimes \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    \textbf{Quantum advantage?} & \textbf{No} & \textbf{No} \\
+    \noalign{\smallskip}\hline
+  \end{tabular}
+\end{table}
+
+\subsection{Sway: a quantum advantage game}
+
+Consider a new game called Sway, purpose-built so all three conditions are met.
+It is a two-player turn-based game played on a grid, similar to Go.
+But, by construction, Sway will satisfy all three conditions:
+
+\begin{itemize}
+  \item Intrinsic stochasticity: The game will include a stochastic environment turn that affects the state of the game.
+  \item Precision is the bottleneck: The repeated environment rounds attenuate the marginal impact of any single move.
+  \item The oracle must be worth building: The rules will be local (only the neighboring cells need to be checked).
+\end{itemize}
+
+\section{Rules of Sway}
+
+In the game of Sway, an $N \times N$ grid is initialized empty.
+The game lasts $H$ rounds.
+Each round, both players take turns placing one stone of their color on an empty cell.
+Then a \textbf{Sway event} occurs: each occupied cell independently may flip to the opponent's color with probability
+\begin{equation}
+p(k) = p_{\text{base}} - k \cdot \delta,
+\end{equation}
+where $k$ is the number of friendly (same-colored) orthogonal neighbors (up to 4) and $\delta$ is a small positive constant (ensuring $p(k) \in [0, 1]$).
+After $H$ rounds, the player with more stones of their color on the board wins.
+
+The flip probability governs stability.
+Isolated stones (low $k$) are fragile: they have no local reinforcement and flip easily.
+Clustered stones (high $k$) are resilient: their neighbors protect them, and they tend to persist through Sway events.
+
+\begin{figure}[ht]
+\centering
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+\cellcolor{black!80}\textcolor{white}{\textbf{B}} & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ \\
+\hline
+\cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & \cellcolor{white}\textbf{W} & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & \cellcolor{white}\textbf{W} \\
+\hline
+\end{tabular}
+\hspace{1.5cm}
+$\xrightarrow{\text{Sway}}$
+\hspace{1.5cm}
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+\cellcolor{black!80}\textcolor{white}{\textbf{B}} & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ \\
+\hline
+\cellcolor{white}\textbf{W} & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & \cellcolor{white}\textbf{W} \\
+\hline
+\end{tabular}
+\caption{A Sway event on a $4 \times 4$ board. The top-left cluster ($k=1$ or $k=2$) mostly persists, while the two isolated stones ($k=0$) are vulnerable. Here the middle-left stone and the center stone both flipped.}
+\label{fig:sway-event}
+\end{figure}
+
+Repeated Sway events compress value differences.
+To see this, consider a single stone that flips with a roughly constant probability $p$ each round.
+Represent the stone's color as a $\pm 1$ variable $X$, where $+1$ means it matches its owner and $-1$ means it has flipped.
+After one Sway event, the expected value is
+\begin{equation}
+\mathbb{E}[X_1] = (1 - p) \cdot X_0 + p \cdot (-X_0) = (1 - 2p) \cdot X_0.
+\end{equation}
+After $R$ successive Sway events, the decay compounds:
+\begin{equation}
+\mathbb{E}[X_R] = (1 - 2p)^R \cdot X_0.
+\end{equation}
+Even for fairly stable stones, repeated Sway quickly shrinks a stone's long-run marginal contribution, especially for early moves that must survive many future rounds, making it difficult to distinguish ``good'' from ``slightly better'' without high-precision estimation.
+
+The single-stone model captures the intuition, but a move simultaneously shifts the flip probabilities of neighboring cells by altering their friendly-neighbor counts.
+A coupling argument, using the path coupling technique of Bubley and Dyer~\cite{bubley1997}, tracks the expected Hamming distance between two worlds that differ by a single move.
+Each Sway event can both heal existing disagreements and spread new ones to neighbors, and the net effect is a contraction by a factor
+\begin{equation}
+\alpha = |1 - 2p_{\text{base}}| + 8\delta
+\end{equation}
+per round.
+With $p_{\text{base}} = 0.30$ and $\delta = 0.05$, this gives $\alpha = 0.80$, so the expected action gap after $T$ remaining rounds is bounded by $\alpha^T$.
+The single-stone decay $(1 - 2p)^R$ is faster than $\alpha^T$ because it ignores neighbor interactions, but both are exponential in the number of remaining rounds, which is the key point.
+For broader background on the ergodic theory of local stochastic interactions on lattices, see Liggett~\cite{liggett1985}.
+
+Note that the precision bottleneck does not apply to every decision. Some moves are obviously weak: an isolated corner placement is clearly worse than reinforcing an existing cluster, and any reasonable policy can prune such candidates without rollouts. The hard decisions arise when the agent must choose among several plausible moves that all reinforce friendly groups but differ in long-run value by a tiny margin. Those are the comparisons where the exponential decay compresses the gap $g$ and classical sampling costs explode.
+
+Despite the compact rules, Sway has real positional play because every placement scores a point on the board \emph{today} while also shaping \emph{future stability} for friendly stones and against the opponent's stones.
+Several strategic motifs emerge:
+
+\begin{itemize}
+  \item Long chains create many low-$k$ endpoints that are fragile, so compact blobs with higher average $k$ tend to be more stable.
+  \item Early placements face many future Sway events, so an unsupported singleton is often wasted and should be reinforced quickly.
+  \item Converting an opponent's stone directly is not always necessary; keeping it at $k = 0$ or $k = 1$ lets Sway do the conversion over time.
+  \item The maximum $k$ is lower on boundaries, so edge regions tend to be more volatile and center control often pays stability dividends.
+\end{itemize}
+
+\subsection{Generalization to real-world applications}
+
+Sway resembles Conway's Game of Life~\cite{gardner1970}, where local interactions produce macroscopic outcomes.
+The core structural pattern (adversarial interventions, local reinforcement, stochastic churn, and a finite-horizon payoff) appears across many real-world domains:
+
+\begin{itemize}
+  \item Opinion dynamics: individuals align with local social neighborhoods, but randomness (media, personal events) causes endogenous flipping.
+  \item Market adoption: local network effects stabilize adoption, while isolated users churn more easily.
+  \item Cultural competition: ideas persist when embedded in communities; isolated believers are more likely to change their mind.
+  \item Epidemic spread: infected individuals in dense clusters sustain transmission, while isolated cases recover without sparking outbreaks.
+\end{itemize}
+
+The mapping to Sway is direct.
+In opinion dynamics, an individual's belief is a stone, their social circle is the neighborhood ($k$), and exposure to media or personal upheaval acts as the Sway event that may flip them.
+In market adoption, a user's choice of product is the stone, the number of friends or colleagues using the same product determines $k$, and competitive offers or shifting preferences play the role of the flip.
+In cultural competition, a person's commitment to an idea is the stone, the surrounding community provides reinforcement, and encounters with rival ideas are the stochastic disruption.
+In epidemic spread, an infected individual is the stone, contact density sets $k$, and recovery is the flip back.
+A reader working on any of these problems can substitute their own domain objects into the framework and apply the same cost analysis developed in the next section.
+
+\section{Evaluating the quantum advantage}
+
+The three conditions from earlier in this chapter describe \emph{when} quantum acceleration applies.
+Once a problem satisfies all three, the next question is \emph{how much} the acceleration helps in practice.
+This section walks through a general cost analysis framework for comparing classical and quantum evaluation, then applies it to Sway as a concrete example.
+The same approach can be used to evaluate any candidate problem.
+
+\subsection{Cost of one rollout}
+
+A single Sway rollout consists of choosing placements for both players (from a policy or heuristic) and then applying the Sway event $H$ times.
+Let $S_t$ denote the number of stones on the board after round $t$.
+Since both players place one stone each round, $S_t = 2t$ until the board fills.
+
+The total number of stone updates across all Sway events is roughly
+\begin{equation}
+\sum_{t=1}^{H} S_t \approx \sum_{t=1}^{H} 2t = H(H+1) \approx H^2.
+\end{equation}
+Each stone update is a small constant amount of work: count friendly neighbors, compare to a threshold, and conditionally flip.
+Let $c$ denote the cost of one such update in primitive operations.
+Then one rollout costs approximately
+\begin{equation}
+\text{Ops per rollout} \approx c \cdot H^2.
+\end{equation}
+The quadratic growth in $H$ means longer games produce more expensive rollouts, but the cost per rollout stays polynomial.
+
+\subsection{Sample complexity for close decisions}
+
+The decay analysis from the previous section showed that the expected action gap contracts by a factor of $\alpha = |1 - 2p_{\text{base}}| + 8\delta$ with each Sway event.
+After $R$ remaining rounds, the gap is bounded by $\alpha^R$.
+With the default parameters ($p_{\text{base}} = 0.30$, $\delta = 0.05$) and $R = 50$ remaining rounds, the contraction bound gives $\alpha^{50} = 0.80^{50} \approx 1.4 \times 10^{-5}$.
+The gap $g$ between the best move and the second-best move is driven to very small values by this compounding effect.
+
+Contrast this with Go, where strong heuristics and learned priors can often separate candidate moves by large margins.
+In Sway, the repeated stochastic erosion compresses the differences by design.
+
+Suppose two candidate moves differ in expected outcome by a gap $g$.
+To reliably choose the better move, the estimation error must be well below $g$.
+The required number of samples scales as:
+
+\begin{itemize}
+  \item Classical Monte Carlo: $\Theta(1/g^2)$ rollouts.
+  \item Quantum amplitude estimation: $\Theta(1/g)$ oracle calls.
+\end{itemize}
+
+Take $g \approx 10^{-5}$ (the order of magnitude from the $\alpha^{50}$ bound above).
+Classical Monte Carlo needs roughly $1/g^2 = 10^{10}$ rollouts to resolve the gap.
+Quantum amplitude estimation needs roughly $1/g = 10^{5}$ oracle calls, five orders of magnitude fewer.
+At a more moderate gap of $g = 10^{-3}$, the classical cost is $10^{6}$ rollouts versus $10^{3}$ oracle calls, still a factor of $1{,}000$.
+Sway's decay mechanism reliably pushes $g$ into the regime where this separation is large.
+
+\subsection{The wall-clock inequality}
+
+The sample-count advantage from the previous section ($1/g$ versus $1/g^2$) does not automatically translate into a wall-clock speedup. A classical computer can run many rollouts in parallel, and each rollout is cheap. A QPU must run oracle calls sequentially within a single amplitude estimation circuit, and each call carries overhead. To determine which machine finishes first, we need to account for four quantities:
+
+\begin{itemize}
+  \item $t_{\text{roll}}$: the time for one classical rollout on a CPU.
+  \item $P$: the number of CPU workers available for parallel evaluation.
+  \item $t_{\text{oracle}}$: the time for one coherent quantum oracle call.
+  \item $C$: an overhead factor for amplitude estimation, covering reflections, phase estimation iterations, and similar bookkeeping.
+\end{itemize}
+
+On the classical side, $1/g^2$ rollouts are needed, but $P$ workers can run them in parallel, so the wall-clock time is
+\begin{equation}
+T_{\text{CPU}} \approx \frac{t_{\text{roll}}}{P} \cdot \frac{1}{g^2}.
+\end{equation}
+On the quantum side, $1/g$ oracle calls are needed, each taking time $t_{\text{oracle}}$, with an additional factor of $C$ for the amplitude estimation bookkeeping:
+\begin{equation}
+T_{\text{QPU}} \approx C \cdot t_{\text{oracle}} \cdot \frac{1}{g}.
+\end{equation}
+
+Setting $T_{\text{QPU}} < T_{\text{CPU}}$ and solving for $t_{\text{oracle}}$ gives the break-even condition:
+\begin{equation}
+\label{eq:wall-clock}
+t_{\text{oracle}} < \frac{t_{\text{roll}}}{C \cdot P \cdot g}.
+\end{equation}
+
+The gap $g$ appears in the denominator on the right-hand side. As the gap shrinks, the right-hand side grows, meaning the QPU can afford a slower per-call cost and still finish first. Conversely, adding more classical workers ($P$) tightens the inequality, raising the bar the QPU must clear. In short, problems with tiny value gaps and limited classical parallelism give quantum the most room to operate.
+
+\subsection{A numerical example}
+
+Consider a $32 \times 32$ board ($N^2 = 1{,}024$ cells) played over $H = 512$ rounds, so that $1{,}024$ stones are placed and the board roughly fills.
+The total number of stone updates across all Sway events is $H(H+1) = 512 \cdot 513 = 262{,}656$.
+At $c = 50$ primitive operations per update, one rollout costs roughly $13$ million operations, which translates to approximately $5$~ms on a modern CPU.
+
+Now consider a gap of $g = 10^{-4}$, the kind of margin that arises when repeated Sway events attenuate early placements.
+Equation~\ref{eq:wall-clock} tells us the QPU wins when $t_{\text{oracle}} < t_{\text{roll}} / (C \cdot P \cdot g)$.
+Plugging in $t_{\text{roll}} = 5$~ms, overhead $C = 10$, and varying the classical parallelism $P$ and oracle speed $t_{\text{oracle}}$, we can compare wall-clock times directly.
+
+Table~\ref{tab:numerical-example} shows the results.
+The classical side scales by adding cores: $10^8$ rollouts at $5$~ms each take $5.8$ days on a single core but drop to $8.3$ minutes on $1{,}000$ cores.
+The quantum side scales by oracle speed: $10^4$ base calls become $10^5$ with overhead $C = 10$, and the wall-clock time depends on how fast each call executes.
+
+\begin{table}[ht]
+  \centering
+  \setlength{\tabcolsep}{0.8em}
+  \caption{Wall-clock comparison for $g = 10^{-4}$ on a $32 \times 32$ Sway board.}
+  \label{tab:numerical-example}
+  \begin{tabular}{@{}llr@{}}
+    \hline\noalign{\smallskip}
+    \textbf{Method} & \textbf{Configuration} & \textbf{Wall-clock time} \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    Classical & 1 CPU core & $\approx 5.8$ days \\
+    Classical & $1{,}000$ CPU cores & $\approx 8.3$ minutes \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    Quantum & $t_{\text{oracle}} = 1$~ms & $\approx 100$ seconds \\
+    Quantum & $t_{\text{oracle}} = 10$~ms & $\approx 17$ minutes \\
+    Quantum & $t_{\text{oracle}} = 100$~ms & $\approx 2.8$ hours \\
+    \noalign{\smallskip}\hline
+  \end{tabular}
+\end{table}
+
+At $1$~ms per oracle call the QPU finishes in under two minutes, well ahead of a $1{,}000$-core classical cluster.
+At $10$~ms the two approaches are roughly comparable.
+At $100$~ms the classical cluster wins, but the QPU still beats a single core by a wide margin.
+
+A caveat on the $1$~ms target: current estimates for logical gate times on surface codes are in the microsecond range~\cite{fowler2012}, and a full oracle circuit for a $1{,}024$-cell board would require many logical gates.
+The $1$~ms figure assumes hardware improvements beyond what is available today.
+The $10$~ms and $100$~ms rows show how the comparison shifts under more conservative assumptions.
+
+These numbers will shift as hardware matures, but the analysis framework is general.
+For any problem satisfying the three conditions, the procedure is the same: estimate the per-rollout cost, characterize the typical value gap $g$, and compare wall-clock times using Equation~\ref{eq:wall-clock}.
+Sway is a clean example because each of these quantities can be derived directly from the rules, but the reasoning transfers to other stochastic evaluation problems.
+
+\section{Strategic motifs in Sway}
+
+The previous sections established the rules and the mathematics, but reading Sway's strategy on paper can feel abstract.
+The following three small board positions show how placement decisions translate into stability tradeoffs, and build intuition for the kind of close calls that drive the precision bottleneck.
+All examples use $p_{\text{base}} = 0.30$ and $\delta = 0.05$, giving the following flip probabilities:
+
+\begin{center}
+\begin{tabular}{cl}
+$k = 0$ & $p = 0.30$ \\
+$k = 1$ & $p = 0.25$ \\
+$k = 2$ & $p = 0.20$ \\
+$k = 3$ & $p = 0.15$ \\
+$k = 4$ & $p = 0.10$
+\end{tabular}
+\end{center}
+
+\subsection{Clusters versus singletons}
+
+After Round~1, one player places in the center and the other places in the corner.
+Both stones have $k = 0$, so each flips with probability $0.30$.
+
+In Round~2, the first player reinforces by placing adjacent to the existing stone.
+The second player places another isolated stone.
+
+\begin{figure}[ht]
+\centering
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+\textbf{W} & $\cdot$ & $\cdot$ & $\cdot$ & \textbf{W} \\
+\hline
+\end{tabular}
+\caption{After Round~2. The two-stone cluster has $k = 1$ (flip probability $0.25$), while each isolated stone has $k = 0$ (flip probability $0.30$).}
+\label{fig:thick-vs-isolated}
+\end{figure}
+
+Even in two rounds, the adjacent placement has already improved stability.
+A move placed next to a friendly stone adds one point of material and simultaneously increases the expected net bias of multiple stones across many future Sway events.
+Using the single-stone decay $\mathbb{E}[X_R] = (1-2p)^R$ from earlier, after $R = 5$ Sway events a clustered stone ($p = 0.25$) has $\mathbb{E}[X_5] = (0.50)^5 \approx 0.031$, while a singleton ($p = 0.30$) has $\mathbb{E}[X_5] = (0.40)^5 \approx 0.010$.
+The clustered stone's expected net contribution to the score difference is about three times larger, even though both stones are near 50/50 in raw match probability after several rounds. The gap in net bias widens with every additional round.
+
+\subsection{The four-stone fortress}
+
+Suppose one player builds a $2 \times 2$ block:
+
+\begin{figure}[ht]
+\centering
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+\end{tabular}
+\caption{A $2 \times 2$ anchor block. Each stone has $k = 2$, so the flip probability drops to $0.20$, a significant improvement over isolated stones at $0.30$.}
+\label{fig:anchor-block}
+\end{figure}
+
+Every stone in the block has $k = 2$, giving a flip probability of $0.20$ compared to $0.25$ for a two-stone chain ($k = 1$) and $0.30$ for a singleton ($k = 0$).
+The difference compounds quickly.
+After $R = 5$ Sway events, $\mathbb{E}[X_5]$ is $0.078$ for a $k = 2$ stone, $0.031$ for $k = 1$, and $0.010$ for $k = 0$.
+After $R = 10$, the values are $0.006$, $0.001$, and $0.0001$ respectively.
+The $k = 2$ stone retains an order of magnitude more net bias than the singleton, meaning its contribution to the score difference is far larger even though all three are approaching 50/50 match probability.
+
+The block also benefits future placements.
+Any stone placed on the perimeter of the block immediately gains at least one friendly neighbor, starting at $k \geq 1$ instead of $k = 0$.
+A fifth stone placed adjacent to two block members starts at $k = 2$, inheriting the same resilience as the original four.
+The block seeds a region of stability that can grow outward over successive rounds.
+
+\subsection{Defensive placement}
+
+Suppose White has two adjacent stones one row from the top edge:
+
+\begin{figure}[ht]
+\centering
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \textbf{W} & \textbf{W} & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+\end{tabular}
+\caption{Two adjacent White stones at $k = 1$, one row from the top edge. White would like to thicken downward into a $2 \times 2$ block.}
+\label{fig:deny-stabilization}
+\end{figure}
+
+One option for Black is to place a wedge directly below one of the White stones, blocking the downward expansion.
+Figure~\ref{fig:wedge-result} shows the board after this move.
+
+\begin{figure}[ht]
+\centering
+\begin{tabular}{|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|w{c}{1.2em}|}
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \textbf{W} & \textbf{W} & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & \cellcolor{black!80}\textcolor{white}{\textbf{B}} & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+$\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ \\
+\hline
+\end{tabular}
+\caption{After the wedge. Black blocks White's downward expansion. White's only remaining growth direction is upward, toward the edge where the maximum $k$ is capped at $3$ instead of $4$.}
+\label{fig:wedge-result}
+\end{figure}
+
+White can still grow upward, but edge cells have fewer orthogonal neighbors, capping $k$ at $3$ instead of the interior maximum of $4$.
+A stone at $k = 3$ ($p = 0.15$) decays as $(0.70)^R$, while an interior stone at $k = 4$ ($p = 0.10$) decays as $(0.80)^R$.
+After $R = 10$ Sway events, the edge stone has $\mathbb{E}[X_{10}] = 0.028$ versus $0.107$ for the interior stone: the interior stone's net contribution to the score difference is nearly four times larger.
+By forcing White toward the boundary, Black degrades the long-run stability of the entire cluster without needing to flip a single stone directly.
+
+\section{Summary}
+
+This chapter established three conditions that a problem must satisfy for quantum acceleration to provide a structural advantage over classical methods: intrinsic stochasticity, tiny value gaps, and cheap reversible transitions.
+Familiar benchmarks like Go and the 2-arm bandit fail these conditions for different reasons.
+Sway satisfies all three by design.
+
+Sway is a benchmark whose difficulty can be dialed by its parameters ($N$, $H$, $p_{\text{base}}$, $\delta$), which control the contraction rate $\alpha$ and thus the precision required for action selection.
+Its rules are intentionally chosen so the environment transition can be compiled into reversible logic without global checks, making it a natural sandbox for the techniques developed in later chapters.
+
+The next chapters turn to implementation: constructing the quantum oracle that simulates Sway's transitions coherently, embedding it inside amplitude estimation, and analyzing the end-to-end performance of the resulting quantum agent.
+
+\input{08-chapter/references}

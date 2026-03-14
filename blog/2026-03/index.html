@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sakura-dark.css">
+<title>Game of Sway</title>
+<style>
+  
+  /* Override highlight theme backgrounds — keep only text colors */
+  div.sourceCode, pre.sourceCode, code.sourceCode { background-color: transparent !important; }
+  code span { background-color: transparent !important; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f9f9f9;
+    color: #4a4a4a;
+    font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    max-width: none;
+  }
+
+  .site-header {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 24px;
+  }
+
+  .home-link {
+    color: #1d7484;
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-bottom: 2px solid transparent;
+  }
+  .home-link:hover { color: #982c61; border-bottom-color: #982c61; }
+
+  .post-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: #888;
+  }
+
+  h1.page-title {
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+    color: #2a2a2a;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 18px;
+  }
+
+  /* Margin notes (desktop) / popovers (mobile) */
+  .prose { position: relative; }
+
+  .footnotes-end-of-document { display: none; }
+
+  .sidenote {
+    position: absolute;
+    right: -260px;
+    width: 220px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #999;
+    transition: color 0.15s;
+  }
+  .sidenote.highlight { color: #4a4a4a; }
+  .sidenote a { font-size: inherit; }
+  .sidenote p { margin: 0; }
+
+  .sidenote-connector {
+    position: absolute;
+    right: -36px;
+    width: 32px;
+    border-top: 1px dashed #ccc;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .sidenote-connector.visible { opacity: 1; }
+
+  .fn-popover {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #4a4a4a;
+    max-width: 360px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .fn-popover.visible { display: block; }
+  .fn-popover p { margin: 0; }
+  .fn-popover a { font-size: inherit; }
+
+  .footnote-ref { position: relative; }
+
+  @media (max-width: 899px) {
+    .sidenote { display: none !important; }
+  }
+  @media (min-width: 900px) {
+    .fn-popover { display: none !important; }
+  }
+
+  /* Anchor links on headings */
+  .prose h2, .prose h3 { position: relative; }
+  .anchor-link {
+    position: absolute;
+    left: -1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bbb;
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.15s;
+    border-bottom: none !important;
+  }
+  .prose h2:hover .anchor-link,
+  .prose h3:hover .anchor-link { opacity: 1; }
+  .anchor-link:hover { color: #1d7484; border-bottom: none !important; }
+
+  /* Prose — Pandoc-generated content */
+  .prose {
+    max-width: 620px;
+    width: 100%;
+  }
+
+  /* Sakura overrides */
+  html { font-size: 100%; }
+  body { font-size: 1rem; }
+  p { margin-bottom: 0.8rem; }
+  ul, ol { margin-bottom: 0.8rem; }
+  h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', 'Georgia', serif; }
+  li > ul, li > ol { margin-bottom: 0; }
+  input, select, textarea { margin-bottom: 0; }
+  table { text-align: left; }
+  code, kbd, samp { background-color: #eef; }
+
+  button {
+    background: #D95032;
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+  }
+  button:hover { background: #F24738; }
+
+  /* Game screen */
+  #game { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+  .info-bar {
+    display: flex;
+    gap: 28px;
+    font-size: 1rem;
+    align-items: center;
+    padding: 0 36px;
+    position: relative;
+    z-index: 15;
+  }
+
+  .score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+  }
+
+  .dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot.black { background: #333; border: 2px solid #888; }
+  .dot.white { background: #f0f0f0; border: 2px solid #ccc; }
+
+  .turn-indicator {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .turn-indicator.black-turn { background: #333; color: #fff; border: 2px solid #888; }
+  .turn-indicator.white-turn { background: #f0f0f0; color: #222; border: 2px solid #ccc; }
+  .turn-indicator.sway-phase { background: #D95032; color: #fff; border: 2px solid #D95032; }
+
+  /* Settings cog */
+  .settings-wrap {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .cog-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.3rem;
+    padding: 2px 6px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .cog-btn:hover { color: #e0e0e0; background: none; }
+
+  .settings-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 14px 18px;
+    z-index: 20;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 230px;
+  }
+  .settings-menu.open {
+    display: flex;
+  }
+
+  .settings-menu label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #555;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .settings-menu input,
+  .settings-menu select {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #4a4a4a;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: 70px;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .settings-menu select { width: auto; }
+
+  #board-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  #canvas {
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+  }
+
+  .status-text {
+    font-size: 0.9rem;
+    color: #aaa;
+    min-height: 1.4em;
+    text-align: center;
+  }
+
+  #result-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #result-overlay.show { display: flex; }
+
+  .result-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 36px 48px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .result-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #aaa;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+  .result-close:hover { color: #444; background: none; }
+
+  .result-box h2 { font-size: 1.8rem; }
+  .result-box .final-scores { font-size: 1.1rem; color: #4a4a4a; }
+
+  .btn-row { display: flex; gap: 12px; justify-content: center; }
+
+  .btn-secondary {
+    background: #e8e8e8;
+    color: #4a4a4a;
+    border: 1px solid #bbb;
+  }
+  .btn-secondary:hover { background: #d0d0d0; }
+
+  /* ─── Simulation Lab ─────────────────────────────────────── */
+  #sim-lab {
+    margin-top: 12px;
+    margin-bottom: 40px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 14px 24px;
+    max-width: 620px;
+    width: 100%;
+  }
+
+  #sim-lab h2 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+    color: #2a2a2a;
+  }
+
+  #sim-lab .sim-desc {
+    font-size: 0.82rem;
+    color: #888;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .sim-controls {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .sim-controls button {
+    margin-left: auto;
+  }
+
+  .sim-controls label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0;
+  }
+
+  .sim-controls input, .sim-controls select {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #4a4a4a;
+    padding: 5px 8px;
+    border-radius: 6px;
+    width: 70px;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  #sim-progress {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0;
+  }
+  #sim-progress:not(:empty) {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Strategy list */
+  .strat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 18px;
+  }
+
+  .strat-list details {
+    background: #efefef;
+    border-radius: 6px;
+    padding: 0 12px;
+  }
+
+  .strat-list summary {
+    padding: 8px 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .strat-list summary::before {
+    content: '+ ';
+    color: #D95032;
+    font-weight: 700;
+  }
+
+  .strat-list details[open] summary::before { content: '- '; }
+
+  .strat-list p {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.55;
+    padding-bottom: 10px;
+  }
+
+  /* Viz tabs */
+  .viz-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .viz-tab {
+    background: #efefef;
+    color: #888;
+    border: 1px solid #ccc;
+    padding: 6px 14px;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .viz-tab:hover {
+    background: #e0e0e0;
+    color: #2a2a2a;
+  }
+
+  .viz-tab.active {
+    background: #e0e0e0;
+    color: #2a2a2a;
+    border-bottom-color: #e0e0e0;
+  }
+
+  .viz-panel { min-height: 120px; }
+
+  .viz-note {
+    font-size: 0.78rem;
+    color: #777;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+
+  /* Heatmap */
+  .heatmap-table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .heatmap-table th, .heatmap-table td {
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+
+  .hm-head {
+    color: #aaa;
+    font-weight: 600;
+    font-size: 0.72rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hm-row-head { text-align: right !important; padding-right: 10px !important; }
+
+  .hm-cell {
+    border-radius: 4px;
+    font-weight: 700;
+    transition: background 0.4s;
+    color: #666;
+  }
+
+  .hm-diag { color: #444; }
+
+  /* Elo */
+  .elo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .elo-rank {
+    width: 28px;
+    text-align: right;
+    font-weight: 700;
+    color: #888;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .elo-name {
+    width: 90px;
+    font-size: 0.85rem;
+    color: #4a4a4a;
+    flex-shrink: 0;
+  }
+
+  .elo-track {
+    flex: 1;
+    height: 26px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .elo-bar {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    transition: width 0.5s ease-out;
+  }
+
+  /* Bracket — traditional left-to-right */
+  .bk-bracket {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 14px;
+    overflow-x: auto;
+  }
+
+  .bk-round {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+  }
+
+  .bk-round-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .bk-matches {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex: 1;
+    gap: 12px;
+  }
+
+  .bk-match {
+    background: #efefef;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+  }
+
+  .bk-slot {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  .bk-slot + .bk-slot {
+    border-top: 1px solid #ddd;
+  }
+
+  .bk-slot.winner {
+    background: #d4f5dc;
+    color: #1a7a35;
+    font-weight: 700;
+  }
+
+  .bk-name { margin-right: 8px; }
+
+  .bk-pct {
+    font-size: 0.72rem;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  .bk-connector {
+    width: 24px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .bk-connector canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* Stacked bars */
+  .stacked-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .stacked-name {
+    width: 90px;
+    font-size: 0.85rem;
+    color: #4a4a4a;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .stacked-track {
+    flex: 1;
+    height: 24px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .stacked-seg {
+    height: 100%;
+    transition: width 0.4s ease-out;
+    min-width: 0;
+  }
+
+  .win-seg { background: #27ae60; }
+  .tie-seg { background: #aaa; }
+  .loss-seg { background: #c0392b; }
+
+  .stacked-pct {
+    width: 60px;
+    font-size: 0.8rem;
+    color: #666;
+    flex-shrink: 0;
+  }
+
+  .stacked-legend {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #888;
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  /* Network graph canvas */
+  #viz-graph canvas { border-radius: 8px; }
+
+  /* Sway dice label */
+  .sway-label {
+    position: absolute;
+    pointer-events: none;
+    font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.2;
+  }
+  .sway-label.visible { opacity: 1; }
+  .sway-label:not(.safe):not(.flipped) {
+    background: rgba(40, 40, 50, 0.92);
+    color: #cccccc;
+    border: 1px solid rgba(150,150,160,0.5);
+  }
+  .sway-label:not(.safe):not(.flipped) .die {
+    background: #3a3a4a;
+    color: #eee;
+    border: 1px solid #666;
+  }
+  .sway-label.safe {
+    background: rgba(40, 40, 50, 0.92);
+    color: #7ec88b;
+    border: 1px solid rgba(80,200,120,0.5);
+  }
+  .sway-label.close {
+    background: rgba(50, 45, 30, 0.92);
+    color: #F2BF80;
+    border: 1px solid rgba(220,190,60,0.6);
+  }
+  .sway-label.close .die {
+    background: #5a4a20;
+    color: #F2BF80;
+    border: 1px solid #8a7a40;
+  }
+  .sway-label.flipped {
+    background: rgba(40, 40, 50, 0.92);
+    color: #ff6b7f;
+    border: 1px solid rgba(233,69,96,0.7);
+  }
+  .sway-label .die {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .sway-label .die.spinning {
+    animation: dieTumble 0.12s linear infinite;
+  }
+  .sway-label .die.landed {
+    animation: dieBounce 0.3s ease-out;
+  }
+  .sway-label.safe .die {
+    background: #2a5a35;
+    color: #a0f0a0;
+    border: 1px solid #4a8a55;
+  }
+  .sway-label.flipped .die {
+    background: #6a2030;
+    color: #ffaaaa;
+    border: 1px solid #9a4050;
+  }
+
+  @keyframes dieTumble {
+    0%   { transform: rotateX(0deg)   rotateZ(0deg);   }
+    25%  { transform: rotateX(90deg)  rotateZ(15deg);  }
+    50%  { transform: rotateX(180deg) rotateZ(-10deg); }
+    75%  { transform: rotateX(270deg) rotateZ(12deg);  }
+    100% { transform: rotateX(360deg) rotateZ(0deg);   }
+  }
+  @keyframes dieBounce {
+    0%   { transform: scale(1.4) rotate(-8deg); }
+    40%  { transform: scale(0.95) rotate(3deg); }
+    70%  { transform: scale(1.08) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+</style>
+<script
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+type="text/javascript"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="home-link" href="https://shukla.io">Home</a>
+  <div class="post-meta">
+    <span class="post-author">Nishant Shukla</span>
+    <span class="post-date">March 14, 2026</span>
+  </div>
+</header>
+<h1 class="page-title">Game of Sway</h1>
+<p class="subtitle">Quantum computing for the whole family!</p>
+
+<div class="prose">
+<h2 id="play-sway">Play Sway</h2>
+<p>Grab some dice and let’s play!</p>
+<p>You’ll need a d20, a grid, and black and white pieces.</p>
+<div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0; flex-wrap:wrap;">
+
+  <!-- D20: 3D icosahedron computed from actual vertex coordinates -->
+  <svg width="80" height="80" viewBox="-6 5 112 95" style="max-width:80px;">
+    <polygon points="22.7,41.2 32.8,93.8 74.9,61.6" fill="rgb(210,210,210)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="22.7,41.2 74.9,61.6 65.8,9.4" fill="rgb(210,210,210)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="32.8,93.8 74.9,61.6 82.0,94.6" fill="rgb(217,217,217)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="102.4,42.4 74.9,61.6 65.8,9.4" fill="rgb(217,217,217)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="22.7,41.2 32.8,93.8 -2.4,61.6" fill="rgb(217,217,217)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="65.8,9.4 18.0,9.4 22.7,41.2" fill="rgb(218,218,218)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="102.4,42.4 74.9,61.6 82.0,94.6" fill="rgb(221,221,221)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="22.7,41.2 -2.4,61.6 18.0,9.4" fill="rgb(222,222,222)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="82.0,94.6 34.2,94.6 32.8,93.8" fill="rgb(229,229,229)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="67.2,10.2 102.4,42.4 65.8,9.4" fill="rgb(229,229,229)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="32.8,93.8 -2.4,61.6 34.2,94.6" fill="rgb(230,230,230)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="65.8,9.4 18.0,9.4 67.2,10.2" fill="rgb(230,230,230)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="77.3,62.8 102.4,42.4 82.0,94.6" fill="rgb(237,237,237)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="25.1,42.4 -2.4,61.6 18.0,9.4" fill="rgb(238,238,238)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="82.0,94.6 34.2,94.6 77.3,62.8" fill="rgb(241,241,241)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="67.2,10.2 77.3,62.8 102.4,42.4" fill="rgb(242,242,242)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="25.1,42.4 -2.4,61.6 34.2,94.6" fill="rgb(242,242,242)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="67.2,10.2 25.1,42.4 18.0,9.4" fill="rgb(242,242,242)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="77.3,62.8 25.1,42.4 34.2,94.6" fill="rgb(249,249,249)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="67.2,10.2 77.3,62.8 25.1,42.4" fill="rgb(249,249,249)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    <text transform="matrix(0.931,0.364,-0.353,0.936,56.5,38.4)" text-anchor="middle" dominant-baseline="central" font-family="'Ubuntu',sans-serif" font-size="18" font-weight="700" fill="#4a4a4a">20</text>
+  </svg>
+
+  <!-- Grid -->
+  <svg width="80" height="80" viewBox="0 0 80 80" style="max-width:80px;">
+    <rect x="0.5" y="0.5" width="79" height="79" fill="none" stroke="#4a4a4a" stroke-width="1.2" rx="2"/>
+    <line x1="20" y1="0.5" x2="20" y2="79.5" stroke="#4a4a4a" stroke-width="0.8"/>
+    <line x1="40" y1="0.5" x2="40" y2="79.5" stroke="#4a4a4a" stroke-width="0.8"/>
+    <line x1="60" y1="0.5" x2="60" y2="79.5" stroke="#4a4a4a" stroke-width="0.8"/>
+    <line x1="0.5" y1="20" x2="79.5" y2="20" stroke="#4a4a4a" stroke-width="0.8"/>
+    <line x1="0.5" y1="40" x2="79.5" y2="40" stroke="#4a4a4a" stroke-width="0.8"/>
+    <line x1="0.5" y1="60" x2="79.5" y2="60" stroke="#4a4a4a" stroke-width="0.8"/>
+  </svg>
+
+  <!-- Black and white stones -->
+  <svg width="80" height="80" viewBox="0 0 80 80" style="max-width:80px;">
+    <circle cx="28" cy="36" r="11" fill="#fff" stroke="#4a4a4a" stroke-width="1.3"/>
+    <circle cx="52" cy="48" r="11" fill="#333" stroke="#4a4a4a" stroke-width="1.3"/>
+  </svg>
+
+</div>
+
+<p>The rules are simple:</p>
+<ul>
+<li>Start with an empty board.</li>
+<li>Two players take turns placing their piece on any open spot.</li>
+<li>Then, <strong>it’s the board’s turn!</strong> Every piece faces an
+existential crisis. Lonely pieces are easily swayed to the opposite
+color. Pieces surrounded by allies hold firm.
+<ul>
+<li>Roll a d20 for each piece on the board, and flip the color based on
+the number of friendly neighbors. The more friendly neighbors, the
+better chance the piece has to stay put.<a href="#fn1"
+class="footnote-ref" id="fnref1"
+role="doc-noteref"><sup>1</sup></a></li>
+</ul></li>
+<li>The game ends when the board is full. The winner is the one with the
+most pieces.</li>
+</ul>
+<p>Try it out! Place a piece on the board to begin.</p>
+<script>window.game_component_strings = {"status-black":"Black: place a stone on an empty cell.","status-white":"White: place a stone on an empty cell.","status-black-ai":"Thinking...","status-white-ai":"Thinking...","status-sway":"Sway!","label-black-turn":"Black's turn","label-white-turn":"White's turn","label-sway":"Sway!","result-black-wins":"Black wins!","result-white-wins":"White wins!","result-tie":"It's a tie!"};</script>
+<!-- Game -->
+<div id="game">
+  <div class="info-bar" style="position:relative;">
+    <span class="score"><span class="dot black"></span> Black: <span id="scoreBlack">0</span></span>
+    <span class="turn-indicator" id="turnLabel">Black's turn</span>
+    <span class="score"><span class="dot white"></span> White: <span id="scoreWhite">0</span></span>
+    <div class="settings-wrap">
+      <button class="cog-btn" id="cogBtn" aria-label="Settings">&#9881;</button>
+      <div class="settings-menu" id="settingsMenu">
+        <label>Grid size
+          <input type="number" id="gridSize" value="8" min="4" max="16">
+        </label>
+        <label>Player 2
+          <select id="p2mode">
+            <option value="human">Human</option>
+            <option value="random">AI: Random</option>
+            <option value="clustery" selected>AI: Clustery</option>
+            <option value="anticluster">AI: Anti-Cluster</option>
+            <option value="fortress">AI: Fortress</option>
+            <option value="destabilizer">AI: Destabilizer</option>
+            <option value="forkbuilder">AI: Fork Builder</option>
+            <option value="minimax">AI: Minimax</option>
+          </select>
+        </label>
+        <label>Play as
+          <select id="humanColor">
+            <option value="black" selected>Black (first)</option>
+            <option value="white">White (second)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="info-bar" style="z-index:auto;">
+    <span id="roundLabel" style="color:#aaa;font-size:0.9rem;">Round 1</span>
+  </div>
+  <div id="board-container">
+    <canvas id="canvas"></canvas>
+  </div>
+  <p class="status-text" id="statusText">Place a stone on an empty cell.</p>
+</div>
+
+<!-- Result overlay -->
+<div id="result-overlay">
+  <div class="result-box">
+    <button class="result-close" id="resultClose">&times;</button>
+    <h2 id="resultTitle">Game Over</h2>
+    <p class="final-scores" id="resultScores"></p>
+    <div class="btn-row">
+      <button onclick="startGame()">Play again</button>
+    </div>
+  </div>
+</div>
+
+<p>Take a moment to see if you can figure out a winning strategy.</p>
+<p>Think you’ve got it?</p>
+<h2 id="strategy">Strategy</h2>
+<p>Before you say this is pure unadulterated chaos, I want you to know
+that at first, I also kept losing (no matter whether I played as black
+or white) and thought there was no strategy here. It turns out<a
+href="#fn2" class="footnote-ref" id="fnref2"
+role="doc-noteref"><sup>2</sup></a>, that’s exactly the evidence why
+some strategy must exist; otherwise, I should be winning 50% of all
+games. If stronger players keep beating weaker ones, there must be some
+exploitable structure hiding under the randomness.</p>
+<p>So, I dreamt up the following rules-based AI strategies to play
+against each other. Each one has a name and a rough description of how
+it decides on the best move:</p>
+<ul>
+<li><strong>Random</strong>: Picks an empty cell uniformly at
+random.</li>
+<li><strong>Clusterer</strong>: Greedily places each stone next to as
+many friendly stones as possible.</li>
+<li><strong>Fortress</strong>: Fortress claims corners and edges first,
+building inward.</li>
+<li><strong>Destabilizer</strong>: Picks the move that maximally
+destabilizes the enemy, with light clustering as a tiebreaker.</li>
+<li><strong>Anti-cluster</strong>: Places stones adjacent to enemy
+clusters to break up their friendly-neighbor connections.</li>
+<li><strong>Fork Builder</strong>: Looks one move ahead to predict “How
+many strong follow-up moves does this placement create?”</li>
+<li><strong>Minimax</strong>: For each candidate move, it simulates the
+opponent playing their deterministic Clusterer best response, then picks
+the move that minimizes the quality of that response.</li>
+</ul>
+<p>Who do you think will win?</p>
+<div id="sim-lab">
+  <div class="sim-controls">
+    <label>Grid
+      <input type="number" id="simN" value="8" min="4" max="16">
+    </label>
+    <label>Games / matchup
+      <input type="number" id="simGames" value="500" min="100" max="5000" step="100">
+    </label>
+    <button id="simRunBtn">Run tournament</button>
+  </div>
+  <p id="sim-progress"></p>
+
+  <div id="sim-viz" style="display:none">
+    <div class="viz-tabs" id="viz-tabs">
+      <button class="viz-tab active" data-tab="heatmap">Heatmap</button>
+      <button class="viz-tab" data-tab="elo">Elo Rankings</button>
+      <button class="viz-tab" data-tab="bracket">Bracket</button>
+      <button class="viz-tab" data-tab="graph">Network</button>
+      <button class="viz-tab" data-tab="stacked">Overall</button>
+    </div>
+    <div class="viz-panel" id="viz-heatmap"></div>
+    <div class="viz-panel" id="viz-elo" style="display:none"></div>
+    <div class="viz-panel" id="viz-bracket" style="display:none"></div>
+    <div class="viz-panel" id="viz-graph" style="display:none"></div>
+    <div class="viz-panel" id="viz-stacked" style="display:none"></div>
+  </div>
+</div>
+
+<p>From the tournament results in the demo above, we see while some
+strategies <em>dominate</em> others, the ranking between the top players
+is more nuanced. This “Go with dice” knockoff is getting
+interesting.</p>
+<p>But these are all hand-crafted heuristics…</p>
+<p>Can we find the <em>optimal</em> strategy? That’s going to require
+something a bit more… unconventional.</p>
+<h2 id="solving-the-game">Solving the game</h2>
+<p>Those strategies above were just a shot in the dark. Time to throw
+some compute at this thing.</p>
+<p>The board is only <span class="math inline">\(8 \times 8\)</span>, so
+there’s no more than 64 choices to make. But, for each possible choice,
+there’s a surprisingly large number of outcomes due to the environmental
+randomness. For example, after placing a move on a board with 36 pieces,
+all 37 stones could have a nonzero probability of flipping, resulting in
+<span class="math inline">\(2^{37}\)</span> (over 137 billion) possible
+outcomes in just one look-ahead.</p>
+<p>In order to build a strong AI player, the following techniques are
+available, but not all are feasible:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Example</th>
+<th>Application to Sway</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Compute the exact solution</td>
+<td>Checkers solved in 2007 by the Chinook project<a href="#fn3"
+class="footnote-ref" id="fnref3"
+role="doc-noteref"><sup>3</sup></a></td>
+<td><span style="color:#c0392b">✘</span> Enumerating all possible game
+states is intractable</td>
+</tr>
+<tr class="even">
+<td>Decompose into independent subgames</td>
+<td>Late-stage Go, Winning Ways<a href="#fn4" class="footnote-ref"
+id="fnref4" role="doc-noteref"><sup>4</sup></a> book examples</td>
+<td><span style="color:#c0392b">✘</span> Neighborhood influence prevents
+generic decomposition</td>
+</tr>
+<tr class="odd">
+<td>Linear programming / minimax solvers</td>
+<td>Heads-up limit Texas Hold’em solved by Cepheus<a href="#fn5"
+class="footnote-ref" id="fnref5"
+role="doc-noteref"><sup>5</sup></a></td>
+<td><span style="color:#c0392b">✘</span> Intractable number of
+variables/constraints</td>
+</tr>
+<tr class="even">
+<td>Find a closed-form trick</td>
+<td>Nim’s XOR-based formula<a href="#fn6" class="footnote-ref"
+id="fnref6" role="doc-noteref"><sup>6</sup></a></td>
+<td><span style="color:#d4a017">?</span> Possible, but game-specific
+tricks are all-or-nothing; no incremental progress until a proof is
+found, if one exists at all, and no guarantee it transfers to similar
+games</td>
+</tr>
+<tr class="odd">
+<td>Learn value and policy priors</td>
+<td>Go / AlphaZero<a href="#fn7" class="footnote-ref" id="fnref7"
+role="doc-noteref"><sup>7</sup></a></td>
+<td><span style="color:#d4a017">?</span> Possible, if we can mitigate
+massive number of self-play iterations</td>
+</tr>
+<tr class="even">
+<td>Monte Carlo rollouts</td>
+<td>Multi-armed bandit<a href="#fn8" class="footnote-ref" id="fnref8"
+role="doc-noteref"><sup>8</sup></a></td>
+<td><span style="color:#27ae60">✔</span> Possible, by mitigating massive
+number of rollouts through quantum computing.</td>
+</tr>
+</tbody>
+</table>
+<p>Monte Carlo rollouts seem promising.<a href="#fn9"
+class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>
+Basically, the technique is to gather data to better model the outcome
+probabilities. The more data you gather (i.e. more samples you take) the
+better.</p>
+<h3 id="rollouts">Rollouts</h3>
+<p>Consider the following game state.</p>
+<div id="sampling-viz" style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:20px 0;">
+  <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap; justify-content:center;">
+    <svg id="sampling-tree" width="200" height="370" style="flex-shrink:0;"></svg>
+    <canvas id="sampling-canvas" style="border-radius:8px;"></canvas>
+  </div>
+  <button id="sampling-toggle" style="padding:6px 20px; font-size:0.82rem;">Sample</button>
+</div>
+<script type="module" src="sampling-viz.js"></script>
+
+<p>Hit “sample” to visualize the tremendous number of immediate outcomes
+from a single state.</p>
+<p>A single rollout plays the game to completion, but how many rollouts
+do we need to feel confident about picking a particular move?</p>
+<p>Well, it depends on how chaotic the board state is. Board states with
+a higher variance of outcomes require more rollouts. Specifically, given
+variance <span class="math inline">\(\sigma^2\)</span> and a desired
+precision <span class="math inline">\(\epsilon\)</span>, the number of
+rollouts needed <em>per move</em> is on the order of<a href="#fn10"
+class="footnote-ref" id="fnref10"
+role="doc-noteref"><sup>10</sup></a></p>
+<p><span class="math display">\[
+O\left(\frac{\sigma^2}{\epsilon^2}\right)
+\]</span></p>
+<p>That could be a <em>lot</em> of rollouts.</p>
+<p>Consider this early-game position. Press “Start sampling” to run
+rollouts for every candidate move. Watch the top two moves emerge on the
+board and the gap between them narrow on the number line.</p>
+<div id="rollout-viz" style="display:flex; flex-direction:column; align-items:center; gap:12px; margin:20px 0; width:100%;">
+
+  <!-- 2×2 grid — always present, other panels hidden initially -->
+  <div id="rollout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:700px;">
+
+    <!-- Top-left: Board -->
+    <div id="rollout-board-cell" style="display:flex; flex-direction:column; align-items:center; gap:4px; grid-column: 1 / -1; transition: all 0.6s ease;">
+      <canvas id="rollout-board" style="border-radius:8px; transition: transform 0.6s ease;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Black to move</div>
+    </div>
+
+    <!-- Top-right: Scatter plot -->
+    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <canvas id="rollout-scatter" width="340" height="260" style="border-radius:8px; background:#f0f0f0; width:100%;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Samples (each dot = one full game)</div>
+    </div>
+
+    <!-- Bottom-left: Move ranking -->
+    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <canvas id="rollout-race" width="340" height="180" style="width:100%; border-radius:8px; background:#f0f0f0;"></canvas>
+      <div style="font-size:0.72rem; color:#888;">Each dot is a move. Gap between <span style="color:#E05545;">#1</span> and <span style="color:#5B8DEF;">#2</span> = ε</div>
+    </div>
+
+    <!-- Bottom-right: Budget calculator -->
+    <div class="rollout-reveal" id="rollout-budget" style="background:#f0f0f0; border:1px solid #ddd; border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; justify-content:center; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+      <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">Samples</div>
+          <div id="rollout-count" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">0</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">σ²</div>
+          <div id="rollout-sigma2" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">—</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:#888;">ε</div>
+          <div id="rollout-eps-val" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">—</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:12px; align-items:flex-end; height:80px;" id="rollout-bars"></div>
+    </div>
+
+  </div>
+
+  <button id="rollout-toggle" style="padding:6px 20px; font-size:0.82rem;">Start sampling</button>
+</div>
+<script type="module" src="rollout-viz.js"></script>
+
+<p>The variance in Sway is gnarly. The gap between good moves is tiny.
+The number of samples needed grows fast!</p>
+<p>What if there were a way to sample all those outcomes at once?</p>
+<h2 id="quantum-superposition">Quantum superposition</h2>
+<p>Here’s the wild part. While a classical computer performs rollouts
+one by one, a quantum computer puts all those possible games into
+superposition, which is a single quantum state that encodes every
+outcome at once.</p>
+<p>Where classical Monte Carlo needs <span
+class="math inline">\(O(\sigma^2/\epsilon^2)\)</span> rollouts per move
+to estimate an expectation, fault-tolerant quantum amplitude
+estimation<a href="#fn11" class="footnote-ref" id="fnref11"
+role="doc-noteref"><sup>11</sup></a> can do it in <span
+class="math inline">\(O(\sigma/\epsilon)\)</span> oracle calls. That’s a
+quadratic reduction! For example, 160,000 rollouts reduces to just
+400!</p>
+<p>It’s not exactly that simple, though. Even if a powerful
+fault-tolerant quantum processing unit (QPU) existed, if the problem
+doesn’t have the right structure, the QPU adds overhead for zero gain.
+More on that below.</p>
+<p>Consider the GPU: it earns its place in a system because certain
+workloads (matrix multiplications, convolutions, ray tracing) map onto
+its massively parallel architecture so well that no amount of CPU clock
+speed can compete.</p>
+<div id="compute-stack-viz" style="display:flex; justify-content:center; margin:20px 0;">
+<svg id="compute-stack-svg" viewBox="0 0 520 140" width="520" height="140" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs><marker id="cs-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker></defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#cs-arrow)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- GPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">GPU</text>
+  <!-- Grid of small cores -->
+  <g id="cs-cores" transform="translate(220,40)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">massively parallel cores</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('cs-cores');
+  const cols = 14, rows = 3, size = 16, gap = 4;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', c * (size + gap));
+      rect.setAttribute('y', r * (size + gap));
+      rect.setAttribute('width', size);
+      rect.setAttribute('height', size);
+      rect.setAttribute('rx', 2);
+      rect.setAttribute('fill', '#d4e6dc');
+      rect.setAttribute('stroke', '#8cbfa3');
+      rect.setAttribute('stroke-width', '0.8');
+      g.appendChild(rect);
+    }
+  }
+})();
+</script>
+
+<p>Remove that structural match and the GPU sits idle or, worse, slows
+things down.</p>
+<p>Similarly, a fault-tolerant QPU also has its own strengths and
+weaknesses. Amplitude amplification<a href="#fn12" class="footnote-ref"
+id="fnref12" role="doc-noteref"><sup>12</sup></a>, amplitude estimation,
+quantum walks, and a handful of linear-algebra routines let a QPU
+replace time-consuming sampling as long as the problem already has the
+combinatorial structure those primitives exploit.</p>
+<div id="qpu-viz" style="display:flex; justify-content:center; margin:20px 0;">
+<svg id="qpu-svg" viewBox="0 0 520 140" width="520" height="140" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs>
+    <marker id="qpu-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker>
+  </defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#qpu-arr)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- QPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">QPU</text>
+  <!-- Superposition visual: overlapping translucent grids -->
+  <g id="qpu-superposition" transform="translate(280,38)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">superposition over stochastic outcomes</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('qpu-superposition');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Draw several overlapping mini-grids offset from each other,
+  // each at decreasing opacity, to suggest superposition of game states
+  const gridSize = 4;
+  const cellPx = 10;
+  const copies = 5;
+  const offsetX = 12;
+  const offsetY = 3;
+  const colors = ['#9b8ec4', '#b8aed6', '#7a6bab', '#c4b8e0', '#6b5a9e'];
+
+  // Random-ish board patterns for each copy
+  const patterns = [
+    [1,0,1,0, 0,1,0,1, 1,0,1,0, 0,1,0,1],
+    [0,1,0,1, 1,0,1,0, 0,0,1,1, 1,1,0,0],
+    [1,1,0,0, 0,0,1,1, 1,0,0,1, 0,1,1,0],
+    [0,0,1,1, 1,1,0,0, 0,1,0,1, 1,0,1,0],
+    [1,0,0,1, 0,1,1,0, 1,1,0,0, 0,0,1,1],
+  ];
+
+  for (let i = copies - 1; i >= 0; i--) {
+    const group = document.createElementNS(ns, 'g');
+    const tx = i * offsetX;
+    const ty = i * offsetY;
+    group.setAttribute('transform', `translate(${tx},${ty})`);
+    group.setAttribute('opacity', i === 0 ? '0.9' : (0.2 + 0.1 * (copies - i)).toFixed(2));
+
+    // Grid background
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', gridSize * cellPx + 2);
+    bg.setAttribute('height', gridSize * cellPx + 2);
+    bg.setAttribute('rx', 2);
+    bg.setAttribute('fill', '#ece8f6');
+    bg.setAttribute('stroke', '#b8aed6');
+    bg.setAttribute('stroke-width', '0.8');
+    group.appendChild(bg);
+
+    // Cells
+    const pat = patterns[i];
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        if (pat[r * gridSize + c]) {
+          const cell = document.createElementNS(ns, 'rect');
+          cell.setAttribute('x', 1 + c * cellPx + 1);
+          cell.setAttribute('y', 1 + r * cellPx + 1);
+          cell.setAttribute('width', cellPx - 2);
+          cell.setAttribute('height', cellPx - 2);
+          cell.setAttribute('rx', 1.5);
+          cell.setAttribute('fill', colors[i]);
+          group.appendChild(cell);
+        }
+      }
+    }
+    g.appendChild(group);
+  }
+
+  // Curly brace / ket label to the right
+  const label = document.createElementNS(ns, 'text');
+  label.setAttribute('x', copies * offsetX + gridSize * cellPx + 18);
+  label.setAttribute('y', gridSize * cellPx / 2 + 10);
+  label.setAttribute('text-anchor', 'start');
+  label.setAttribute('font-size', '10');
+  label.setAttribute('fill', '#9b8ec4');
+  label.setAttribute('font-style', 'italic');
+  label.textContent = '|ψ⟩';
+  g.appendChild(label);
+})();
+</script>
+
+<p>While most problems do not need a quantum computer, this one
+does!</p>
+<h2 id="quantum-advantage">Quantum advantage</h2>
+<p>When does quantum mechanics reduce the fundamental work in AI search?
+Three conditions must hold at once:</p>
+<ol type="1">
+<li><strong>Sampling is inherent.</strong> The environment is stochastic
+and no classical trick can eliminate the need to average over random
+outcomes. (Like the environment’s turn in Sway)</li>
+<li><strong>Precision is the bottleneck.</strong> The differences
+between good and great decisions are tiny, forcing enormous sample
+counts. (We’ve just seen this in action above)</li>
+<li><strong>The oracle must be worth building.</strong> The dynamics are
+simple enough to compile into reversible, coherent transitions without
+drowning in overhead. (Sway’s rules are simple enough to be built in a
+quantum circuit)</li>
+</ol>
+<p>The usual benchmark problems fail at least one:</p>
+<ul>
+<li>Go is deterministic, doesn’t need extreme precision, and expensive
+to build.</li>
+<li>The 2-arm bandit is stochastic, but tiny gaps are incidental to
+specific instances rather than an inherent feature of the problem, and
+each classical sample costs near-zero computation. The fixed overhead of
+fault-tolerant quantum error correction far exceeds that trivial
+per-sample cost.</li>
+</ul>
+<p>Sway passes all three. The environment turn is irreducibly
+stochastic. The repeated Sway events attenuate the marginal impact of
+any single move. And the rules are local: each cell only checks its
+immediate neighbors, making the transition cheap to compile into
+reversible logic.</p>
+<h2 id="what-else-looks-like-this">What else looks like this?</h2>
+<p>Honestly, I don’t know how far the ideas here stretch. But the
+pattern of “neighbors reinforce you, isolation makes you vulnerable, and
+randomness keeps everyone honest” does seem to pop up in places beyond
+board games.<a href="#fn13" class="footnote-ref" id="fnref13"
+role="doc-noteref"><sup>13</sup></a> Here are a few that caught my
+eye:</p>
+<script>window.applications_component_strings = {"title-0":"Opinion dynamics","desc-0":"People surrounded by like-minded friends hold firm. Isolated voices quietly change their tune.","title-1":"Market adoption","desc-1":"Users stick with a product when everyone around them uses it too. Lone adopters drift away.","title-2":"Cultural competition","desc-2":"Ideas survive in tight communities. A lone believer is easy to sway.","title-3":"Epidemic spread","desc-3":"Dense clusters sustain transmission. Isolated cases burn out on their own."};</script>
+<div id="applications-viz" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:560px; margin:20px auto;">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-0" style="border-radius:6px;"></canvas>
+    <div id="app-title-0" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-0" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-1" style="border-radius:6px;"></canvas>
+    <div id="app-title-1" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-1" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-2" style="border-radius:6px;"></canvas>
+    <div id="app-title-2" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-2" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <canvas id="app-board-3" style="border-radius:6px;"></canvas>
+    <div id="app-title-3" style="font-size:0.78rem; font-weight:600; color:#4a4a4a;"></div>
+    <div id="app-desc-3" style="font-size:0.68rem; color:#666; text-align:center; line-height:1.35;"></div>
+  </div>
+</div>
+<script>
+(function() {
+  var S = window.applications_component_strings || {};
+
+  // Populate text from markdown attributes
+  for (var i = 0; i < 4; i++) {
+    var titleEl = document.getElementById('app-title-' + i);
+    var descEl = document.getElementById('app-desc-' + i);
+    if (titleEl) titleEl.textContent = S['title-' + i] || '';
+    if (descEl) descEl.textContent = S['desc-' + i] || '';
+  }
+
+  var N = 6;
+  var cellPx = 22;
+  var pad = 10;
+  var totalPx = cellPx * N + pad * 2;
+  var dpr = window.devicePixelRatio || 1;
+
+  var themes = [
+    { bg: '#e8d8c4', grid: '#b89f78', a: '#c0392b', aS: '#8e2a1e', b: '#2980b9', bS: '#1a5276' },
+    { bg: '#d4e6dc', grid: '#8cbfa3', a: '#27ae60', aS: '#1a7a40', b: '#e67e22', bS: '#a35a18' },
+    { bg: '#dbd4ee', grid: '#a99bc8', a: '#8e44ad', aS: '#6a2980', b: '#f39c12', bS: '#b87409' },
+    { bg: '#f5d5d5', grid: '#c9a0a0', a: '#e74c3c', aS: '#a93226', b: '#7f8c8d', bS: '#5a6364' },
+  ];
+
+  var boards = [
+    [
+      [2,2,0,0,1,0],
+      [2,2,1,0,0,0],
+      [0,2,0,0,0,1],
+      [0,0,0,1,1,0],
+      [1,0,0,1,1,0],
+      [0,0,1,0,1,1],
+    ],
+    [
+      [0,2,0,0,0,0],
+      [0,0,1,1,0,2],
+      [0,1,1,1,0,0],
+      [0,0,1,1,0,0],
+      [2,0,0,0,0,0],
+      [0,0,0,2,0,2],
+    ],
+    [
+      [2,0,0,0,0,2],
+      [0,0,0,0,0,0],
+      [0,0,2,0,0,0],
+      [0,0,0,0,1,1],
+      [0,0,0,1,1,1],
+      [0,2,0,1,1,0],
+    ],
+    [
+      [0,0,0,2,0,0],
+      [1,1,0,0,0,0],
+      [1,1,1,0,0,2],
+      [0,1,1,0,0,0],
+      [0,0,0,0,2,0],
+      [0,0,0,0,0,0],
+    ],
+  ];
+
+  for (var b = 0; b < 4; b++) {
+    var canvas = document.getElementById('app-board-' + b);
+    canvas.width = totalPx * dpr;
+    canvas.height = totalPx * dpr;
+    canvas.style.width = totalPx + 'px';
+    canvas.style.height = totalPx + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var t = themes[b];
+    var grid = boards[b];
+
+    ctx.fillStyle = t.bg;
+    ctx.fillRect(0, 0, totalPx, totalPx);
+
+    ctx.strokeStyle = t.grid;
+    ctx.lineWidth = 0.8;
+    for (var i = 0; i < N; i++) {
+      var x = pad + i * cellPx + cellPx / 2;
+      ctx.beginPath(); ctx.moveTo(x, pad + cellPx / 2); ctx.lineTo(x, pad + (N-1) * cellPx + cellPx / 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pad + cellPx / 2, x); ctx.lineTo(pad + (N-1) * cellPx + cellPx / 2, x); ctx.stroke();
+    }
+
+    var r = cellPx * 0.36;
+    for (var row = 0; row < N; row++) {
+      for (var col = 0; col < N; col++) {
+        var v = grid[row][col];
+        if (v === 0) continue;
+        var cx = pad + col * cellPx + cellPx / 2;
+        var cy = pad + row * cellPx + cellPx / 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = v === 1 ? t.a : t.b;
+        ctx.fill();
+        ctx.strokeStyle = v === 1 ? t.aS : t.bS;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+    }
+  }
+})();
+</script>
+
+<p>It’s a toy game with toy rules. But it’s interesting that the same
+tension between local stability and global randomness creates hard
+computational problems. If quantum speedups apply to one, maybe they
+apply to others. That’s a question I’d love to see explored.</p>
+<footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #ddd; text-align: center; font-size: 0.82rem; color: #888;">
+  <p style="margin-bottom: 0.5rem;">&copy; Nishant Shukla 2026</p>
+  <p>
+    <a href="http://github.com/binroot" target="_blank" style="margin: 0 0.5rem; color: #1d7484; text-decoration: none; border-bottom: 2px solid transparent;">GitHub</a>
+    <a href="https://www.linkedin.com/in/shuklanx/" target="_blank" style="margin: 0 0.5rem; color: #1d7484; text-decoration: none; border-bottom: 2px solid transparent;">LinkedIn</a>
+    <a href="mailto:nishant@shukla.io" target="_blank" style="margin: 0 0.5rem; color: #1d7484; text-decoration: none; border-bottom: 2px solid transparent;">Email</a>
+  </p>
+</footer>
+
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A piece with 0, 1, 2, 3, or 4 friendly orthogonal
+neighbors flips with probability 4/20, 3/20, 2/20, 1/20, 0/20
+respectively.<a href="#fnref1" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>James Somers, <a
+href="https://jsomers.net/blog/it-turns-out">“It Turns Out”</a>.<a
+href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Schaeffer, J. et al., <a
+href="https://www.science.org/doi/10.1126/science.1144079">“Checkers Is
+Solved,”</a> <em>Science</em>, vol. 317, no. 5844, pp. 1518–1522,
+2007.<a href="#fnref3" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Berlekamp, E., Conway, J., and Guy, R., <a
+href="https://en.wikipedia.org/wiki/Winning_Ways_for_your_Mathematical_Plays"><em>Winning
+Ways for your Mathematical Plays</em></a>, Academic Press, 1982.<a
+href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Bowling, M. et al., <a
+href="https://www.science.org/doi/10.1126/science.1259433">“Heads-up
+Limit Hold’em Poker is Solved,”</a> <em>Science</em>, vol. 347, no.
+6218, pp. 145–149, 2015.<a href="#fnref5" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Sprague, R., <a
+href="https://www.jstage.jst.go.jp/article/tmj1911/41/0/41_0_438/_article">“Über
+mathematische Kampfspiele,”</a> <em>Tohoku Math. J.</em>, vol. 41,
+pp. 438–444, 1935. See also Grundy, P. M., “Mathematics and Games,”
+<em>Eureka</em>, vol. 2, pp. 6–8, 1939.<a href="#fnref6"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Silver, D. et al., <a
+href="https://www.science.org/doi/10.1126/science.aar6404">“A General
+Reinforcement Learning Algorithm that Masters Chess, Shogi, and Go
+through Self-Play,”</a> <em>Science</em>, vol. 362, no. 6419,
+pp. 1140–1144, 2018.<a href="#fnref7" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>Kocsis, L. and Szepesvári, C., <a
+href="https://doi.org/10.1007/11871842_29">“Bandit Based Monte-Carlo
+Planning,”</a> <em>ECML</em>, pp. 282–293, 2006.<a href="#fnref8"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>See my quick introduction to <a
+href="https://shukla.io/blog/2026-02/grammar.html">Monte Carlo Tree
+Search</a>.<a href="#fnref9" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>This follows from <a
+href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality">Chebyshev’s
+inequality</a>. Chebyshev, P. L., “Des valeurs moyennes,” <em>J. Math.
+Pures Appl.</em>, ser. 2, vol. 12, pp. 177–184, 1867.<a href="#fnref10"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>Montanaro, A., <a
+href="https://doi.org/10.1098/rspa.2015.0301">“Quantum Speedup of Monte
+Carlo Methods,”</a> <em>Proc. R. Soc. A</em>, vol. 471, no. 2181,
+2015.<a href="#fnref11" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn12"><p>Brassard, G. et al., <a
+href="https://doi.org/10.1090/conm/305/05215">“Quantum Amplitude
+Amplification and Estimation,”</a> <em>Contemporary Mathematics</em>,
+vol. 305, pp. 53–74, 2002.<a href="#fnref12" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn13"><p>The voter model captures this kind of dynamic. See also
+<a
+href="https://shukla.io/blog/2026-01/nano-gov.html">Nano-governance</a>
+for a related exploration. See Clifford, P. and Sudbury, A., <a
+href="https://doi.org/10.1093/biomet/60.3.581">“A Model for Spatial
+Conflict,”</a> <em>Biometrika</em>, vol. 60, no. 3, pp. 581–588, 1973.
+For a broader survey, see Castellano, C. et al., <a
+href="https://doi.org/10.1103/RevModPhys.81.591">“Statistical Physics of
+Social Dynamics,”</a> <em>Rev. Mod. Phys.</em>, vol. 81, pp. 591–646,
+2009.<a href="#fnref13" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</div>
+
+<script>
+  // Margin notes (desktop) + popovers (mobile)
+  (function() {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+
+    const sidenotes = [];
+
+    document.querySelectorAll('a.footnote-ref').forEach(ref => {
+      const fnId = ref.getAttribute('href').slice(1); // e.g. "fn1"
+      const fnLi = document.getElementById(fnId);
+      if (!fnLi) return;
+
+      // Clone content, strip the back-link
+      const content = fnLi.cloneNode(true);
+      content.querySelectorAll('.footnote-back').forEach(b => b.remove());
+      const html = content.innerHTML;
+
+      // Desktop: absolute-positioned sidenote in the right margin
+      const side = document.createElement('aside');
+      side.className = 'sidenote';
+      side.innerHTML = html;
+      prose.appendChild(side);
+
+      // Connector line from ref to sidenote
+      const connector = document.createElement('div');
+      connector.className = 'sidenote-connector';
+      prose.appendChild(connector);
+
+      sidenotes.push({ ref, side, connector });
+
+      // Hover: highlight sidenote + show connector
+      ref.addEventListener('mouseenter', () => {
+        side.classList.add('highlight');
+        connector.classList.add('visible');
+      });
+      ref.addEventListener('mouseleave', () => {
+        side.classList.remove('highlight');
+        connector.classList.remove('visible');
+      });
+      side.addEventListener('mouseenter', () => {
+        side.classList.add('highlight');
+        connector.classList.add('visible');
+      });
+      side.addEventListener('mouseleave', () => {
+        side.classList.remove('highlight');
+        connector.classList.remove('visible');
+      });
+
+      // Mobile: popover on tap
+      const popover = document.createElement('div');
+      popover.className = 'fn-popover';
+      popover.innerHTML = html;
+      ref.style.position = 'relative';
+      ref.appendChild(popover);
+
+      ref.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Close any other open popovers
+        document.querySelectorAll('.fn-popover.visible').forEach(p => {
+          if (p !== popover) p.classList.remove('visible');
+        });
+        // Position below the ref, clamped to viewport
+        const rect = ref.getBoundingClientRect();
+        popover.style.top = (rect.bottom + 4) + 'px';
+        popover.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 368)) + 'px';
+        popover.classList.toggle('visible');
+      });
+    });
+
+    // Position all sidenotes using viewport-relative math (scroll-safe)
+    function positionAll() {
+      const proseTop = prose.getBoundingClientRect().top + window.scrollY;
+      sidenotes.forEach(({ ref, side, connector }) => {
+        const refY = ref.getBoundingClientRect().top + window.scrollY - proseTop;
+        side.style.top = refY + 'px';
+        connector.style.top = (refY + 8) + 'px';
+      });
+    }
+
+    // Run after full layout (images, canvases, modules)
+    window.addEventListener('load', positionAll);
+    window.addEventListener('resize', positionAll);
+    // Also reposition when prose layout changes (dynamic content)
+    new ResizeObserver(positionAll).observe(prose);
+
+    // Close popovers on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.footnote-ref') && !e.target.closest('.fn-popover')) {
+        document.querySelectorAll('.fn-popover.visible').forEach(p => p.classList.remove('visible'));
+      }
+    });
+  })();
+
+  // Open all external links in new tabs
+  document.querySelectorAll('a[href^="http"]').forEach(a => {
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener');
+  });
+
+  document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => {
+    const a = document.createElement('a');
+    a.className = 'anchor-link';
+    a.href = '#' + h.id;
+    a.textContent = '#';
+    a.setAttribute('aria-hidden', 'true');
+    h.prepend(a);
+  });
+</script>
+<script type="module" src="ui.js"></script>
+<script type="module" src="sim-ui.js"></script>
+<script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
+</body>
+</html>
