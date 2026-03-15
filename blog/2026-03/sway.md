@@ -90,7 +90,7 @@ In order to build a strong AI player, the following techniques are available, bu
 | Linear programming / minimax solvers | Heads-up limit Texas Hold'em solved by Cepheus[^cepheus] | <span style="color:#c0392b">✘</span> Intractable number of variables/constraints |
 | Find a closed-form trick | Nim's XOR-based formula[^spraguegrundy] | <span style="color:#d4a017">?</span> Possible, but game-specific tricks are all-or-nothing; no incremental progress until a proof is found, if one exists at all, and no guarantee it transfers to similar games |
 | Learn value and policy priors | Go / AlphaZero[^alphazero] | <span style="color:#d4a017">?</span> Possible, if we can mitigate massive number of self-play iterations |
-| Monte Carlo rollouts | Multi-armed bandit[^uct] | <span style="color:#27ae60">✔</span> Possible, by mitigating massive number of rollouts through quantum computing |
+| Monte Carlo rollouts | Multi-armed bandit[^uct] | <span style="color:#d4a017">?</span> Possible, if we can mitigate massive number of rollouts |
 
 Monte Carlo rollouts seem promising.[^mcts]
 Basically, the technique is to gather data to better model the outcome probabilities.
@@ -117,7 +117,7 @@ $$
 
 That could be a _lot_ of rollouts. 
 
-Consider this early-game position. Press "Start sampling" to run rollouts for every candidate move. Watch the top two moves emerge on the board and the gap between them narrow on the number line.
+Consider this early-game position. Press "Start rollouts" to run rollouts for every candidate move. Watch the top two moves emerge on the board and the gap between them narrow on the number line.
 
 ::: {#rollout-component}
 :::
