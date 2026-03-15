@@ -103,20 +103,7 @@ function updateUI() {
   const { b, w } = countStones(grid, N);
   document.getElementById('scoreBlack').textContent = b;
   document.getElementById('scoreWhite').textContent = w;
-  document.getElementById('roundLabel').textContent = `Round ${round}`;
 
-  const label = document.getElementById('turnLabel');
-  label.className = 'turn-indicator';
-  if (phase === 'black') {
-    label.textContent = str('label-black-turn', "Black's turn");
-    label.classList.add('black-turn');
-  } else if (phase === 'white') {
-    label.textContent = str('label-white-turn', "White's turn");
-    label.classList.add('white-turn');
-  } else if (phase === 'sway') {
-    label.textContent = str('label-sway', 'Sway!');
-    label.classList.add('sway-phase');
-  }
 
   const st = document.getElementById('statusText');
   if (phase === 'black') {

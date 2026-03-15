@@ -53,6 +53,9 @@ boardCanvas.width = totalPx * dpr;
 boardCanvas.height = totalPx * dpr;
 boardCanvas.style.width = totalPx + 'px';
 boardCanvas.style.height = totalPx + 'px';
+boardCanvas.style.maxWidth = '100%';
+boardCanvas.style.height = 'auto';
+boardCanvas.style.aspectRatio = '1 / 1';
 boardCtx.scale(dpr, dpr);
 
 function drawBoardState() {

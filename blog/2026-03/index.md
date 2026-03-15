@@ -1,7 +1,7 @@
 ---
 title: Game of Sway
 author: Nishant Shukla
-date: March 14, 2026
+date: March 15, 2026
 subtitle: Quantum computing for the whole family!
 ---
 
@@ -46,7 +46,7 @@ Think you've got it?
 ## Strategy
 
 Before you say this is pure unadulterated chaos, I want you to know that at first, I also kept losing (no matter whether I played as black or white) and thought there was no strategy here.
-It turns out[^itturnsout], that's exactly the evidence why some strategy must exist; otherwise, I should be winning 50% of all games. 
+It turns out[^itturnsout] that's exactly the evidence why some strategy must exist; otherwise, I should be winning 50% of all games. 
 If stronger players keep beating weaker ones, there must be some exploitable structure hiding under the randomness.
 
 So, I dreamt up the following rules-based AI strategies to play against each other.
@@ -54,7 +54,7 @@ Each one has a name and a rough description of how it decides on the best move:
 
 - **Random**: Picks an empty cell uniformly at random.
 - **Clusterer**: Greedily places each stone next to as many friendly stones as possible.
-- **Fortress**: Fortress claims corners and edges first, building inward.
+- **Fortress**: Claims corners and edges first, building inward.
 - **Destabilizer**: Picks the move that maximally destabilizes the enemy, with light clustering as a tiebreaker.
 - **Anti-cluster**: Places stones adjacent to enemy clusters to break up their friendly-neighbor connections.
 - **Fork Builder**: Looks one move ahead to predict "How many strong follow-up moves does this placement create?"
@@ -66,7 +66,7 @@ Who do you think will win?
 :::
 
 
-From the  tournament results in the demo above, we see while some strategies _dominate_ others, the ranking between the top players is more nuanced.
+From the tournament results in the demo above, we see while some strategies _dominate_ others, the ranking between the top players is more nuanced.
 This "Go with dice" knockoff is getting interesting.
 
 But these are all hand-crafted heuristics... 
@@ -79,7 +79,7 @@ Those strategies above were just a shot in the dark. Time to throw some compute 
 
 The board is only $8 \times 8$, so there's no more than 64 choices to make. 
 But, for each possible choice, there's a surprisingly large number of outcomes due to the environmental randomness.
-For example, after placing a move on a board with 36 pieces, all 37 stones could have a nonzero probability of flipping, resulting in $2^{37}$ (over 137 billion) possible outcomes in just one look-ahead.
+For example, after placing a piece on a board with 36 pieces, all 37 stones could have a nonzero probability of flipping, resulting in $2^{37}$ (over 137 billion) possible outcomes in just one look-ahead.
 
 In order to build a strong AI player, the following techniques are available, but not all are feasible:
 
@@ -90,7 +90,7 @@ In order to build a strong AI player, the following techniques are available, bu
 | Linear programming / minimax solvers | Heads-up limit Texas Hold'em solved by Cepheus[^cepheus] | <span style="color:#c0392b">✘</span> Intractable number of variables/constraints |
 | Find a closed-form trick | Nim's XOR-based formula[^spraguegrundy] | <span style="color:#d4a017">?</span> Possible, but game-specific tricks are all-or-nothing; no incremental progress until a proof is found, if one exists at all, and no guarantee it transfers to similar games |
 | Learn value and policy priors | Go / AlphaZero[^alphazero] | <span style="color:#d4a017">?</span> Possible, if we can mitigate massive number of self-play iterations |
-| Monte Carlo rollouts | Multi-armed bandit[^uct] | <span style="color:#27ae60">✔</span> Possible, by mitigating massive number of rollouts through quantum computing. |
+| Monte Carlo rollouts | Multi-armed bandit[^uct] | <span style="color:#27ae60">✔</span> Possible, by mitigating massive number of rollouts through quantum computing |
 
 Monte Carlo rollouts seem promising.[^mcts]
 Basically, the technique is to gather data to better model the outcome probabilities.
@@ -159,14 +159,14 @@ When does quantum mechanics reduce the fundamental work in AI search? Three cond
 
 The usual benchmark problems fail at least one:
 
-- Go is deterministic, doesn't need extreme precision, and expensive to build. 
+- Go is deterministic, doesn't need extreme precision, and is expensive to build. 
 - The 2-arm bandit is stochastic, but tiny gaps are incidental to specific instances rather than an inherent feature of the problem, and each classical sample costs near-zero computation. The fixed overhead of fault-tolerant quantum error correction far exceeds that trivial per-sample cost.
 
 Sway passes all three. The environment turn is irreducibly stochastic. The repeated Sway events attenuate the marginal impact of any single move. And the rules are local: each cell only checks its immediate neighbors, making the transition cheap to compile into reversible logic.
 
 
 
-## What else looks like this?
+## Can't unsee it
 
 Honestly, I don't know how far the ideas here stretch. 
 But the pattern of "neighbors reinforce you, isolation makes you vulnerable, and randomness keeps everyone honest" does seem to pop up in places beyond board games.[^votermodel] Here are a few that caught my eye:

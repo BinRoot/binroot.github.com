@@ -270,97 +270,7 @@ function drawBracketConnectors() {
   });
 }
 
-// ─── 4. Network Graph ────────────────────────────────────────────────
-function renderGraph(results) {
-  const panel = document.getElementById('viz-graph');
-  panel.innerHTML = '<p class="viz-note">Arrow points from winner to loser. Thickness and opacity show dominance margin.</p>';
-
-  const canvas = document.createElement('canvas');
-  const size = Math.min(440, window.innerWidth - 80);
-  canvas.width = size;
-  canvas.height = size;
-  canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
-  panel.appendChild(canvas);
-
-  const ctx = canvas.getContext('2d');
-  const cx = size / 2, cy = size / 2, radius = size * 0.34;
-  const nodeR = size * 0.055;
-
-  const nodes = STRATS.map((s, i) => {
-    const angle = -Math.PI / 2 + (2 * Math.PI * i) / S;
-    return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle), name: s.name };
-  });
-
-  // Draw edges
-  for (let i = 0; i < S; i++) {
-    for (let j = i + 1; j < S; j++) {
-      const wr = combinedWinRate(results, i, j);
-      const margin = Math.abs(wr - 0.5);
-      if (margin < 0.01) continue;
-
-      const winner = wr >= 0.5 ? i : j;
-      const loser = winner === i ? j : i;
-
-      const thickness = 1 + margin * 14;
-      const alpha = 0.25 + margin * 1.5;
-
-      // Line
-      ctx.beginPath();
-      ctx.moveTo(nodes[winner].x, nodes[winner].y);
-      ctx.lineTo(nodes[loser].x, nodes[loser].y);
-      ctx.strokeStyle = `rgba(80, 200, 120, ${Math.min(alpha, 1)})`;
-      ctx.lineWidth = thickness;
-      ctx.stroke();
-
-      // Arrowhead
-      const dx = nodes[loser].x - nodes[winner].x;
-      const dy = nodes[loser].y - nodes[winner].y;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const ux = dx / len, uy = dy / len;
-      const tipX = nodes[loser].x - ux * (nodeR + 6);
-      const tipY = nodes[loser].y - uy * (nodeR + 6);
-      const arrowLen = 8 + margin * 12;
-
-      ctx.beginPath();
-      ctx.moveTo(tipX, tipY);
-      ctx.lineTo(tipX - ux * arrowLen + uy * arrowLen * 0.5, tipY - uy * arrowLen - ux * arrowLen * 0.5);
-      ctx.lineTo(tipX - ux * arrowLen - uy * arrowLen * 0.5, tipY - uy * arrowLen + ux * arrowLen * 0.5);
-      ctx.closePath();
-      ctx.fillStyle = `rgba(80, 200, 120, ${Math.min(alpha, 1)})`;
-      ctx.fill();
-
-      // Win rate label at midpoint
-      const mx = (nodes[i].x + nodes[j].x) / 2;
-      const my = (nodes[i].y + nodes[j].y) / 2;
-      const pct = Math.max(wr, 1 - wr);
-      ctx.fillStyle = '#999';
-      ctx.font = `${Math.round(size * 0.027)}px system-ui`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText((pct * 100).toFixed(0) + '%', mx + uy * 12, my - ux * 12);
-    }
-  }
-
-  // Draw nodes
-  nodes.forEach(n => {
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, nodeR, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a1f3a';
-    ctx.fill();
-    ctx.strokeStyle = '#D95032';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.fillStyle = '#e0e0e0';
-    ctx.font = `bold ${Math.round(size * 0.026)}px system-ui`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(n.name, n.x, n.y);
-  });
-}
-
-// ─── 5. Stacked Overall Bars ─────────────────────────────────────────
+// ─── 4. Stacked Overall Bars ─────────────────────────────────────────
 function renderStacked(results) {
   const panel = document.getElementById('viz-stacked');
 
@@ -452,14 +362,11 @@ runBtn.addEventListener('click', async () => {
 
       completedMatchups++;
       updateHeatmapCell(i, j, r);
+      renderElo(results);
+      renderBracket(results);
+      renderStacked(results);
     }
   }
-
-  // All done — render remaining visualizations
-  renderElo(results);
-  renderBracket(results);
-  renderGraph(results);
-  renderStacked(results);
 
   progressEl.textContent = `Done — ${(totalMatchups * gamesPerMatchup).toLocaleString()} games on ${N}\u00d7${N} grid.`;
   runBtn.textContent = 'Run tournament';

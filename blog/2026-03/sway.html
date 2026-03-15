@@ -116,6 +116,7 @@
 
   @media (max-width: 899px) {
     .sidenote { display: none !important; }
+    .prose ol, .prose ul { padding-left: 1.2em; }
   }
   @media (min-width: 900px) {
     .fn-popover { display: none !important; }
@@ -177,9 +178,11 @@
     gap: 28px;
     font-size: 1rem;
     align-items: center;
+    justify-content: center;
     padding: 0 36px;
     position: relative;
     z-index: 15;
+    width: 100%;
   }
 
   .score {
@@ -796,7 +799,7 @@ type="text/javascript"></script>
   <a class="home-link" href="https://shukla.io">Home</a>
   <div class="post-meta">
     <span class="post-author">Nishant Shukla</span>
-    <span class="post-date">March 14, 2026</span>
+    <span class="post-date">March 15, 2026</span>
   </div>
 </header>
 <h1 class="page-title">Game of Sway</h1>
@@ -809,7 +812,7 @@ type="text/javascript"></script>
 <div style="display:flex; justify-content:center; align-items:center; gap:40px; margin:20px 0; flex-wrap:wrap;">
 
   <!-- D20: 3D icosahedron computed from actual vertex coordinates -->
-  <svg width="80" height="80" viewBox="-6 5 112 95" style="max-width:80px;">
+  <svg width="60" height="60" viewBox="-6 5 112 95" style="max-width:60px; margin-right:12px;">
     <polygon points="22.7,41.2 32.8,93.8 74.9,61.6" fill="rgb(210,210,210)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
     <polygon points="22.7,41.2 74.9,61.6 65.8,9.4" fill="rgb(210,210,210)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
     <polygon points="32.8,93.8 74.9,61.6 82.0,94.6" fill="rgb(217,217,217)" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
@@ -875,7 +878,6 @@ most pieces.</li>
 <div id="game">
   <div class="info-bar" style="position:relative;">
     <span class="score"><span class="dot black"></span> Black: <span id="scoreBlack">0</span></span>
-    <span class="turn-indicator" id="turnLabel">Black's turn</span>
     <span class="score"><span class="dot white"></span> White: <span id="scoreWhite">0</span></span>
     <div class="settings-wrap">
       <button class="cog-btn" id="cogBtn" aria-label="Settings">&#9881;</button>
@@ -904,9 +906,6 @@ most pieces.</li>
       </div>
     </div>
   </div>
-  <div class="info-bar" style="z-index:auto;">
-    <span id="roundLabel" style="color:#aaa;font-size:0.9rem;">Round 1</span>
-  </div>
   <div id="board-container">
     <canvas id="canvas"></canvas>
   </div>
@@ -932,9 +931,9 @@ most pieces.</li>
 that at first, I also kept losing (no matter whether I played as black
 or white) and thought there was no strategy here. It turns out<a
 href="#fn2" class="footnote-ref" id="fnref2"
-role="doc-noteref"><sup>2</sup></a>, that’s exactly the evidence why
-some strategy must exist; otherwise, I should be winning 50% of all
-games. If stronger players keep beating weaker ones, there must be some
+role="doc-noteref"><sup>2</sup></a> that’s exactly the evidence why some
+strategy must exist; otherwise, I should be winning 50% of all games. If
+stronger players keep beating weaker ones, there must be some
 exploitable structure hiding under the randomness.</p>
 <p>So, I dreamt up the following rules-based AI strategies to play
 against each other. Each one has a name and a rough description of how
@@ -944,8 +943,8 @@ it decides on the best move:</p>
 random.</li>
 <li><strong>Clusterer</strong>: Greedily places each stone next to as
 many friendly stones as possible.</li>
-<li><strong>Fortress</strong>: Fortress claims corners and edges first,
-building inward.</li>
+<li><strong>Fortress</strong>: Claims corners and edges first, building
+inward.</li>
 <li><strong>Destabilizer</strong>: Picks the move that maximally
 destabilizes the enemy, with light clustering as a tiebreaker.</li>
 <li><strong>Anti-cluster</strong>: Places stones adjacent to enemy
@@ -960,7 +959,7 @@ the move that minimizes the quality of that response.</li>
 <div id="sim-lab">
   <div class="sim-controls">
     <label>Grid
-      <input type="number" id="simN" value="8" min="4" max="16">
+      <input type="number" id="simN" value="8" min="4" max="16" style="width:46px;">
     </label>
     <label>Games / matchup
       <input type="number" id="simGames" value="500" min="100" max="5000" step="100">
@@ -974,13 +973,11 @@ the move that minimizes the quality of that response.</li>
       <button class="viz-tab active" data-tab="heatmap">Heatmap</button>
       <button class="viz-tab" data-tab="elo">Elo Rankings</button>
       <button class="viz-tab" data-tab="bracket">Bracket</button>
-      <button class="viz-tab" data-tab="graph">Network</button>
       <button class="viz-tab" data-tab="stacked">Overall</button>
     </div>
     <div class="viz-panel" id="viz-heatmap"></div>
     <div class="viz-panel" id="viz-elo" style="display:none"></div>
     <div class="viz-panel" id="viz-bracket" style="display:none"></div>
-    <div class="viz-panel" id="viz-graph" style="display:none"></div>
     <div class="viz-panel" id="viz-stacked" style="display:none"></div>
   </div>
 </div>
@@ -998,10 +995,10 @@ some compute at this thing.</p>
 <p>The board is only <span class="math inline">\(8 \times 8\)</span>, so
 there’s no more than 64 choices to make. But, for each possible choice,
 there’s a surprisingly large number of outcomes due to the environmental
-randomness. For example, after placing a move on a board with 36 pieces,
-all 37 stones could have a nonzero probability of flipping, resulting in
-<span class="math inline">\(2^{37}\)</span> (over 137 billion) possible
-outcomes in just one look-ahead.</p>
+randomness. For example, after placing a piece on a board with 36
+pieces, all 37 stones could have a nonzero probability of flipping,
+resulting in <span class="math inline">\(2^{37}\)</span> (over 137
+billion) possible outcomes in just one look-ahead.</p>
 <p>In order to build a strong AI player, the following techniques are
 available, but not all are feasible:</p>
 <table>
@@ -1062,7 +1059,7 @@ massive number of self-play iterations</td>
 <td>Multi-armed bandit<a href="#fn8" class="footnote-ref" id="fnref8"
 role="doc-noteref"><sup>8</sup></a></td>
 <td><span style="color:#27ae60">✔</span> Possible, by mitigating massive
-number of rollouts through quantum computing.</td>
+number of rollouts through quantum computing</td>
 </tr>
 </tbody>
 </table>
@@ -1332,8 +1329,8 @@ quantum circuit)</li>
 </ol>
 <p>The usual benchmark problems fail at least one:</p>
 <ul>
-<li>Go is deterministic, doesn’t need extreme precision, and expensive
-to build.</li>
+<li>Go is deterministic, doesn’t need extreme precision, and is
+expensive to build.</li>
 <li>The 2-arm bandit is stochastic, but tiny gaps are incidental to
 specific instances rather than an inherent feature of the problem, and
 each classical sample costs near-zero computation. The fixed overhead of
@@ -1345,7 +1342,7 @@ stochastic. The repeated Sway events attenuate the marginal impact of
 any single move. And the rules are local: each cell only checks its
 immediate neighbors, making the transition cheap to compile into
 reversible logic.</p>
-<h2 id="what-else-looks-like-this">What else looks like this?</h2>
+<h2 id="cant-unsee-it">Can’t unsee it</h2>
 <p>Honestly, I don’t know how far the ideas here stretch. But the
 pattern of “neighbors reinforce you, isolation makes you vulnerable, and
 randomness keeps everyone honest” does seem to pop up in places beyond
@@ -1623,6 +1620,8 @@ role="doc-backlink">↩︎</a></p></li>
       ref.appendChild(popover);
 
       ref.addEventListener('click', function(e) {
+        // Let clicks on links inside the popover navigate normally
+        if (e.target.closest('.fn-popover') && e.target.closest('a:not(.footnote-ref)')) return;
         e.preventDefault();
         // Close any other open popovers
         document.querySelectorAll('.fn-popover.visible').forEach(p => {

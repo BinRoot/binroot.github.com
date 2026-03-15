@@ -116,6 +116,7 @@
 
   @media (max-width: 899px) {
     .sidenote { display: none !important; }
+    .prose ol, .prose ul { padding-left: 1.2em; }
   }
   @media (min-width: 900px) {
     .fn-popover { display: none !important; }
@@ -177,9 +178,11 @@
     gap: 28px;
     font-size: 1rem;
     align-items: center;
+    justify-content: center;
     padding: 0 36px;
     position: relative;
     z-index: 15;
+    width: 100%;
   }
 
   .score {
@@ -861,6 +864,8 @@ $body$
       ref.appendChild(popover);
 
       ref.addEventListener('click', function(e) {
+        // Let clicks on links inside the popover navigate normally
+        if (e.target.closest('.fn-popover') && e.target.closest('a:not(.footnote-ref)')) return;
         e.preventDefault();
         // Close any other open popovers
         document.querySelectorAll('.fn-popover.visible').forEach(p => {
