@@ -185,7 +185,7 @@ function drawScatter() {
 
   sctx.fillStyle = '#888';
   sctx.textAlign = 'center';
-  sctx.fillText('sample #', margin.l + pw / 2, SCH - 4);
+  sctx.fillText(totalSamples > 0 ? `${totalSamples.toLocaleString()} samples` : 'sample #', margin.l + pw / 2, SCH - 4);
 
   if (scatterDots.length === 0) return;
 
@@ -239,7 +239,7 @@ function drawRanking() {
     return;
   }
 
-  const margin = { l: 40, r: 40, t: 30, b: 50 };
+  const margin = { l: 40, r: 40, t: 30, b: 80 };
   const pw = RCW - margin.l - margin.r;
   const lineY = margin.t + 40;
 
@@ -340,7 +340,6 @@ function drawRanking() {
 }
 
 // ─── 3. Budget calculator ─────────────────────────────────────────────
-const countEl = document.getElementById('rollout-count');
 const epsValEl = document.getElementById('rollout-eps-val');
 const sigma2El = document.getElementById('rollout-sigma2');
 const barsEl = document.getElementById('rollout-bars');
@@ -357,7 +356,6 @@ function updateBudget() {
   const v = avgVar;
   const sigma = Math.sqrt(v);
 
-  countEl.textContent = totalSamples.toLocaleString();
   sigma2El.textContent = count > 0 ? v.toFixed(1) : '—';
 
   const sorted = getRankedMoves();
@@ -416,10 +414,9 @@ function revealGrid() {
   boardCell.style.transition = 'none';
   boardCell.style.gridColumn = '1';
 
-  // 3. Reveal the hidden panels (set max-height so they take space, but stay invisible)
+  // 3. Reveal the hidden panels (display them, but keep invisible)
   revealPanels.forEach(p => {
-    p.style.maxHeight = '400px';
-    p.style.overflow = 'visible';
+    p.style.display = 'flex';
   });
 
   // 4. Force reflow to get the final position
@@ -505,7 +502,7 @@ toggleBtn.addEventListener('click', () => {
   }
 
   running = !running;
-  toggleBtn.textContent = running ? 'Pause' : 'Continue sampling';
+  toggleBtn.textContent = running ? 'Pause' : 'Continue rollouts';
   if (running) {
     batchTimer = requestAnimationFrame(runBatch);
   } else if (batchTimer) {

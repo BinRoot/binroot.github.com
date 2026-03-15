@@ -161,9 +161,9 @@
     background: #D95032;
     color: #fff;
     border: none;
-    padding: 10px 28px;
+    padding: 6px 20px;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.82rem;
     cursor: pointer;
     transition: background 0.2s;
     font-weight: 600;
@@ -961,7 +961,7 @@ the move that minimizes the quality of that response.</li>
     <label>Grid
       <input type="number" id="simN" value="8" min="4" max="16" style="width:46px;">
     </label>
-    <label>Games / matchup
+    <label>Games
       <input type="number" id="simGames" value="500" min="100" max="5000" step="100">
     </label>
     <button id="simRunBtn">Run tournament</button>
@@ -1075,7 +1075,7 @@ better.</p>
     <svg id="sampling-tree" width="200" height="370" style="flex-shrink:0;"></svg>
     <canvas id="sampling-canvas" style="border-radius:8px;"></canvas>
   </div>
-  <button id="sampling-toggle" style="padding:6px 20px; font-size:0.82rem;">Sample</button>
+  <button id="sampling-toggle">Sample</button>
 </div>
 <script type="module" src="sampling-viz.js"></script>
 
@@ -1109,24 +1109,20 @@ board and the gap between them narrow on the number line.</p>
     </div>
 
     <!-- Top-right: Scatter plot -->
-    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+    <div class="rollout-reveal" style="display:none; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; transition: opacity 0.5s ease 0.3s;">
       <canvas id="rollout-scatter" width="340" height="260" style="border-radius:8px; background:#f0f0f0; width:100%;"></canvas>
       <div style="font-size:0.72rem; color:#888;">Samples (each dot = one full game)</div>
     </div>
 
     <!-- Bottom-left: Move ranking -->
-    <div class="rollout-reveal" style="display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
-      <canvas id="rollout-race" width="340" height="180" style="width:100%; border-radius:8px; background:#f0f0f0;"></canvas>
+    <div class="rollout-reveal" style="display:none; flex-direction:column; align-items:center; gap:4px; opacity:0; transition: opacity 0.5s ease 0.3s;">
+      <canvas id="rollout-race" width="340" height="220" style="width:100%; border-radius:8px; background:#f0f0f0;"></canvas>
       <div style="font-size:0.72rem; color:#888;">Each dot is a move. Gap between <span style="color:#E05545;">#1</span> and <span style="color:#5B8DEF;">#2</span> = ε</div>
     </div>
 
     <!-- Bottom-right: Budget calculator -->
-    <div class="rollout-reveal" id="rollout-budget" style="background:#f0f0f0; border:1px solid #ddd; border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; justify-content:center; opacity:0; max-height:0; overflow:hidden; transition: opacity 0.5s ease 0.3s, max-height 0.5s ease;">
+    <div class="rollout-reveal" id="rollout-budget" style="background:#f0f0f0; border:1px solid #ddd; border-radius:8px; padding:14px 16px; display:none; flex-direction:column; justify-content:center; opacity:0; transition: opacity 0.5s ease 0.3s;">
       <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
-        <div style="text-align:center;">
-          <div style="font-size:0.72rem; color:#888;">Samples</div>
-          <div id="rollout-count" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">0</div>
-        </div>
         <div style="text-align:center;">
           <div style="font-size:0.72rem; color:#888;">σ²</div>
           <div id="rollout-sigma2" style="font-family:'Ubuntu Mono',monospace; font-size:1.1rem; color:#4a4a4a;">—</div>
@@ -1141,7 +1137,7 @@ board and the gap between them narrow on the number line.</p>
 
   </div>
 
-  <button id="rollout-toggle" style="padding:6px 20px; font-size:0.82rem;">Start sampling</button>
+  <button id="rollout-toggle">Start rollouts</button>
 </div>
 <script type="module" src="rollout-viz.js"></script>
 
