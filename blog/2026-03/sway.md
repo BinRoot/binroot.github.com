@@ -3,6 +3,8 @@ title: Game of Sway
 author: Nishant Shukla
 date: March 15, 2026
 subtitle: Quantum computing for the whole family!
+description: "An interactive board game where dice rolls flip your pieces, and solving it may need a quantum computer. Play Sway in your browser, pit AI strategies against each other, and see how quantum amplitude estimation speeds up Monte Carlo search in stochastic games."
+url: https://shukla.io/blog/2026-03/sway.html
 ---
 
 ## Play Sway

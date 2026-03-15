@@ -8,6 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="sakura-dark.css">
 <title>$title$</title>
+$if(description)$<meta name="description" content="$description$">$endif$
+$if(url)$<link rel="canonical" href="$url$">$endif$
+<meta property="og:type" content="article">
+<meta property="og:title" content="$title$">
+$if(description)$<meta property="og:description" content="$description$">$endif$
+$if(url)$<meta property="og:url" content="$url$">$endif$
+$if(author)$<meta property="article:author" content="$author$">$endif$
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="$title$">
+$if(description)$<meta name="twitter:description" content="$description$">$endif$
 <style>
   $highlighting-css$
   /* Override highlight theme backgrounds — keep only text colors */
