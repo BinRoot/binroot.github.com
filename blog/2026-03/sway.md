@@ -168,8 +168,7 @@ Sway passes all three. The environment turn is irreducibly stochastic. The repea
 
 ## Can't unsee it
 
-Honestly, I don't know how far the ideas here stretch. 
-But the pattern of "neighbors reinforce you, isolation makes you vulnerable, and the environment shakes things up" does seem to pop up in places beyond board games.[^votermodel] Here are a few that caught my eye:
+Now that you think of it, the pattern of "neighbors reinforce you, isolation makes you vulnerable, and the environment shakes things up" does seem to pop up everywhere.[^votermodel] Here are a few that caught my eye:
 
 ::: {#applications-component
   title-0="Opinion dynamics"
