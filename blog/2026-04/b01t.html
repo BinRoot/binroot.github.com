@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<title>Entangled Spagetti Code | Nishant Shukla</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Quantum computing has its own class of
+bugs. Dirty ancillae, bad uncomputation, silent decoherence. b01t is a
+Python DSL that catches them at build time.">
+<link rel="canonical" href="https://shukla.io/blog/2026-04/b01t.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Entangled Spagetti Code">
+<meta property="og:description" content="Quantum computing has its own
+class of bugs. Dirty ancillae, bad uncomputation, silent decoherence.
+b01t is a Python DSL that catches them at build time.">
+<meta property="og:url" content="https://shukla.io/blog/2026-04/b01t.html">
+<meta property="article:author" content="Nishant Shukla">
+<meta property="article:published_time" content="2026-04-13">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Entangled Spagetti Code">
+<meta name="twitter:description" content="Quantum computing has its own
+class of bugs. Dirty ancillae, bad uncomputation, silent decoherence.
+b01t is a Python DSL that catches them at build time.">
+<meta property="og:image" content="https://shukla.io/blog/2026-04/helix.svg">
+<meta name="twitter:image" content="https://shukla.io/blog/2026-04/helix.svg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Entangled Spagetti Code",
+  "description": "Quantum computing has its own class of bugs. Dirty
+ancillae, bad uncomputation, silent decoherence. b01t is a Python DSL
+that catches them at build time.",
+  "url": "https://shukla.io/blog/2026-04/b01t.html",
+  "author": {"@type": "Person", "name": "Nishant Shukla"},
+  "datePublished": "2026-04-13",
+  "publisher": {"@type": "Person", "name": "Nishant Shukla"}
+}
+</script>
+<style>
+  pre > code.sourceCode { white-space: pre; position: relative; }
+  pre > code.sourceCode > span { line-height: 1.25; }
+  pre > code.sourceCode > span:empty { height: 1.2em; }
+  .sourceCode { overflow: visible; }
+  code.sourceCode > span { color: inherit; text-decoration: inherit; }
+  div.sourceCode { margin: 1em 0; }
+  pre.sourceCode { margin: 0; }
+  @media screen {
+  div.sourceCode { overflow: auto; }
+  }
+  @media print {
+  pre > code.sourceCode { white-space: pre-wrap; }
+  pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+  }
+  pre.numberSource code
+    { counter-reset: source-line 0; }
+  pre.numberSource code > span
+    { position: relative; left: -4em; counter-increment: source-line; }
+  pre.numberSource code > span > a:first-child::before
+    { content: counter(source-line);
+      position: relative; left: -1em; text-align: right; vertical-align: baseline;
+      border: none; display: inline-block;
+      -webkit-touch-callout: none; -webkit-user-select: none;
+      -khtml-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      padding: 0 4px; width: 4em;
+      color: #aaaaaa;
+    }
+  pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+  div.sourceCode
+    {   }
+  @media screen {
+  pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+  }
+  code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+  code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+  code span.at { color: #7d9029; } /* Attribute */
+  code span.bn { color: #40a070; } /* BaseN */
+  code span.bu { color: #008000; } /* BuiltIn */
+  code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+  code span.ch { color: #4070a0; } /* Char */
+  code span.cn { color: #880000; } /* Constant */
+  code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+  code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+  code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+  code span.dt { color: #902000; } /* DataType */
+  code span.dv { color: #40a070; } /* DecVal */
+  code span.er { color: #ff0000; font-weight: bold; } /* Error */
+  code span.ex { } /* Extension */
+  code span.fl { color: #40a070; } /* Float */
+  code span.fu { color: #06287e; } /* Function */
+  code span.im { color: #008000; font-weight: bold; } /* Import */
+  code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+  code span.op { color: #666666; } /* Operator */
+  code span.ot { color: #007020; } /* Other */
+  code span.pp { color: #bc7a00; } /* Preprocessor */
+  code span.sc { color: #4070a0; } /* SpecialChar */
+  code span.ss { color: #bb6688; } /* SpecialString */
+  code span.st { color: #4070a0; } /* String */
+  code span.va { color: #19177c; } /* Variable */
+  code span.vs { color: #4070a0; } /* VerbatimString */
+  code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  div.sourceCode, code.sourceCode { background-color: transparent !important; }
+  pre.sourceCode { background-color: #3635f305 !important; padding: 1em 1.2em; border-radius: 6px; }
+  code span { background-color: transparent !important; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f9f9f9;
+    color: #4a4a4a;
+    font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    max-width: none;
+  }
+
+  .site-header {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 24px;
+  }
+
+  .home-link {
+    color: #1d7484;
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-bottom: 2px solid transparent;
+  }
+  .home-link:hover { color: #982c61; border-bottom-color: #982c61; }
+
+  .post-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: #888;
+  }
+
+  h1.page-title {
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 36px;
+    color: #2a2a2a;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 18px;
+  }
+
+  .prose {
+    max-width: 920px;
+    width: 100%;
+    position: relative;
+  }
+
+  .panel {
+    column-count: 2;
+    column-gap: 3em;
+    column-rule: none;
+    margin-bottom: 4em;
+  }
+  .panel.single {
+    column-count: 1;
+    column-rule: none;
+    max-width: 620px;
+  }
+  .panel > * {
+    break-inside: avoid;
+  }
+
+  .prose > div.sourceCode {
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 4em;
+  }
+
+  .prose > figure {
+    margin: 0 0 4em;
+  }
+  .prose > figure img {
+    width: 100%;
+    height: auto;
+  }
+  .prose > figure figcaption {
+    display: none;
+  }
+
+  @media (max-width: 960px) {
+    .prose { max-width: 620px; }
+    .panel { column-count: 1; column-rule: none; }
+    .panel.single { max-width: none; }
+    .prose > div.sourceCode { margin-bottom: 1.5em; }
+  }
+
+  .footnotes-end-of-document { display: none; }
+
+  .sidenote {
+    position: absolute;
+    right: -260px;
+    width: 220px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #999;
+    transition: color 0.15s;
+  }
+  .sidenote.highlight { color: #4a4a4a; }
+  .sidenote a { font-size: inherit; }
+  .sidenote p { margin: 0; }
+
+  .sidenote-connector {
+    position: absolute;
+    right: -36px;
+    width: 32px;
+    border-top: 1px dashed #ccc;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .sidenote-connector.visible { opacity: 1; }
+
+  .fn-popover {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #4a4a4a;
+    max-width: 360px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .fn-popover.visible { display: block; }
+  .fn-popover p { margin: 0; }
+  .fn-popover a { font-size: inherit; }
+
+  .footnote-ref { position: relative; }
+
+  @media (max-width: 899px) {
+    .sidenote { display: none !important; }
+    .prose ol, .prose ul { padding-left: 1.2em; }
+  }
+  @media (min-width: 900px) {
+    .fn-popover { display: none !important; }
+  }
+
+  .prose h2, .prose h3 { position: relative; }
+  .anchor-link {
+    position: absolute;
+    left: -1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bbb;
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.15s;
+    border-bottom: none !important;
+  }
+  .prose h2:hover .anchor-link,
+  .prose h3:hover .anchor-link { opacity: 1; }
+  .anchor-link:hover { color: #1d7484; border-bottom: none !important; }
+
+  html { font-size: 100%; }
+  body { font-size: 1rem; }
+  p { margin-bottom: 0.8rem; }
+  ul, ol { margin-bottom: 0.8rem; }
+  h1, h2, h3, h4, h5, h6 { font-family: 'EB Garamond', 'Georgia', serif; }
+  li > ul, li > ol { margin-bottom: 0; }
+  code, kbd, samp { background-color: #eef; }
+  a { color: #1d7484; text-decoration: none; border-bottom: 2px solid transparent; }
+  a:hover { color: #982c61; border-bottom-color: #982c61; }
+</style>
+
+</head>
+<body>
+
+<header class="site-header">
+  <a class="home-link" href="https://shukla.io">Home</a>
+  <div class="post-meta">
+    <a class="post-author" href="mailto:nishant@shukla.io">Nishant
+Shukla</a>
+    <span class="post-date">April 2026</span>
+  </div>
+</header>
+<h1 class="page-title">Entangled Spagetti Code</h1>
+
+
+<div class="prose">
+<figure>
+<img src="helix.svg"
+alt="Quantum circuit transitioning into a double-helix of entanglement" />
+<figcaption aria-hidden="true">Quantum circuit transitioning into a
+double-helix of entanglement</figcaption>
+</figure>
+<p>Functional programmers <strong>hate</strong> mutable variables.</p>
+<p>Take this Python snippet, for instance. Imagine you’re reviewing a PR
+and you spot this:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poll_usage():</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  is_backup_needed <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> is_usage_high:</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># toggle</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    is_backup_needed <span class="op">=</span> <span class="kw">not</span> is_backup_needed</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
+<p>The variable <code>is_backup_needed</code> feels wrong. To me, this
+imperative approach is anxiety inducing. I would prefer an immutable
+variable since assignment only needs to happens once. Then, there’s
+never any doubt about whether the variable is “ready” to use yet. As you
+can see, over time, we each develop our own preferences and coding
+styles.</p>
+<p>This same discourse around type-safety, immutable variables, and
+software engineering best practices are not as mature in the quantum
+computing world. We’ll talk about it soon, but let’s return to that code
+snippet.</p>
+<p>Here’s a silly (and interesting, as you’ll see soon) way to refactor
+it:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> maybe_invert(condition, _aux):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  aux <span class="op">=</span> _aux</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> condition:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    aux <span class="op">=</span> <span class="kw">not</span> aux</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> aux</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poll_usage():</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  is_backup_needed <span class="op">=</span> maybe_invert(is_usage_high, <span class="va">False</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
+<p>I know it looks stupid, and in Python there’s better ways, but stick
+with me for the payoff.</p>
+<p>In quantum computing, the <code>maybe_invert(...)</code> function is
+commonly called the <code>CX</code> gate (“C” for Controlled or
+Conditional, “X” for not), and it’s used <em>all the time</em>.</p>
+<p>You can run <code>CX</code> in superposition, so it acts on multiple
+computational branches at once and can create entanglement. That is one
+of the basic ingredients used to build algorithms that promise speedups
+on future fault-tolerant quantum computers.</p>
+<p>In practice, that looks like this:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># variable 0 is the condition</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># variable 1 is the ancilla (or aux)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The CX gate is like `maybe_invert`</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>qc.cx(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># variable 1 now holds the &quot;return value&quot;, kind of</span></span></code></pre></div>
+<p>However, a major pain in the ass in quantum computing is that
+temporary variables (ancillae) need to be reset before you reuse or
+discard them.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>qc.cx(<span class="dv">0</span>, <span class="dv">1</span>)  <span class="co"># compute ancilla</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>qc.z(<span class="dv">1</span>)      <span class="co"># do something with the ancilla</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>???          <span class="co"># IMPORTANT: uncompute ancilla</span></span></code></pre></div>
+<p>If you forget to do so, you’ve committed a sin as woeful as indexing
+an array out of bounds or referencing an invalid pointer. Your quantum
+speedup will crash, your towelettes will no longer be moist, and your
+felt baseball cap will lose the soft touch it once had.</p>
+<p>Quantum is hard because your toolbox of things you can do on
+variables (qubits) is a <em>bit</em> limited. It would be too easy to
+simply assign <code>aux = 0</code>, pack up your bags, and go home.
+Nonetheless, Perlis said “a language that doesn’t affect the way you
+think about programming is not worth knowing.”</p>
+<p>There really isn’t much out there to help programmers catch these
+issues, so I’ve prototyped a Python DSL called <code>b01t</code>, which
+has <code>ancilla</code> blocks that look like this:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> ancilla(<span class="dv">1</span>) <span class="im">as</span> anc:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  compute(<span class="kw">lambda</span>: cx(sys[<span class="dv">0</span>], anc[<span class="dv">0</span>]))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  phase(<span class="kw">lambda</span>: z(anc[<span class="dv">0</span>]))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  uncompute()</span></code></pre></div>
+<p>Heyo, that kinda speaks for itself!</p>
+<p>By the way, the following are guaranteed:</p>
+<ul>
+<li>✅ Soundness: every quantum program produced by this DSL is safe. No
+false promises.</li>
+<li>✅️ Correctness: every safe quantum program could be expressed by
+this DSL.</li>
+</ul>
+<p>Please try it out! <strong><a
+href="https://github.com/binroot/b01t">https://github.com/binroot/b01t</a></strong></p>
+<p>Want to collaborate? <a
+href="mailto:nishant@shukla.io">nishant@shukla.io</a>.</p>
+</div>
+
+<script>
+  // Margin notes (desktop) + popovers (mobile)
+  (function() {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+
+    const sidenotes = [];
+
+    document.querySelectorAll('a.footnote-ref').forEach(ref => {
+      const fnId = ref.getAttribute('href').slice(1);
+      const fnLi = document.getElementById(fnId);
+      if (!fnLi) return;
+
+      const content = fnLi.cloneNode(true);
+      content.querySelectorAll('.footnote-back').forEach(b => b.remove());
+      const html = content.innerHTML;
+
+      const side = document.createElement('aside');
+      side.className = 'sidenote';
+      side.innerHTML = html;
+      prose.appendChild(side);
+
+      const connector = document.createElement('div');
+      connector.className = 'sidenote-connector';
+      prose.appendChild(connector);
+
+      sidenotes.push({ ref, side, connector });
+
+      ref.addEventListener('mouseenter', () => { side.classList.add('highlight'); connector.classList.add('visible'); });
+      ref.addEventListener('mouseleave', () => { side.classList.remove('highlight'); connector.classList.remove('visible'); });
+      side.addEventListener('mouseenter', () => { side.classList.add('highlight'); connector.classList.add('visible'); });
+      side.addEventListener('mouseleave', () => { side.classList.remove('highlight'); connector.classList.remove('visible'); });
+
+      const popover = document.createElement('div');
+      popover.className = 'fn-popover';
+      popover.innerHTML = html;
+      ref.style.position = 'relative';
+      ref.appendChild(popover);
+
+      ref.addEventListener('click', function(e) {
+        if (e.target.closest('.fn-popover') && e.target.closest('a:not(.footnote-ref)')) return;
+        e.preventDefault();
+        document.querySelectorAll('.fn-popover.visible').forEach(p => { if (p !== popover) p.classList.remove('visible'); });
+        const rect = ref.getBoundingClientRect();
+        popover.style.top = (rect.bottom + 4) + 'px';
+        popover.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 368)) + 'px';
+        popover.classList.toggle('visible');
+      });
+    });
+
+    function positionAll() {
+      const proseTop = prose.getBoundingClientRect().top + window.scrollY;
+      sidenotes.forEach(({ ref, side, connector }) => {
+        const refY = ref.getBoundingClientRect().top + window.scrollY - proseTop;
+        side.style.top = refY + 'px';
+        connector.style.top = (refY + 8) + 'px';
+      });
+    }
+
+    window.addEventListener('load', positionAll);
+    window.addEventListener('resize', positionAll);
+    new ResizeObserver(positionAll).observe(prose);
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.footnote-ref') && !e.target.closest('.fn-popover')) {
+        document.querySelectorAll('.fn-popover.visible').forEach(p => p.classList.remove('visible'));
+      }
+    });
+  })();
+
+  document.querySelectorAll('a[href^="http"]').forEach(a => {
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener');
+  });
+
+  document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => {
+    const a = document.createElement('a');
+    a.className = 'anchor-link';
+    a.href = '#' + h.id;
+    a.textContent = '#';
+    a.setAttribute('aria-hidden', 'true');
+    h.prepend(a);
+  });
+
+  // Two-column comic-panel layout: split prose at code blocks
+  (function() {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+
+    const children = Array.from(prose.children);
+    const groups = [];
+    let current = [];
+
+    children.forEach(child => {
+      if (child.classList.contains('sourceCode') || child.tagName === 'FIGURE') {
+        if (current.length) {
+          groups.push({ type: 'text', els: current });
+          current = [];
+        }
+        groups.push({ type: 'code', el: child });
+      } else if (
+        child.classList.contains('sidenote') ||
+        child.classList.contains('sidenote-connector') ||
+        child.classList.contains('footnotes-end-of-document')
+      ) {
+        // leave in place
+      } else {
+        current.push(child);
+      }
+    });
+    if (current.length) groups.push({ type: 'text', els: current });
+
+    groups.forEach(group => {
+      if (group.type !== 'text') return;
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      if (group.els.length <= 1) panel.classList.add('single');
+      prose.insertBefore(panel, group.els[0]);
+      group.els.forEach(el => panel.appendChild(el));
+    });
+  })();
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
+</body>
+</html>
