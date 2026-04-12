@@ -6,14 +6,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-<title>Entangled Spagetti Code | Nishant Shukla</title>
+<title>Entangled Spaghetti Code | Nishant Shukla</title>
 <meta name="robots" content="index, follow">
 <meta name="description" content="Quantum computing has its own class of
 bugs. Dirty ancillae, bad uncomputation, silent decoherence. b01t is a
 Python DSL that catches them at build time.">
 <link rel="canonical" href="https://shukla.io/blog/2026-04/b01t.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Entangled Spagetti Code">
+<meta property="og:title" content="Entangled Spaghetti Code">
 <meta property="og:description" content="Quantum computing has its own
 class of bugs. Dirty ancillae, bad uncomputation, silent decoherence.
 b01t is a Python DSL that catches them at build time.">
@@ -21,7 +21,7 @@ b01t is a Python DSL that catches them at build time.">
 <meta property="article:author" content="Nishant Shukla">
 <meta property="article:published_time" content="2026-04-13">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Entangled Spagetti Code">
+<meta name="twitter:title" content="Entangled Spaghetti Code">
 <meta name="twitter:description" content="Quantum computing has its own
 class of bugs. Dirty ancillae, bad uncomputation, silent decoherence.
 b01t is a Python DSL that catches them at build time.">
@@ -31,7 +31,7 @@ b01t is a Python DSL that catches them at build time.">
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "Entangled Spagetti Code",
+  "headline": "Entangled Spaghetti Code",
   "description": "Quantum computing has its own class of bugs. Dirty
 ancillae, bad uncomputation, silent decoherence. b01t is a Python DSL
 that catches them at build time.",
@@ -299,7 +299,7 @@ Shukla</a>
     <span class="post-date">April 2026</span>
   </div>
 </header>
-<h1 class="page-title">Entangled Spagetti Code</h1>
+<h1 class="page-title">Entangled Spaghetti Code</h1>
 
 
 <div class="prose">
@@ -320,14 +320,14 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># toggle</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    is_backup_needed <span class="op">=</span> <span class="kw">not</span> is_backup_needed</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
-<p>The variable <code>is_backup_needed</code> feels wrong. To me, this
-imperative approach is anxiety inducing. I would prefer an immutable
-variable since assignment only needs to happens once. Then, there’s
-never any doubt about whether the variable is “ready” to use yet. As you
-can see, over time, we each develop our own preferences and coding
+<p>The variable <code>is_backup_needed</code> feels wrong to me. This
+imperative approach is anxiety-inducing. I would prefer an immutable
+variable since assignment only needs to happen once. Then, there’s never
+any doubt about whether the variable is “ready” to use yet. As you can
+see, over time, we each develop our own preferences and coding
 styles.</p>
-<p>This same discourse around type-safety, immutable variables, and
-software engineering best practices are not as mature in the quantum
+<p>This same discourse around type safety, immutable variables, and
+software engineering best practices is not as mature in the quantum
 computing world. We’ll talk about it soon, but let’s return to that code
 snippet.</p>
 <p>Here’s a silly (and interesting, as you’ll see soon) way to refactor
@@ -343,15 +343,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  is_backup_needed <span class="op">=</span> maybe_invert(is_usage_high, <span class="va">False</span>)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  ...</span></code></pre></div>
-<p>I know it looks stupid, and in Python there’s better ways, but stick
-with me for the payoff.</p>
+<p>I know it looks stupid, and in Python there are better ways, but
+stick with me for the payoff.</p>
 <p>In quantum computing, the <code>maybe_invert(...)</code> function is
-commonly called the <code>CX</code> gate (“C” for Controlled or
-Conditional, “X” for not), and it’s used <em>all the time</em>.</p>
+commonly called the <code>CX</code> gate (“C” for controlled or
+conditional, “X” for NOT), and it’s used <em>all the time</em>.</p>
 <p>You can run <code>CX</code> in superposition, so it acts on multiple
-computational branches at once and can create entanglement. That is one
-of the basic ingredients used to build algorithms that promise speedups
-on future fault-tolerant quantum computers.</p>
+computational basis branches at once and can create entanglement. That
+is one of the basic ingredients used to build algorithms that promise
+speedups on future fault-tolerant quantum computers.</p>
 <p>In practice, that looks like this:</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># variable 0 is the condition</span></span>
@@ -360,8 +360,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>qc.cx(<span class="dv">0</span>, <span class="dv">1</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># variable 1 now holds the &quot;return value&quot;, kind of</span></span></code></pre></div>
 <p>However, a major pain in the ass in quantum computing is that
-temporary variables (ancillae) need to be reset before you reuse or
-discard them.</p>
+temporary variables (ancillae) must be reset before you reuse or discard
+them.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>qc.cx(<span class="dv">0</span>, <span class="dv">1</span>)  <span class="co"># compute ancilla</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>qc.z(<span class="dv">1</span>)      <span class="co"># do something with the ancilla</span></span>
@@ -370,9 +370,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 an array out of bounds or referencing an invalid pointer. Your quantum
 speedup will crash, your towelettes will no longer be moist, and your
 felt baseball cap will lose the soft touch it once had.</p>
-<p>Quantum is hard because your toolbox of things you can do on
+<p>Quantum computing is hard because the set of things you can do with
 variables (qubits) is a <em>bit</em> limited. It would be too easy to
-simply assign <code>aux = 0</code>, pack up your bags, and go home.
+simply assign <code>aux = 0</code>, pack your bags, and go home.
 Nonetheless, Perlis said “a language that doesn’t affect the way you
 think about programming is not worth knowing.”</p>
 <p>There really isn’t much out there to help programmers catch these
@@ -388,8 +388,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <ul>
 <li>✅ Soundness: every quantum program produced by this DSL is safe. No
 false promises.</li>
-<li>✅️ Correctness: every safe quantum program could be expressed by
-this DSL.</li>
+<li>✅️ Correctness: every safe quantum program can be expressed by this
+DSL.</li>
 </ul>
 <p>Please try it out! <strong><a
 href="https://github.com/binroot/b01t">https://github.com/binroot/b01t</a></strong></p>
