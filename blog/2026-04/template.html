@@ -131,9 +131,10 @@ $if(image)$<meta name="twitter:image" content="$image$">$endif$
 
   @media (max-width: 960px) {
     .prose { max-width: 620px; }
-    .panel { column-count: 1; column-rule: none; }
+    .panel { column-count: 1; column-rule: none; margin-bottom: 0; }
     .panel.single { max-width: none; }
     .prose > div.sourceCode { margin-bottom: 1.5em; }
+    .prose > figure { margin-bottom: 1.5em; }
   }
 
   .footnotes-end-of-document { display: none; }
