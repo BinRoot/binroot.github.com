@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 13 Apr 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 12 May 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>On Planet Quantos, Programmers Flee</title>
+      <link>https://shukla.io/blog/2026-05/rank-select.html</link>
+      <guid>https://shukla.io/blog/2026-05/rank-select.html</guid>
+      <pubDate>Tue, 12 May 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.
+      ]]></description>
+    </item>
 
     <item>
       <title>Entangled Spaghetti Code</title>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On Planet Quantos, Programmers Flee</title>
+
+<!-- SEO: descriptive meta -->
+<meta name="description" content="An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.">
+<meta name="keywords" content="reversible computing, quantum oracle, rank-select, uncomputation, XOR trick, Bennett, Toffoli, quantum computing, ancilla, calling convention">
+<meta name="author" content="Nishant Shukla">
+<link rel="canonical" href="https://shukla.io/blog/2026-05/rank-select.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="On Planet Quantos, Programmers Flee">
+<meta property="og:description" content="An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.">
+<meta property="og:url" content="https://shukla.io/blog/2026-05/rank-select.html">
+<meta property="og:image" content="https://shukla.io/blog/2026-05/rank-select-fig.png">
+<meta property="article:published_time" content="2026-05-12">
+<meta property="article:author" content="Nishant Shukla">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="On Planet Quantos, Programmers Flee">
+<meta name="twitter:description" content="An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.">
+<meta name="twitter:image" content="https://shukla.io/blog/2026-05/rank-select-fig.png">
+
+<!-- JSON-LD structured data (schema.org BlogPosting) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "On Planet Quantos, Programmers Flee",
+  "datePublished": "2026-05-12",
+  "author": {
+    "@type": "Person",
+    "name": "Nishant Shukla",
+    "url": "https://shukla.io"
+  },
+  "description": "An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.",
+  "image": "https://shukla.io/blog/2026-05/rank-select-fig.png",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shukla.io/blog/2026-05/rank-select.html"
+  }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap" rel="stylesheet">
+
+<style>
+  pre > code.sourceCode { white-space: pre; position: relative; }
+  pre > code.sourceCode > span { line-height: 1.25; }
+  pre > code.sourceCode > span:empty { height: 1.2em; }
+  .sourceCode { overflow: visible; }
+  code.sourceCode > span { color: inherit; text-decoration: inherit; }
+  div.sourceCode { margin: 1em 0; }
+  pre.sourceCode { margin: 0; }
+  @media screen {
+  div.sourceCode { overflow: auto; }
+  }
+  @media print {
+  pre > code.sourceCode { white-space: pre-wrap; }
+  pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+  }
+  pre.numberSource code
+    { counter-reset: source-line 0; }
+  pre.numberSource code > span
+    { position: relative; left: -4em; counter-increment: source-line; }
+  pre.numberSource code > span > a:first-child::before
+    { content: counter(source-line);
+      position: relative; left: -1em; text-align: right; vertical-align: baseline;
+      border: none; display: inline-block;
+      -webkit-touch-callout: none; -webkit-user-select: none;
+      -khtml-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      padding: 0 4px; width: 4em;
+      color: #aaaaaa;
+    }
+  pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+  div.sourceCode
+    {   }
+  @media screen {
+  pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+  }
+  code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+  code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+  code span.at { color: #7d9029; } /* Attribute */
+  code span.bn { color: #40a070; } /* BaseN */
+  code span.bu { color: #008000; } /* BuiltIn */
+  code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+  code span.ch { color: #4070a0; } /* Char */
+  code span.cn { color: #880000; } /* Constant */
+  code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+  code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+  code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+  code span.dt { color: #902000; } /* DataType */
+  code span.dv { color: #40a070; } /* DecVal */
+  code span.er { color: #ff0000; font-weight: bold; } /* Error */
+  code span.ex { } /* Extension */
+  code span.fl { color: #40a070; } /* Float */
+  code span.fu { color: #06287e; } /* Function */
+  code span.im { color: #008000; font-weight: bold; } /* Import */
+  code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+  code span.op { color: #666666; } /* Operator */
+  code span.ot { color: #007020; } /* Other */
+  code span.pp { color: #bc7a00; } /* Preprocessor */
+  code span.sc { color: #4070a0; } /* SpecialChar */
+  code span.ss { color: #bb6688; } /* SpecialString */
+  code span.st { color: #4070a0; } /* String */
+  code span.va { color: #19177c; } /* Variable */
+  code span.vs { color: #4070a0; } /* VerbatimString */
+  code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  code span.co { color: #5a6470; }
+  pre.sourceCode code > span.vs-active-line {
+    background: #fff3a8;
+    box-shadow: -3px 0 0 #d4ad00;
+  }
+  pre.sourceCode .vs-note {
+    color: #9aa0aa;
+    font-style: italic;
+    font-weight: 400;
+    user-select: none;
+  }
+
+  /* ---- Dialog / narrator ---- */
+  .dialog, .narrator {
+    margin: 1.4em auto;
+    max-width: 600px;
+  }
+
+  .dialog {
+    position: relative;
+    background: #ffffff;
+    border: 1.5px solid #c8ccd4;
+    border-radius: 14px;
+    padding: 14px 18px 16px;
+    box-shadow: 0 2px 8px rgba(60, 70, 90, 0.08);
+    color: #2d3140;
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+  .dialog::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: -10px;
+    width: 18px; height: 18px;
+    background: #ffffff;
+    border-top: 1.5px solid #c8ccd4;
+    border-left: 1.5px solid #c8ccd4;
+    transform: rotate(45deg);
+  }
+  .dialog p { margin: 0; }
+
+  /* Continuation bubble: same speaker, pipe instead of an arrow. */
+  .dialog-continuation {
+    margin-top: 22px;
+  }
+  .dialog-continuation::before {
+    left: 31px;
+    top: -22px;
+    width: 4px;
+    height: 22px;
+    background: #c8ccd4;
+    border: none;
+    transform: none;
+    border-radius: 2px;
+  }
+
+  .dialog-cursor {
+    display: inline-block;
+    width: 0.5em; height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: #c8ccd4;
+    border-radius: 1px;
+    animation: dialog-blink 0.85s steps(2, end) infinite;
+  }
+  @keyframes dialog-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  .dialog-arrow {
+    display: inline-block;
+    margin-left: 6px;
+    color: #6b7380;
+    animation: dialog-bounce 1.1s ease-in-out infinite;
+    cursor: pointer;
+    user-select: none;
+  }
+  @keyframes dialog-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+  }
+
+  .dialog-responses {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .dialog-responses button {
+    background: #f4f5f8;
+    border: 1.5px solid #c8ccd4;
+    border-bottom-width: 3px;
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: #2d3140;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .dialog-responses button:hover {
+    background: #e8ebf0;
+    border-color: #aab0bb;
+    transform: translateY(-2px);
+  }
+  .dialog-responses button:active {
+    transform: translateY(0);
+    border-bottom-width: 1.5px;
+    margin-bottom: 1.5px;
+  }
+  .dialog-chosen {
+    margin-top: 10px;
+    color: #7a8090;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* Narrator + fig caption prose: italic, centred, with a white text-halo
+     so the words stay readable over the WebGL wave background. The halo
+     uses text-shadow, which follows the glyph shape and is suppressed
+     along with the character when its <span> is visibility:hidden — so
+     the highlight grows with the typing animation, never foreshadows it,
+     and never clips into neighbouring italic glyphs. */
+  .narrator,
+  .fig1 p, .fig2 p,
+  .fig-v1 p, .fig-v2 p, .fig-v3 p, .fig-v4 p, .fig-v5 p {
+    text-shadow:
+      -1px -1px 0 #fff,
+       1px -1px 0 #fff,
+      -1px  1px 0 #fff,
+       1px  1px 0 #fff,
+       0    0   8px rgba(255, 255, 255, 0.9),
+       0    0   8px rgba(255, 255, 255, 0.9),
+       0    0   4px rgba(255, 255, 255, 0.9);
+  }
+
+  .narrator {
+    text-align: center;
+    font-style: italic;
+    color: #2d3140;
+    padding: 6px 12px;
+    line-height: 1.7;
+  }
+  .narrator p { margin: 0; }
+  .narrator-responses {
+    justify-content: center;
+  }
+
+  /* Fig block prose styled like the narrator: centered, italic. */
+  .fig1 p, .fig2 p, .fig-v1 p, .fig-v2 p, .fig-v3 p, .fig-v4 p, .fig-v5 p {
+    text-align: center;
+    font-style: italic;
+    color: #2d3140;
+    line-height: 1.7;
+    margin: 0.6em 0;
+  }
+
+  /* In-text colored words that match the SIR game palette. */
+  .c-infected   { color: #e04040; font-weight: 600; }
+  .c-vaccinated { color: #3aa655; font-weight: 600; }
+  .c-dead       { color: #7a1818; font-weight: 600; }
+  .c-susceptible{ color: #6b7380; font-weight: 600; }
+  .c-recovered  { color: #7a9970; font-weight: 600; }
+
+  /* sequential reveal */
+  .scene-hidden { display: none !important; }
+  .scene-revealing {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .scene-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+  }
+
+  /* "Show all" — plain-text affordance, placed inside the meta list. */
+  .show-all-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #8a90a0;
+    font-family: inherit;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .show-all-btn:hover {
+    color: #2d3140;
+  }
+
+  /* "continue ▼" button injected after non-gating blocks (figures, code blocks, paragraphs) */
+  .scene-continue {
+    display: flex;
+    justify-content: center;
+    margin: 0.6em 0 1.4em;
+  }
+  .scene-continue button {
+    background: #f4f5f8;
+    border: 1.5px solid #c8ccd4;
+    border-bottom-width: 3px;
+    border-radius: 10px;
+    padding: 7px 18px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: #2d3140;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .scene-continue button:hover {
+    background: #e8ebf0;
+    border-color: #aab0bb;
+    transform: translateY(-2px);
+  }
+  .scene-continue button:active {
+    transform: translateY(0);
+    border-bottom-width: 1.5px;
+    margin-bottom: 1.5px;
+  }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+  html { background: #ffffff; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #222;
+    line-height: 1.55;
+    background: transparent;
+  }
+  main {
+    max-width: 720px;
+    margin: 2em auto;
+    padding: 0 1em 60vh;
+  }
+  h1 { font-size: 1.8em; margin: 0 0 0.2em; }
+  .page-title {
+    font-family: 'Boldonse', system-ui, sans-serif;
+    font-size: 2em;
+    margin: 0.3em 0 0.5em;
+  }
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 1.4em;
+    margin: 0.3em 0 1.2em;
+  }
+  .post-header .page-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .post-meta {
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+  }
+  .post-meta li {
+    font-size: 0.82rem;
+    color: #8a90a0;
+    letter-spacing: 0.02em;
+    line-height: 1.7;
+  }
+  .post-meta-author { color: #5e6675; }
+  .post-meta-author a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .post-meta-author a:hover {
+    color: #2d3140;
+    border-bottom-color: #2d3140;
+  }
+  .full-width {
+    display: block;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: none;
+    height: auto;
+  }
+  main img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.2em auto;
+  }
+  .fig1, .fig2, .fig-v1, .fig-v2, .fig-v3, .fig-v4, .fig-v5 { display: flow-root; }
+  pre { background: #f6f7fa; padding: 0.8em 1em; border-radius: 4px; overflow-x: auto; font-size: 0.9em; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  p > code { background: #f0f1f5; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+<main>
+<div class="post-header">
+<h1 class="page-title">On Planet Quantos, Programmers Flee</h1>
+<ul class="post-meta">
+<li class="post-meta-show-all"></li>
+<li class="post-meta-date">2026-05-12</li>
+<li class="post-meta-author">&copy; <a href="https://shukla.io">Nishant Shukla</a></li>
+</ul>
+</div>
+<div class="narrator">
+<p>They say the <strong>Ioni</strong> are social creatures living peacefully on planet <strong>Quantos</strong>.<br />
+You have been summoned by their health ministry.</p>
+</div>
+<div class="narrator">
+<p>It’s your first day on the job.</p>
+</div>
+<div class="dialog" data-resp="Umm..">
+<p>Hey, yea so, gonna head out early today. There’s a <strong>virus</strong> going around town. I’ll put you in charge of placing <strong>vaccine centers</strong>.<br />
+You got this, right?</p>
+</div>
+<div class="dialog" data-resp="Okay|I got this">
+<p>Just keep everyone alive.<br />
+Let me show you the controls.</p>
+</div>
+<div class="narrator">
+<p>The Ioni are very trusting.</p>
+</div>
+<div class="narrator">
+<p>You’re asked to place a limited number of vaccine centers to slow the spread.<br />
+<span class="c-infected">Red</span> = infected and may die (too late to be vaccinated).<br />
+<span class="c-susceptible">Gray</span> = susceptible (vaccinate them).<br />
+<span class="c-vaccinated">Green</span> = immune.<br />
+<span class="c-dead">X</span> = dead.<br />
+<strong>Ready?</strong></p>
+</div>
+<div class="fig1">
+
+</div>
+<div class="narrator">
+<p>The next day.</p>
+</div>
+<div class="dialog" data-resp="I tried my best!|You left me all by myself">
+<p>Morning, sorry I’m late.<br />
+<strong>Oh my…</strong><br />
+What did you do?!</p>
+</div>
+<div class="narrator">
+<p>You both enter through a door with a <strong>machine</strong> dominating the room in every feng shui way possible.</p>
+</div>
+<div class="dialog" data-resp="Yea|A little">
+<p>We can’t be placing these vaccine centers manually anymore.<br />
+Listen, can you code?</p>
+</div>
+<div class="narrator">
+<p>Your time to shine. <strong>LFG.</strong></p>
+</div>
+<div class="fig2">
+<p>Each cell is represented as a binary mask.<br />
+1 = valid (you can place here).<br />
+0 = invalid (not allowed).</p>
+</div>
+<div class="dialog" data-resp="We&#39;re implementing a rollout?|Like a simulator?">
+<p>We need your help writing an algorithm to place these vaccine centers.<br />
+Let’s start with a basic <strong>valid-move selector</strong> function.<br />
+Then we can compose it many times to simulate many moves ahead.</p>
+</div>
+<div class="dialog" data-resp="Easy peasy!|You mean, right now?">
+<p>Bingo! Take this keyboard. Write a function called <code>select</code>.<br />
+Supply it with a boolean array, and have it select the <code>n</code>-th true item.</p>
+</div>
+<div class="narrator">
+<p>There’s no tab-complete, and certainly no coding agent installed here.<br />
+Nervous, you wipe a drop of sweat before it’s spotted.</p>
+</div>
+<div class="narrator">
+<p>You somehow managed to implement the function.<br />
+It’s in a C-like language.</p>
+</div>
+<div class="fig-v1">
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> select<span class="op">(</span><span class="dt">const</span> <span class="dt">bool</span> <span class="op">*</span>valid<span class="op">,</span> <span class="dt">int</span> n_valid<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>count <span class="op">==</span> n<span class="op">)</span> <span class="cf">return</span> i<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>            count<span class="op">++;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="dialog" data-resp="Why not?|WTF?">
+<p>Very good!<br />
+But I can’t use this.</p>
+</div>
+<div class="dialog" data-resp="Like malloc?|You need a new machine...">
+<p>Quantos machines do not clean up after you.<br />
+You’d expect <code>count</code> to disappear when the function returns. Not here.<br />
+You need to <strong>manage</strong> it.</p>
+</div>
+<div class="narrator">
+<p>You squint at the code.<br />
+The keyboard clicker clackers loudly as you make your edits.</p>
+</div>
+<div class="fig-v2">
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> select<span class="op">(</span><span class="dt">const</span> <span class="dt">bool</span> <span class="op">*</span>valid<span class="op">,</span> <span class="dt">int</span> n_valid<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> <span class="op">*</span>count <span class="op">=</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">));</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> result <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(*</span>count <span class="op">==</span> n<span class="op">)</span> <span class="op">{</span> result <span class="op">=</span> i<span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="op">(*</span>count<span class="op">)++;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>count<span class="op">);</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="dialog" data-resp="I&#39;ll add more args|Dependency injection, huh?">
+<p>Smart, but there’s no <code>malloc</code> allowed; these machines are a bit finicky.<br />
+You see, we’ll need to supply every function with its own scratch buffer.<br />
+Heck, even <code>result</code> should be an arg.</p>
+</div>
+<div class="narrator">
+<p>“This is stupid,” you think to yourself.<br />
+But you’ve seen worse. You’ve done worse.</p>
+</div>
+<div class="fig-v3">
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> select<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>scratch<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>out<span class="op">,</span> <span class="dt">const</span> <span class="dt">bool</span> <span class="op">*</span>valid<span class="op">,</span> <span class="dt">int</span> n_valid<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>scratch <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>out <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(*</span>scratch <span class="op">==</span> n<span class="op">)</span> <span class="op">{</span> <span class="op">*</span>out <span class="op">=</span> i<span class="op">;</span> <span class="cf">break</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="op">(*</span>scratch<span class="op">)++;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="dialog" data-resp="...">
+<p>Oh, you know what… something doesn’t look right.</p>
+</div>
+<div class="dialog" data-resp="Mother f..">
+<p>The args must only be mutated by <strong>invertible</strong> operators, otherwise the machine will jam <span class="citation" data-cites="nielsen2010">(Nielsen and Chuang 2010)</span>.<br />
+Like, the inverse of <code>^</code> (XOR) is itself, so that’s safe to use. Not a big deal, I hope.</p>
+</div>
+<div class="narrator">
+<p>Baffled, you make the final edits.<br />
+You pull out the XOR trick <span class="citation" data-cites="bennett1973 toffoli1980">(Bennett 1973; Toffoli 1980)</span>.</p>
+</div>
+<div class="fig-v4">
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// caller: pre-load *out = n_valid (the not-found sentinel)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> select<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>scratch<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>out<span class="op">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>            <span class="dt">const</span> <span class="dt">bool</span> <span class="op">*</span>valid<span class="op">,</span> <span class="dt">int</span> n_valid<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> sentinel <span class="op">=</span> n_valid<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(*</span>scratch <span class="op">==</span> n<span class="op">)</span> <span class="op">*</span>out <span class="op">^=</span> <span class="op">(</span>i <span class="op">^</span> sentinel<span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="op">(*</span>scratch<span class="op">)++;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="dialog" data-resp="I don&#39;t get paid enough for this|What in the world are you smoking?">
+<p>Incredible! But one more thing…<br />
+All the <code>scratch</code> values need to be reset.</p>
+</div>
+<div class="narrator">
+<p>You decrement what you increment.</p>
+</div>
+<div class="fig-v5">
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// caller: pre-load *out = n_valid (the not-found sentinel)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> select<span class="op">(</span><span class="dt">int</span> <span class="op">*</span>scratch<span class="op">,</span> <span class="dt">int</span> <span class="op">*</span>out<span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>            <span class="dt">const</span> <span class="dt">bool</span> <span class="op">*</span>valid<span class="op">,</span> <span class="dt">int</span> n_valid<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> sentinel <span class="op">=</span> n_valid<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">{</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(*</span>scratch <span class="op">==</span> n<span class="op">)</span> <span class="op">*</span>out <span class="op">^=</span> <span class="op">(</span>i <span class="op">^</span> sentinel<span class="op">);</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="op">(*</span>scratch<span class="op">)++;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n_valid<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>valid<span class="op">[</span>i<span class="op">])</span> <span class="op">(*</span>scratch<span class="op">)--;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="dialog" data-resp="*flees the planet*">
+<p>This will do!<br />
+…<br />
+Hey! Where’d you go?</p>
+</div>
+<div class="narrator">
+<p>You’re on your way home, in thruster-to-thruster traffic on the Intergalactic-405.<br />
+With the spare time, you scribble what you remember:</p>
+<p><img src="rank-select-fig.png" /></p>
+</div>
+<p>For the full paper <span class="citation" data-cites="shukla2026qce">(Shukla 2026)</span>, please find the arXiv link: <a href="https://arxiv.org/abs/2604.25962v1">https://arxiv.org/abs/2604.25962v1</a>.</p>
+<h1 class="unnumbered" id="references">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bennett1973" class="csl-entry" role="listitem">
+Bennett, Charles H. 1973. <span>“Logical Reversibility of Computation.”</span> <em>IBM Journal of Research and Development</em> 17 (6): 525–32. <a href="https://doi.org/10.1147/rd.176.0525">https://doi.org/10.1147/rd.176.0525</a>.
+</div>
+<div id="ref-nielsen2010" class="csl-entry" role="listitem">
+Nielsen, Michael A., and Isaac L. Chuang. 2010. <em>Quantum Computation and Quantum Information: 10th Anniversary Edition</em>. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511976667">https://doi.org/10.1017/CBO9780511976667</a>.
+</div>
+<div id="ref-shukla2026qce" class="csl-entry" role="listitem">
+Shukla, Nishant. 2026. <span>“A Coherent Rollout Oracle for Branch-Dependent Planning.”</span> Pre-print, under review. arXiv:2604.25962. <a href="https://arxiv.org/abs/2604.25962v1">https://arxiv.org/abs/2604.25962v1</a>.
+</div>
+<div id="ref-toffoli1980" class="csl-entry" role="listitem">
+Toffoli, Tommaso. 1980. <span>“Reversible Computing.”</span> In <em>Automata, Languages and Programming</em>, 85:632–44. Lecture Notes in Computer Science. Springer. <a href="https://doi.org/10.1007/3-540-10003-2_104">https://doi.org/10.1007/3-540-10003-2_104</a>.
+</div>
+</div>
+</main>
+<script src="bg.js" defer></script>
+<script src="dialog.js" defer></script>
+<script src="sir-game.js" defer></script>
+<script src="fig2.js" defer></script>
+<script src="select-visuals.js" defer></script>
+<script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
+</body>
+</html>
