@@ -608,18 +608,40 @@
       else v++;
     }
 
+    // Narrow viewports get abbreviated labels and a smaller font so the
+    // bottom strip doesn't overflow into the right-aligned stations counter,
+    // and the end-of-epidemic banner doesn't crash into the top-right buttons.
+    const tight = W < 560;
+    const LABELS = tight
+      ? { susceptible: 'susc', infected: 'inf', recovered: 'rec', vaccinated: 'vacc', dead: 'dead' }
+      : { susceptible: 'susceptible', infected: 'infected', recovered: 'recovered', vaccinated: 'vaccinated', dead: 'dead' };
+    const HUD_FONT  = tight ? '11px ui-monospace, monospace' : '13px ui-monospace, monospace';
+    const HUD_GAP   = tight ? 10 : 18;
+    const HUD_PAD   = tight ? 8 : 12;
+
     // bottom HUD strip backdrop
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     ctx.fillRect(0, H - 30, W, 30);
 
-    ctx.font = '13px ui-monospace, monospace';
+    ctx.font = HUD_FONT;
     ctx.textBaseline = 'alphabetic';
-    let xOff = 12;
+
+    // Stations counter (right side of HUD) — measured first so we can clip
+    // the left-side stats to its left edge.
+    const counterText = tight
+      ? `${stations.size}/${STATION_BUDGET}`
+      : `stations  ${stations.size} / ${STATION_BUDGET}`;
+    const tw = ctx.measureText(counterText).width;
+    const counterX = W - tw - HUD_PAD;
+
+    let xOff = HUD_PAD;
     const drawStat = (label, n, color) => {
+      const text = `${LABELS[label]} ${n}`;
+      const w = ctx.measureText(text).width;
+      if (xOff + w > counterX - HUD_GAP) return;  // would crash into counter; skip
       ctx.fillStyle = color;
-      const text = `${label} ${n}`;
       ctx.fillText(text, xOff, H - 12);
-      xOff += ctx.measureText(text).width + 18;
+      xOff += w + HUD_GAP;
     };
     drawStat('susceptible', s, COLOR[S]);
     drawStat('infected',    i, COLOR[I]);
@@ -627,14 +649,11 @@
     drawStat('vaccinated',  v, COLOR[V]);
     drawStat('dead',        d, COLOR[D]);
 
-    // Stations counter (right side of HUD).
-    const counterText = `stations  ${stations.size} / ${STATION_BUDGET}`;
-    const tw = ctx.measureText(counterText).width;
     ctx.fillStyle = stationsLeft > 0 ? COLOR[V] : '#9aa3b0';
-    ctx.fillText(counterText, W - tw - 14, H - 12);
+    ctx.fillText(counterText, counterX, H - 12);
 
     if (i === 0) {
-      ctx.font = '13px ui-monospace, monospace';
+      ctx.font = HUD_FONT;
       const endStats = [
         ['susceptible', s, COLOR[S]],
         ['recovered',   r, COLOR[R]],
@@ -642,24 +661,27 @@
         ['dead',        d, COLOR[D]],
       ];
       const items = endStats.map(([label, n, c]) => {
-        const text = `${label} ${n}`;
+        const text = `${LABELS[label]} ${n}`;
         return { text, color: c, w: ctx.measureText(text).width };
       });
-      const totalW = items.reduce((a, it) => a + it.w, 0) + (items.length - 1) * 18;
-      const bw = Math.max(440, totalW + 60);
+      const totalW = items.reduce((a, it) => a + it.w, 0) + (items.length - 1) * HUD_GAP;
+      // Banner sits below the top-row buttons (which end at y≈40) on narrow
+      // viewports so it doesn't get occluded by the pause/reset buttons.
+      const bannerY = tight ? 46 : 6;
+      const bw = Math.min(W - 16, Math.max(tight ? 240 : 440, totalW + 60));
       ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-      ctx.fillRect(W / 2 - bw / 2, 6, bw, 44);
-      ctx.font = '14px ui-monospace, monospace';
+      ctx.fillRect(W / 2 - bw / 2, bannerY, bw, 44);
+      ctx.font = tight ? '12px ui-monospace, monospace' : '14px ui-monospace, monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#3aa655';
-      ctx.fillText('epidemic over', W / 2, 24);
-      ctx.font = '13px ui-monospace, monospace';
+      ctx.fillText('epidemic over', W / 2, bannerY + 18);
+      ctx.font = HUD_FONT;
       ctx.textAlign = 'left';
       let xs = W / 2 - totalW / 2;
       for (const it of items) {
         ctx.fillStyle = it.color;
-        ctx.fillText(it.text, xs, 42);
-        xs += it.w + 18;
+        ctx.fillText(it.text, xs, bannerY + 36);
+        xs += it.w + HUD_GAP;
       }
     }
 

@@ -55,7 +55,7 @@ What did you do?!
 :::
 
 :::narrator
-You both enter through a door with a **machine** dominating the room in every feng shui way possible.
+You both enter through a door into a room with a machine dominating the space in every feng shui way possible.
 :::
 
 ::: {.dialog data-resp="Yea|A little"}
