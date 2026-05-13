@@ -49,7 +49,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Ubuntu:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
 <style>
   pre > code.sourceCode { white-space: pre; position: relative; }
@@ -340,7 +340,7 @@
   html, body { margin: 0; padding: 0; overflow-x: hidden; }
   html { background: #ffffff; }
   body {
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: 'Ubuntu', system-ui, -apple-system, "Segoe UI", sans-serif;
     color: #222;
     line-height: 1.55;
     background: transparent;
@@ -406,7 +406,7 @@
     margin: 1.2em auto;
   }
   .fig1, .fig2, .fig-v1, .fig-v2, .fig-v3, .fig-v4, .fig-v5 { display: flow-root; }
-  pre { overflow-x: auto; font-size: 0.9em; }
+  pre { overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   p > code { background: #f0f1f5; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.92em; }
 
@@ -494,7 +494,7 @@ Let me show you the controls.</p>
 </div>
 <div class="dialog" data-resp="I tried my best!|You left me all by myself">
 <p>Morning, sorry I’m late.<br />
-<strong>Oh my…</strong> {{vaccinated}} saved, {{dead}} dead.<br />
+<strong>Oh my…</strong><br />
 What did you do?!</p>
 </div>
 <div class="narrator">
@@ -641,20 +641,25 @@ All the <code>scratch</code> values need to be reset.</p>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="dialog" data-resp="Hold on... is this a quantum computer?|*flees the planet*">
-<p>Boo-yea baby! That’s the rank-select primitive.<br />
+<p>Boo-yea baby! That’s the <strong>rank-select</strong> primitive.<br />
 We’ve been stuck on it for ten years.<br />
 Anyway. Ready for the next algorithm?<br />
-Let’s implement the state-transition function.</p>
+Let’s implement the <strong>state-transition</strong> function.</p>
+</div>
+<div class="narrator">
+<p>You eye the exit. Now’s your chance.</p>
 </div>
 <div class="dialog" data-resp="">
 <p>First we’ll need a fresh scratch register, then…<br />
-Huh. Must’ve stepped out for a bit. I’ll wait.</p>
+<strong>Huh.</strong><br />
+Must’ve stepped out for a bit. I’ll wait.</p>
 </div>
 <div class="narrator">
 <p>You’re on your way home, in thruster-to-thruster traffic on the Intergalactic-405.<br />
 With the spare time, you scribble what you remember:</p>
 <p><img src="rank-select-fig.png" alt="Gate-level circuit diagram of the rank-select primitive: a controlled-XOR cascade gated on a unary-encoded counter register, with an uncompute pass that restores the counter to zero." /></p>
-<p>Back on Earth, you write it up properly: <a href="https://arxiv.org/abs/2604.25962v1">arXiv preprint</a> <span class="citation" data-cites="shukla2026qce">(Shukla 2026)</span>.</p>
+<p>Back on Earth, you write up the paper: <a href="https://arxiv.org/abs/2604.25962v1">arXiv preprint</a> <span class="citation" data-cites="shukla2026qce">(Shukla 2026)</span>. Then a blog post.</p>
+<p>You’re reading it now.</p>
 </div>
 <h2 class="unnumbered" id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">

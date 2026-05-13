@@ -50,7 +50,7 @@ The next day.
 
 ::: {.dialog data-resp="I tried my best!|You left me all by myself"}
 Morning, sorry I'm late.
-**Oh my...** {{vaccinated}} saved, {{dead}} dead.
+**Oh my...**
 What did you do?!
 :::
 
@@ -237,15 +237,20 @@ void select(int *scratch, int *out,
 :::
 
 ::: {.dialog data-resp="Hold on... is this a quantum computer?|*flees the planet*"}
-Boo-yea baby! That's the rank-select primitive.
+Boo-yea baby! That's the **rank-select** primitive.
 We've been stuck on it for ten years.
 Anyway. Ready for the next algorithm?
-Let's implement the state-transition function.
+Let's implement the **state-transition** function.
+:::
+
+:::narrator
+You eye the exit. Now's your chance.
 :::
 
 ::: {.dialog data-resp=""}
 First we'll need a fresh scratch register, then...
-Huh. Must've stepped out for a bit. I'll wait.
+**Huh.**
+Must've stepped out for a bit. I'll wait.
 :::
 
 
@@ -255,7 +260,9 @@ With the spare time, you scribble what you remember:
 
 ![Gate-level circuit diagram of the rank-select primitive: a controlled-XOR cascade gated on a unary-encoded counter register, with an uncompute pass that restores the counter to zero.](rank-select-fig.png)
 
-Back on Earth, you write it up properly: [arXiv preprint](https://arxiv.org/abs/2604.25962v1) [@shukla2026qce].
+Back on Earth, you write up the paper: [arXiv preprint](https://arxiv.org/abs/2604.25962v1) [@shukla2026qce]. Then a blog post.
+
+You're reading it now.
 :::
 
 
