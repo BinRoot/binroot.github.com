@@ -106,6 +106,8 @@
   }
 
   function simulateV4(valid, n) {
+    // V4: reversible output only (no uncompute). Scratch is left dirty.
+    // Line numbering accounts for the `// caller: ...` comment as line 1.
     const steps = [];
     const sentinel = valid.length;
     let scratch = 0;            // caller, init 0
@@ -124,32 +126,71 @@
         activeBit,
       });
 
-    snap(1, [], `valid=[${valid.map(b => b ? 1 : 0).join(',')}], n=${n}`);
-    snap(3, [], `sentinel = ${sentinel}`);
-    // Forward pass
+    snap(2, [], `valid=[${valid.map(b => b ? 1 : 0).join(',')}], n=${n}`);
+    snap(4, [], `sentinel = ${sentinel}`);
     for (let it = 0; it < valid.length; it++) {
-      i = it; snap(5, ['i'], `i = ${it}`, it);
-      snap(6, ['i'], `valid[${it}] = ${valid[it] ? 1 : 0}`, it);
+      i = it; snap(6, ['i'], `i = ${it}`, it);
+      snap(7, ['i'], `valid[${it}] = ${valid[it] ? 1 : 0}`, it);
       if (valid[it]) {
-        snap(7, ['scratch'], `*scratch = ${scratch}, n = ${n}`, it);
+        snap(8, ['scratch'], `*scratch = ${scratch}, n = ${n}`, it);
         if (scratch === n) {
           out ^= (it ^ sentinel);
-          snap(7, ['out'], `*out ^= ${it}^${sentinel} → ${fmtOut(out)}`, it);
+          snap(8, ['out'], `*out ^= ${it}^${sentinel} → ${fmtOut(out)}`, it);
         }
         scratch++;
-        snap(8, ['scratch'], `*scratch = ${scratch}`, it);
+        snap(9, ['scratch'], `*scratch = ${scratch}`, it);
+      }
+    }
+    snap(12, [], `*scratch = ${scratch} (left dirty), *out = ${fmtOut(out)}`);
+    return steps;
+  }
+
+  function simulateV5(valid, n) {
+    // V5: V4 + uncompute pass to restore *scratch to 0.
+    const steps = [];
+    const sentinel = valid.length;
+    let scratch = 0;
+    let out = sentinel;
+    let i = '?';
+    const fmtOut = (v) => v === sentinel ? `N(${sentinel})` : v;
+    const snap = (line, active = [], note = '', activeBit) =>
+      steps.push({
+        line,
+        mem: {
+          stack: { i },
+          caller: { scratch, out: fmtOut(out) },
+        },
+        active,
+        note,
+        activeBit,
+      });
+
+    snap(2, [], `valid=[${valid.map(b => b ? 1 : 0).join(',')}], n=${n}`);
+    snap(4, [], `sentinel = ${sentinel}`);
+    // Forward pass
+    for (let it = 0; it < valid.length; it++) {
+      i = it; snap(6, ['i'], `i = ${it}`, it);
+      snap(7, ['i'], `valid[${it}] = ${valid[it] ? 1 : 0}`, it);
+      if (valid[it]) {
+        snap(8, ['scratch'], `*scratch = ${scratch}, n = ${n}`, it);
+        if (scratch === n) {
+          out ^= (it ^ sentinel);
+          snap(8, ['out'], `*out ^= ${it}^${sentinel} → ${fmtOut(out)}`, it);
+        }
+        scratch++;
+        snap(9, ['scratch'], `*scratch = ${scratch}`, it);
       }
     }
     // Uncompute pass
     for (let it = 0; it < valid.length; it++) {
-      i = it; snap(12, ['i'], `i = ${it} (uncompute)`, it);
-      snap(13, ['i'], `valid[${it}] = ${valid[it] ? 1 : 0}`, it);
+      i = it; snap(13, ['i'], `i = ${it} (uncompute)`, it);
+      snap(14, ['i'], `valid[${it}] = ${valid[it] ? 1 : 0}`, it);
       if (valid[it]) {
         scratch--;
-        snap(13, ['scratch'], `*scratch = ${scratch}`, it);
+        snap(14, ['scratch'], `*scratch = ${scratch}`, it);
       }
     }
-    snap(15, [], `*scratch = ${scratch}, *out = ${fmtOut(out)}`);
+    snap(16, [], `*scratch = ${scratch}, *out = ${fmtOut(out)}`);
     return steps;
   }
 
@@ -440,6 +481,7 @@
     { cls: 'fig-v2', simulate: simulateV2 },
     { cls: 'fig-v3', simulate: simulateV3 },
     { cls: 'fig-v4', simulate: simulateV4 },
+    { cls: 'fig-v5', simulate: simulateV5 },
   ];
 
   FIGURES.forEach(f => {

@@ -344,9 +344,32 @@ $if(math)$$math$$endif$
     margin: 1.2em auto;
   }
   .fig1, .fig2, .fig-v1, .fig-v2, .fig-v3, .fig-v4, .fig-v5 { display: flow-root; }
-  pre { background: #f6f7fa; padding: 0.8em 1em; border-radius: 4px; overflow-x: auto; font-size: 0.9em; }
+  pre { overflow-x: auto; font-size: 0.9em; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   p > code { background: #f0f1f5; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.92em; }
+
+  /* Post footer: social icons mirroring the site's blog index. */
+  .post-footer {
+    text-align: center;
+    margin: 4em 0 0;
+    padding-top: 2em;
+    border-top: 1px solid #e2e5ea;
+  }
+  .post-footer-icons {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+  }
+  .post-footer-icons a {
+    color: #6b7380;
+    font-size: 22px;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .post-footer-icons a:hover {
+    color: #2d3140;
+    transform: translateY(-2px);
+  }
 
   /* Bibliography: hanging indent so continuation lines of one entry don't
      look the same as the first line of the next, plus a thin divider
@@ -376,7 +399,15 @@ $if(author)$<li class="post-meta-author">&copy; <a href="https://shukla.io">$for
 </ul>
 </div>
 $body$
+<footer class="post-footer">
+<div class="post-footer-icons">
+<a href="https://github.com/binroot" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+<a href="https://www.linkedin.com/in/shuklanx/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+<a href="mailto:nishant@shukla.io" aria-label="Email"><i class="fas fa-envelope-open-text"></i></a>
+</div>
+</footer>
 </main>
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 <script src="bg.js" defer></script>
 <script src="dialog.js" defer></script>
 <script src="sir-game.js" defer></script>

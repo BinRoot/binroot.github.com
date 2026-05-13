@@ -17,7 +17,7 @@
 <meta property="og:description" content="An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.">
 <meta property="og:url" content="https://shukla.io/blog/2026-05/rank-select.html">
 <meta property="og:image" content="https://shukla.io/blog/2026-05/rank-select-fig.png">
-<meta property="article:published_time" content="2026-05-12">
+<meta property="article:published_time" content="2026-05-13">
 <meta property="article:author" content="Nishant Shukla">
 
 <!-- Twitter Card -->
@@ -32,7 +32,7 @@
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "headline": "On Planet Quantos, Programmers Flee",
-  "datePublished": "2026-05-12",
+  "datePublished": "2026-05-13",
   "author": {
     "@type": "Person",
     "name": "Nishant Shukla",
@@ -406,9 +406,32 @@
     margin: 1.2em auto;
   }
   .fig1, .fig2, .fig-v1, .fig-v2, .fig-v3, .fig-v4, .fig-v5 { display: flow-root; }
-  pre { background: #f6f7fa; padding: 0.8em 1em; border-radius: 4px; overflow-x: auto; font-size: 0.9em; }
+  pre { overflow-x: auto; font-size: 0.9em; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   p > code { background: #f0f1f5; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.92em; }
+
+  /* Post footer: social icons mirroring the site's blog index. */
+  .post-footer {
+    text-align: center;
+    margin: 4em 0 0;
+    padding-top: 2em;
+    border-top: 1px solid #e2e5ea;
+  }
+  .post-footer-icons {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+  }
+  .post-footer-icons a {
+    color: #6b7380;
+    font-size: 22px;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .post-footer-icons a:hover {
+    color: #2d3140;
+    transform: translateY(-2px);
+  }
 
   /* Bibliography: hanging indent so continuation lines of one entry don't
      look the same as the first line of the next, plus a thin divider
@@ -433,7 +456,7 @@
 <h1 class="page-title">On Planet Quantos, Programmers Flee</h1>
 <ul class="post-meta">
 <li class="post-meta-show-all"></li>
-<li class="post-meta-date">2026-05-12</li>
+<li class="post-meta-date">2026-05-13</li>
 <li class="post-meta-author">&copy; <a href="https://shukla.io">Nishant Shukla</a></li>
 </ul>
 </div>
@@ -471,7 +494,7 @@ Let me show you the controls.</p>
 </div>
 <div class="dialog" data-resp="I tried my best!|You left me all by myself">
 <p>Morning, sorry I’m late.<br />
-<strong>Oh my…</strong><br />
+<strong>Oh my…</strong> {{vaccinated}} saved, {{dead}} dead.<br />
 What did you do?!</p>
 </div>
 <div class="narrator">
@@ -617,18 +640,23 @@ All the <code>scratch</code> values need to be reset.</p>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </div>
-<div class="dialog" data-resp="*flees the planet*">
-<p>This will do!<br />
-…<br />
-Hey! Where’d you go?</p>
+<div class="dialog" data-resp="Hold on... is this a quantum computer?|*flees the planet*">
+<p>Boo-yea baby! That’s the rank-select primitive.<br />
+We’ve been stuck on it for ten years.<br />
+Anyway. Ready for the next algorithm?<br />
+Let’s implement the state-transition function.</p>
+</div>
+<div class="dialog" data-resp="">
+<p>First we’ll need a fresh scratch register, then…<br />
+Huh. Must’ve stepped out for a bit. I’ll wait.</p>
 </div>
 <div class="narrator">
 <p>You’re on your way home, in thruster-to-thruster traffic on the Intergalactic-405.<br />
 With the spare time, you scribble what you remember:</p>
-<p><img src="rank-select-fig.png" /></p>
+<p><img src="rank-select-fig.png" alt="Gate-level circuit diagram of the rank-select primitive: a controlled-XOR cascade gated on a unary-encoded counter register, with an uncompute pass that restores the counter to zero." /></p>
+<p>Back on Earth, you write it up properly: <a href="https://arxiv.org/abs/2604.25962v1">arXiv preprint</a> <span class="citation" data-cites="shukla2026qce">(Shukla 2026)</span>.</p>
 </div>
-<p>For the full paper <span class="citation" data-cites="shukla2026qce">(Shukla 2026)</span>, please find the arXiv link: <a href="https://arxiv.org/abs/2604.25962v1">https://arxiv.org/abs/2604.25962v1</a>.</p>
-<h1 class="unnumbered" id="references">References</h1>
+<h2 class="unnumbered" id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-bennett1973" class="csl-entry" role="listitem">
 Bennett, Charles H. 1973. <span>“Logical Reversibility of Computation.”</span> <em>IBM Journal of Research and Development</em> 17 (6): 525–32. <a href="https://doi.org/10.1147/rd.176.0525">https://doi.org/10.1147/rd.176.0525</a>.
@@ -643,7 +671,15 @@ Shukla, Nishant. 2026. <span>“A Coherent Rollout Oracle for Branch-Dependent P
 Toffoli, Tommaso. 1980. <span>“Reversible Computing.”</span> In <em>Automata, Languages and Programming</em>, 85:632–44. Lecture Notes in Computer Science. Springer. <a href="https://doi.org/10.1007/3-540-10003-2_104">https://doi.org/10.1007/3-540-10003-2_104</a>.
 </div>
 </div>
+<footer class="post-footer">
+<div class="post-footer-icons">
+<a href="https://github.com/binroot" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+<a href="https://www.linkedin.com/in/shuklanx/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+<a href="mailto:nishant@shukla.io" aria-label="Email"><i class="fas fa-envelope-open-text"></i></a>
+</div>
+</footer>
 </main>
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 <script src="bg.js" defer></script>
 <script src="dialog.js" defer></script>
 <script src="sir-game.js" defer></script>

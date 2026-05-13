@@ -22,6 +22,29 @@ body {
     margin: 5px;
 }
 
+/* Notification badge on the blog link: a small red dot that pulses
+   to signal there are new posts the visitor hasn't read. */
+.social-icon.has-pulse {
+    position: relative;
+}
+.pulse-dot {
+    position: absolute;
+    top: 3px;
+    right: 0;
+    width: 7px;
+    height: 7px;
+    background: #5b8ed4;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(91, 142, 212, 0.45);
+    animation: pulse-dot 2.6s ease-out infinite;
+    pointer-events: none;
+}
+@keyframes pulse-dot {
+    0%   { box-shadow: 0 0 0 0   rgba(91, 142, 212, 0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(91, 142, 212, 0); }
+    100% { box-shadow: 0 0 0 0   rgba(91, 142, 212, 0); }
+}
+
 .multiple-shadows {
     box-shadow:
         0 20px 30px -15px rgba(0,0,0,0.5),
@@ -49,7 +72,7 @@ body {
 
 .parallelogram {
     width: 85%;
-    height: 90%;
+    height: 110%;
     margin-left: 0.7em;
     z-index: -1;
     position: absolute;

@@ -1,6 +1,6 @@
 ---
 title: On Planet Quantos, Programmers Flee
-date: 2026-05-12
+date: 2026-05-13
 author: Nishant Shukla
 description: An interactive story about porting a classical rank-select function to a reversible (quantum-oracle-style) form. Step through five C implementations, each adding one constraint from the world of unitary computation.
 keywords: reversible computing, quantum oracle, rank-select, uncomputation, XOR trick, Bennett, Toffoli, quantum computing, ancilla, calling convention
@@ -50,7 +50,7 @@ The next day.
 
 ::: {.dialog data-resp="I tried my best!|You left me all by myself"}
 Morning, sorry I'm late.
-**Oh my...**
+**Oh my...** {{vaccinated}} saved, {{dead}} dead.
 What did you do?!
 :::
 
@@ -236,22 +236,28 @@ void select(int *scratch, int *out,
 ```
 :::
 
-::: {.dialog data-resp="*flees the planet*"}
-This will do!
-...
-Hey! Where'd you go?
+::: {.dialog data-resp="Hold on... is this a quantum computer?|*flees the planet*"}
+Boo-yea baby! That's the rank-select primitive.
+We've been stuck on it for ten years.
+Anyway. Ready for the next algorithm?
+Let's implement the state-transition function.
+:::
+
+::: {.dialog data-resp=""}
+First we'll need a fresh scratch register, then...
+Huh. Must've stepped out for a bit. I'll wait.
 :::
 
 
 :::narrator
 You're on your way home, in thruster-to-thruster traffic on the Intergalactic-405.
-With the spare time, you scribble what you remember: 
+With the spare time, you scribble what you remember:
 
-![](rank-select-fig.png)
+![Gate-level circuit diagram of the rank-select primitive: a controlled-XOR cascade gated on a unary-encoded counter register, with an uncompute pass that restores the counter to zero.](rank-select-fig.png)
+
+Back on Earth, you write it up properly: [arXiv preprint](https://arxiv.org/abs/2604.25962v1) [@shukla2026qce].
 :::
 
-For the full paper [@shukla2026qce], please find the arXiv link: [https://arxiv.org/abs/2604.25962v1](https://arxiv.org/abs/2604.25962v1).
 
 
-
-# References
+## References

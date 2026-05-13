@@ -38,6 +38,30 @@
       data-utcoffset="-7"
       defer
     ></script>
+    <script>
+      // Tag any post-card whose data-date is within 30 days as new.
+      // Runs after DOM is parsed so the badges land on first paint.
+      document.addEventListener('DOMContentLoaded', () => {
+        const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+        const now = Date.now();
+        document.querySelectorAll('.post-card[data-date]').forEach(card => {
+          const posted = new Date(card.dataset.date).getTime();
+          const age = now - posted;
+          // Treat the window as [-1 day, +30 days] so a future-dated post
+          // (publishing tomorrow due to timezone) still gets the badge.
+          if (age >= -1 * 24 * 60 * 60 * 1000 && age < THIRTY_DAYS) {
+            const title = card.querySelector('.post-title');
+            if (title) {
+              const badge = document.createElement('span');
+              badge.className = 'post-new-badge';
+              badge.textContent = 'new';
+              title.appendChild(document.createTextNode(' '));
+              title.appendChild(badge);
+            }
+          }
+        });
+      });
+    </script>
   </head>
   <body class="blog-shell">
     <section class="section blog-main">
@@ -57,33 +81,51 @@
 
             <h1 class="title mb-5">Blog</h1>
 
-            <a class="post-card" href="2026-05/rank-select.html">
-              <span class="post-title">On Planet Quantos, Programmers Flee</span>
+            <a class="post-card" href="2026-05/rank-select.html" data-date="2026-05-13">
+              <span class="post-main">
+                <span class="post-title">On Planet Quantos, Programmers Flee</span>
+                <span class="post-desc">The quantum rank-select primitive, described through an interactive story.</span>
+              </span>
               <span class="post-date">May 2026</span>
             </a>
 
-            <a class="post-card" href="2026-04/b01t.html">
-              <span class="post-title">Entangled Spaghetti Code</span>
+            <a class="post-card" href="2026-04/b01t.html" data-date="2026-04-13">
+              <span class="post-main">
+                <span class="post-title">Entangled Spaghetti Code</span>
+                <span class="post-desc">Quantum computing has its own class of bugs. b01t is a Python DSL that catches them at build time.</span>
+              </span>
               <span class="post-date">April 2026</span>
             </a>
 
-            <a class="post-card" href="2026-03/sway.html">
-              <span class="post-title">Game of Sway</span>
+            <a class="post-card" href="2026-03/sway.html" data-date="2026-03-15">
+              <span class="post-main">
+                <span class="post-title">Game of Sway</span>
+                <span class="post-desc">Quantum computing for the whole family!</span>
+              </span>
               <span class="post-date">March 2026</span>
             </a>
 
-            <a class="post-card" href="2026-02/grammar.html">
-              <span class="post-title">Grammar models are back, baby!</span>
+            <a class="post-card" href="2026-02/grammar.html" data-date="2026-02-03">
+              <span class="post-main">
+                <span class="post-title">Grammar models are back, baby!</span>
+                <span class="post-desc">A framework for grammar generation, inference, and scoring with applications to MCTS and grammar synthesis.</span>
+              </span>
               <span class="post-date">February 2026</span>
             </a>
 
-            <a class="post-card" href="2026-01/nano-gov.html">
-              <span class="post-title">Nano Governments</span>
+            <a class="post-card" href="2026-01/nano-gov.html" data-date="2026-01-11">
+              <span class="post-main">
+                <span class="post-title">Nano Governments</span>
+                <span class="post-desc">Mathematical formulations of nanoscale governments.</span>
+              </span>
               <span class="post-date">January 2026</span>
             </a>
 
-            <a class="post-card" href="2021-11/algebra-notes.html">
-              <span class="post-title">Algebra Notes</span>
+            <a class="post-card" href="2021-11/algebra-notes.html" data-date="2021-11-12">
+              <span class="post-main">
+                <span class="post-title">Algebra Notes</span>
+                <span class="post-desc">Diabolical charades of algebra.</span>
+              </span>
               <span class="post-date">November 2021</span>
             </a>
           </div>

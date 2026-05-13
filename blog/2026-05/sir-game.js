@@ -715,6 +715,14 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
     }
+
+    // Publish live tallies to the host's dataset so dialog.js can substitute
+    // {{vaccinated}}, {{dead}}, etc. into subsequent dialog blocks.
+    host.dataset.susceptible = s;
+    host.dataset.infected    = i;
+    host.dataset.recovered   = r;
+    host.dataset.vaccinated  = v;
+    host.dataset.dead        = d;
   }
 
   // ---- loop ----

@@ -47,6 +47,23 @@
   // response options reveal into this buffer without forcing another scroll.
   const SCROLL_BUFFER = 140;
 
+  // Track active user scrolling so the auto-follow doesn't fight the reader
+  // when they scroll up/back during typing. The flag clears 1.2s after the
+  // last user input so auto-follow can resume.
+  let userScrolling = false;
+  let userScrollTimer = null;
+  function markUserScroll() {
+    userScrolling = true;
+    clearTimeout(userScrollTimer);
+    userScrollTimer = setTimeout(() => { userScrolling = false; }, 1200);
+  }
+  window.addEventListener('wheel',     markUserScroll, { passive: true });
+  window.addEventListener('touchmove', markUserScroll, { passive: true });
+  window.addEventListener('keydown', (e) => {
+    const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+    if (scrollKeys.includes(e.key)) markUserScroll();
+  }, { passive: true });
+
   function followScroll(el) {
     // Smoothly scroll the element into view, keeping SCROLL_BUFFER of empty
     // space below it. Only scrolls *down* — never yanks back upward.
@@ -62,6 +79,8 @@
 
   function followScrollSnap(el) {
     // Instant variant — keeps content in view during typing without smooth-scroll lag.
+    // Skipped while the user is actively scrolling so we don't snap them back.
+    if (userScrolling) return;
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight;
     const overshoot = rect.bottom - (vh - SCROLL_BUFFER);
@@ -188,12 +207,32 @@
     followScroll(wrap);
   }
 
+  // Live tokens like {{vaccinated}} are substituted from the SIR game's
+  // current tallies, which sir-game.js publishes onto .fig1's dataset on
+  // every render. Substitution happens before typing so per-character spans
+  // wrap the final numbers, not the placeholder.
+  function substituteTokens(root) {
+    const fig1 = document.querySelector('.fig1');
+    const ds = fig1 ? fig1.dataset : {};
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const targets = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.includes('{{')) targets.push(node);
+    }
+    for (const n of targets) {
+      n.textContent = n.textContent.replace(/\{\{(\w+)\}\}/g, (m, key) =>
+        ds[key] !== undefined ? ds[key] : m);
+    }
+  }
+
   // ---- Layout-stable typing animation ----
   // Replace every text node with per-character spans set to visibility:hidden.
   // The full layout is computed up front (at final size), so revealing
   // characters one at a time doesn't reflow the bubble. This keeps centered
   // text (narrator) from shifting horizontally as it grows.
   function startTyping(root, onDone) {
+    substituteTokens(root);
     const items = [];
 
     function collect(node) {
