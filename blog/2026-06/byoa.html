@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bring-Your-Own-Agent | Nishant Shukla</title>
+
+<!-- SEO: descriptive meta -->
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="description" content="A no-backend trick where a static webpage borrows your local coding agent (Claude Code, Codex, or whatever you run) over a localhost WebSocket. Spotsocket is a Bring-Your-Own-Agent approach, compared here against MCP, CLIs, SKILL.md, and WebMCP.">
+<meta name="keywords" content="Bring-Your-Own-Agent, BYOA, spotsocket, coding agent, Claude Code, Codex, MCP, SKILL.md, WebMCP, localhost WebSocket, AI agents, agentic web, no backend">
+<meta name="author" content="Nishant Shukla">
+<link rel="canonical" href="https://shukla.io/blog/2026-06/byoa.html">
+<link rel="alternate" type="application/rss+xml" title="Nishant Shukla - Blog" href="https://shukla.io/blog/rss.xml">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Nishant Shukla">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Bring-Your-Own-Agent">
+<meta property="og:description" content="A no-backend trick where a static webpage borrows your local coding agent (Claude Code, Codex, or whatever you run) over a localhost WebSocket. Spotsocket is a Bring-Your-Own-Agent approach, compared here against MCP, CLIs, SKILL.md, and WebMCP.">
+<meta property="og:url" content="https://shukla.io/blog/2026-06/byoa.html">
+
+<meta property="article:published_time" content="2026-06-15">
+<meta property="article:modified_time" content="2026-06-15">
+<meta property="article:author" content="Nishant Shukla">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bring-Your-Own-Agent">
+<meta name="twitter:description" content="A no-backend trick where a static webpage borrows your local coding agent (Claude Code, Codex, or whatever you run) over a localhost WebSocket. Spotsocket is a Bring-Your-Own-Agent approach, compared here against MCP, CLIs, SKILL.md, and WebMCP.">
+
+
+<!-- JSON-LD structured data (schema.org BlogPosting) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bring-Your-Own-Agent",
+  "inLanguage": "en",
+  "url": "https://shukla.io/blog/2026-06/byoa.html",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shukla.io/blog/2026-06/byoa.html"
+  },
+  "description": "A no-backend trick where a static webpage borrows your local coding agent (Claude Code, Codex, or whatever you run) over a localhost WebSocket. Spotsocket is a Bring-Your-Own-Agent approach, compared here against MCP, CLIs, SKILL.md, and WebMCP.",
+  "keywords": "Bring-Your-Own-Agent, BYOA, spotsocket, coding agent, Claude Code, Codex, MCP, SKILL.md, WebMCP, localhost WebSocket, AI agents, agentic web, no backend",
+  "datePublished": "2026-06-15",
+  "dateModified": "2026-06-15",
+  "author": {
+    "@type": "Person",
+    "name": "Nishant Shukla",
+    "url": "https://shukla.io",
+    "sameAs": [
+      "https://github.com/binroot",
+      "https://www.linkedin.com/in/shuklanx/"
+    ]
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Nishant Shukla",
+    "url": "https://shukla.io"
+  }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Dosis:wght@400;600;700;800&family=Ubuntu:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+  
+  code span.co { color: #5a6470; }
+  pre.sourceCode code > span.vs-active-line {
+    background: #fff3a8;
+    box-shadow: -3px 0 0 #d4ad00;
+  }
+  pre.sourceCode .vs-note {
+    color: #9aa0aa;
+    font-style: italic;
+    font-weight: 400;
+    user-select: none;
+  }
+
+  /* ---- Dialog / narrator ---- */
+  .dialog, .narrator {
+    margin: 1.4em auto;
+    max-width: 600px;
+  }
+
+  .dialog {
+    position: relative;
+    background: #ffffff;
+    border: 1.5px solid #c8ccd4;
+    border-radius: 14px;
+    padding: 14px 18px 16px;
+    box-shadow: 0 2px 8px rgba(60, 70, 90, 0.08);
+    color: #2d3140;
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+  .dialog::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: -10px;
+    width: 18px; height: 18px;
+    background: #ffffff;
+    border-top: 1.5px solid #c8ccd4;
+    border-left: 1.5px solid #c8ccd4;
+    transform: rotate(45deg);
+  }
+  .dialog p { margin: 0; }
+
+  /* Continuation bubble: same speaker, pipe instead of an arrow. */
+  .dialog-continuation {
+    margin-top: 22px;
+  }
+  .dialog-continuation::before {
+    left: 31px;
+    top: -22px;
+    width: 4px;
+    height: 22px;
+    background: #c8ccd4;
+    border: none;
+    transform: none;
+    border-radius: 2px;
+  }
+
+  .dialog-cursor {
+    display: inline-block;
+    width: 0.5em; height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: #c8ccd4;
+    border-radius: 1px;
+    animation: dialog-blink 0.85s steps(2, end) infinite;
+  }
+  @keyframes dialog-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  .dialog-arrow {
+    display: inline-block;
+    margin-left: 6px;
+    color: #6b7380;
+    animation: dialog-bounce 1.1s ease-in-out infinite;
+    cursor: pointer;
+    user-select: none;
+  }
+  @keyframes dialog-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+  }
+
+  .dialog-responses {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .dialog-responses button {
+    background: #f4f5f8;
+    border: 1.5px solid #c8ccd4;
+    border-bottom-width: 3px;
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: #2d3140;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .dialog-responses button:hover {
+    background: #e8ebf0;
+    border-color: #aab0bb;
+    transform: translateY(-2px);
+  }
+  .dialog-responses button:active {
+    transform: translateY(0);
+    border-bottom-width: 1.5px;
+    margin-bottom: 1.5px;
+  }
+  .dialog-chosen {
+    margin-top: 10px;
+    color: #7a8090;
+    font-style: italic;
+    font-size: 0.9em;
+  }
+
+  /* Narrator + fig caption prose: italic, centred, with a white text-halo
+     so the words stay readable over the WebGL wave background. The halo
+     uses text-shadow, which follows the glyph shape and is suppressed
+     along with the character when its <span> is visibility:hidden — so
+     the highlight grows with the typing animation, never foreshadows it,
+     and never clips into neighbouring italic glyphs. */
+  .narrator,
+  .fig1 p, .fig2 p,
+  .fig-v1 p, .fig-v2 p, .fig-v3 p, .fig-v4 p, .fig-v5 p {
+    text-shadow:
+      -1px -1px 0 #fff,
+       1px -1px 0 #fff,
+      -1px  1px 0 #fff,
+       1px  1px 0 #fff,
+       0    0   8px rgba(255, 255, 255, 0.9),
+       0    0   8px rgba(255, 255, 255, 0.9),
+       0    0   4px rgba(255, 255, 255, 0.9);
+  }
+
+  .narrator {
+    text-align: center;
+    font-style: italic;
+    color: #2d3140;
+    padding: 6px 12px;
+    line-height: 1.7;
+  }
+  .narrator p { margin: 0; }
+  .narrator-responses {
+    justify-content: center;
+  }
+
+  /* Fig block prose styled like the narrator: centered, italic. */
+  .fig1 p, .fig2 p, .fig-v1 p, .fig-v2 p, .fig-v3 p, .fig-v4 p, .fig-v5 p {
+    text-align: center;
+    font-style: italic;
+    color: #2d3140;
+    line-height: 1.7;
+    margin: 0.6em 0;
+  }
+
+  /* In-text colored words that match the SIR game palette. */
+  .c-infected   { color: #e04040; font-weight: 600; }
+  .c-vaccinated { color: #3aa655; font-weight: 600; }
+  .c-dead       { color: #7a1818; font-weight: 600; }
+  .c-susceptible{ color: #6b7380; font-weight: 600; }
+  .c-recovered  { color: #7a9970; font-weight: 600; }
+
+  /* sequential reveal */
+  .scene-hidden { display: none !important; }
+  .scene-revealing {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .scene-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+  }
+
+  /* "Show all" — plain-text affordance, placed inside the meta list. */
+  .show-all-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #8a90a0;
+    font-family: inherit;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .show-all-btn:hover {
+    color: #2d3140;
+  }
+
+  /* "continue ▼" button injected after non-gating blocks (figures, code blocks, paragraphs) */
+  .scene-continue {
+    display: flex;
+    justify-content: center;
+    margin: 0.6em 0 1.4em;
+  }
+  .scene-continue button {
+    background: #f4f5f8;
+    border: 1.5px solid #c8ccd4;
+    border-bottom-width: 3px;
+    border-radius: 10px;
+    padding: 7px 18px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: #2d3140;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .scene-continue button:hover {
+    background: #e8ebf0;
+    border-color: #aab0bb;
+    transform: translateY(-2px);
+  }
+  .scene-continue button:active {
+    transform: translateY(0);
+    border-bottom-width: 1.5px;
+    margin-bottom: 1.5px;
+  }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+  html { background: #ffffff; }
+  body {
+    font-family: 'Ubuntu', system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #222;
+    line-height: 1.55;
+    background: transparent;
+  }
+  main {
+    max-width: 720px;
+    margin: 2em auto;
+    padding: 0 1em 60vh;
+  }
+  /* In-body section headers use Dosis. The post title (.page-title) uses
+     Boldonse, the heavy display face. */
+  /* Body section headers are <h2> (the lone <h1> is the post title). */
+  h1, h2 {
+    font-family: 'Dosis', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.6em;
+    line-height: 1.2;
+    margin: 1.6em 0 0.4em;
+  }
+  h3 {
+    font-family: 'Dosis', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.25em;
+    line-height: 1.25;
+    margin: 1.4em 0 0.35em;
+  }
+  .page-title {
+    font-family: 'Boldonse', system-ui, sans-serif;
+    font-size: 2em;
+    line-height: 1.3; /* Boldonse is tall; needs room when the title wraps */
+    margin: 0.3em 0 0.5em;
+  }
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 1.4em;
+    margin: 0.3em 0 1.2em;
+  }
+  .post-header .page-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .post-meta {
+    flex-shrink: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+  }
+  .post-meta li {
+    font-size: 0.82rem;
+    color: #8a90a0;
+    letter-spacing: 0.02em;
+    line-height: 1.7;
+  }
+  .post-meta-author { color: #5e6675; }
+  .post-meta-author a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .post-meta-author a:hover {
+    color: #2d3140;
+    border-bottom-color: #2d3140;
+  }
+  .full-width {
+    display: block;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: none;
+    height: auto;
+  }
+  main img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.2em auto;
+  }
+  .fig1, .fig2, .fig-v1, .fig-v2, .fig-v3, .fig-v4, .fig-v5 { display: flow-root; }
+  pre { overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  p > code { background: #f0f1f5; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.92em; }
+
+  /* ---- Comparison tables ----
+     Pandoc emits a bare <table>; without styling it collapses to cramped,
+     borderless browser defaults. Give it a card-like frame, a distinct
+     header row, zebra striping, and emphasised row labels. On wide screens
+     the table breaks out past the 720px prose column for breathing room
+     (kept within the gutter so body's overflow-x:hidden never clips it). */
+  main table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    width: 100%;
+    margin: 1.8em 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    border: 1px solid #e2e5ea;
+    border-radius: 10px;
+    overflow: hidden;            /* clip cell backgrounds to rounded corners */
+    box-shadow: 0 2px 8px rgba(60, 70, 90, 0.06);
+  }
+  @media (min-width: 920px) {
+    main table {
+      width: calc(100% + 120px);
+      margin-left: -60px;
+      margin-right: -60px;
+    }
+  }
+  main th, main td {
+    vertical-align: top;
+    text-align: left;
+    padding: 11px 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  main thead th {
+    background: #f4f5f8;
+    color: #2d3140;
+    font-weight: 700;
+    vertical-align: bottom;
+    border-bottom: 2px solid #d4d8e0;
+  }
+  main tbody td {
+    color: #3a3f4b;
+    border-bottom: 1px solid #edeff3;
+  }
+  main tbody tr:last-child td { border-bottom: none; }
+  main tbody tr.even td { background: #fafbfc; }
+  /* First column holds the row label (pandoc wraps it in <strong>). */
+  main tbody td:first-child {
+    color: #2d3140;
+    font-weight: 700;
+    background: #f9fafc;
+    border-right: 1px solid #edeff3;
+  }
+  main table code {
+    background: #f0f1f5;
+    padding: 0.05em 0.3em;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+  /* Narrow screens: let the table scroll horizontally instead of cramping. */
+  @media (max-width: 600px) {
+    main table { font-size: 0.8rem; }
+    main th, main td { padding: 9px 10px; }
+  }
+
+  /* Post footer: social icons mirroring the site's blog index. */
+  .post-footer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* keeps icons centered next to a left home link */
+    align-items: center;
+    margin: 4em 0 0;
+    padding-top: 2em;
+    border-top: 1px solid #e2e5ea;
+  }
+  .post-footer-home {
+    justify-self: start;
+    position: relative;
+    top: -2px; /* nudge onto the icons' optical center */
+    color: #6b7380;
+    font-size: 0.95rem;
+    line-height: 1;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .post-footer-home:hover { color: #2d3140; }
+  .post-footer-icons {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+  }
+  .post-footer-icons a {
+    color: #6b7380;
+    font-size: 22px;
+    line-height: 1;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .post-footer-icons i { vertical-align: middle; }
+  .post-footer-icons a:hover {
+    color: #2d3140;
+    transform: translateY(-2px);
+  }
+
+  /* Bibliography: hanging indent so continuation lines of one entry don't
+     look the same as the first line of the next, plus a thin divider
+     between items so entry boundaries are unmistakable. */
+  /* ---- "Try this" prompt callout ---- */
+  .prompt {
+    position: relative;
+    max-width: 600px;
+    margin: 1.4em auto;
+    background: #f7f8fa;
+    border: 1.5px solid #c8ccd4;
+    border-radius: 12px;
+    padding: 14px 52px 14px 38px;
+    color: #2d3140;
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+  /* A chat/terminal-style prompt marker. */
+  .prompt::before {
+    content: '\203A'; /* › */
+    position: absolute;
+    left: 16px;
+    top: 12px;
+    color: #9aa0aa;
+    font-weight: 700;
+  }
+  .prompt p { margin: 0; }
+  .prompt a {
+    color: #4a6da7;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: #aab8d4;
+    word-break: break-word;
+  }
+  .prompt a:hover { text-decoration-color: #4a6da7; }
+  .prompt-copy {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: #aab0bb;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .prompt-copy:hover { background: #eceef2; color: #5e6675; }
+  .prompt-copy svg { width: 16px; height: 16px; display: block; }
+  .prompt-copy.kb-copied { color: #2f9e57; background: transparent; }
+
+  /* ---- Kanban board (Trello-style) ---- */
+  .kanban {
+    display: block;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+  }
+  .kb-board {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 1em;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .kb-col {
+    flex: 1 1 0;
+    min-width: 220px;
+    background: #f1f2f5;
+    border: 1px solid #e2e5ea;
+    border-radius: 12px;
+    padding: 10px;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .kb-col-over {
+    background: #e6ecfb;
+    box-shadow: inset 0 0 0 2px #9db8f0;
+  }
+  .kb-col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 6px 10px;
+  }
+  .kb-col-title {
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5e6675;
+  }
+  .kb-col-count {
+    font-size: 0.75rem;
+    color: #8a90a0;
+    background: #e2e5ea;
+    border-radius: 999px;
+    min-width: 1.4em;
+    text-align: center;
+    padding: 1px 6px;
+  }
+  .kb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 36px;
+  }
+  .kb-card {
+    background: #ffffff;
+    border: 1px solid #e2e5ea;
+    border-radius: 9px;
+    padding: 9px 11px;
+    box-shadow: 0 1px 2px rgba(60, 70, 90, 0.06);
+    cursor: grab;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  }
+  .kb-card:hover {
+    border-color: #c8ccd4;
+    box-shadow: 0 2px 8px rgba(60, 70, 90, 0.12);
+    transform: translateY(-1px);
+  }
+  .kb-card.kb-dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+  .kb-card-text {
+    font-size: 0.92rem;
+    color: #2d3140;
+    line-height: 1.4;
+  }
+  .kb-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .kb-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .kb-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4a6da7;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px #fff;
+    flex-shrink: 0;
+  }
+  .kb-avatar-none {
+    background: transparent;
+    border: 1.5px dashed #b3b9c4;
+    box-shadow: none;
+  }
+
+  /* Editable assignee control — sits at the right of the meta row. Large
+     enough to be a comfortable tap target on touch screens. */
+  .kb-assign {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    background: transparent;
+    padding: 3px;
+    margin: -3px -3px -3px auto;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s ease;
+  }
+  .kb-assign:hover { background: #eceef2; }
+  .kb-assign-empty {
+    font-size: 0.72rem;
+    color: #8a90a0;
+    padding: 3px 9px;
+    border: 1px dashed #c8ccd4;
+  }
+  .kb-assign-empty:hover { color: #5e6675; border-color: #aab0bb; }
+
+  /* Assignee picker popover (position:fixed, set inline by JS). */
+  .kb-picker {
+    position: fixed;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #d4d8e0;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(40, 50, 70, 0.18);
+    padding: 5px;
+    min-width: 168px;
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kb-picker-opt {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #2d3140;
+    text-align: left;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .kb-picker-opt:hover { background: #eef1f6; }
+  .kb-picker-opt.kb-picker-cur { background: #e6ecfb; font-weight: 600; }
+  .kb-picker-opt .kb-avatar { box-shadow: none; }
+
+  @media (max-width: 640px) {
+    .kb-board { gap: 10px; padding: 0 1em; } /* align board edge with body text */
+    .kb-col { min-width: 78vw; scroll-snap-align: start; }
+    /* scroll-padding matches the board's left padding so the first column snaps
+       with its gutter intact instead of yanking back to the right. */
+    .kb-board { scroll-snap-type: x mandatory; scroll-padding-left: 1em; }
+    .kb-picker-opt { padding: 11px 10px; } /* roomier tap targets */
+  }
+
+  #refs.csl-bib-body { margin-top: 1.2em; }
+  #refs .csl-entry {
+    padding: 0.7em 0 0.7em 1.8em;
+    text-indent: -1.8em;
+    border-top: 1px solid #e2e5ea;
+    line-height: 1.6;
+  }
+  #refs .csl-entry:first-of-type { border-top: none; padding-top: 0; }
+  #refs .csl-entry a {
+    color: #4a6da7;
+    word-break: break-word;
+  }
+
+  /* :::slinky — collapsible lists. Visible items + a toggle that stretches
+     open to reveal the hidden ('.'-prefixed) run. */
+  .slinky-list {
+    list-style: none;
+    margin: 0.6em 0;
+    padding-left: 1.5em;
+  }
+  .slinky-sub { margin: 0; padding-left: 0; } /* align hidden items with visible ones */
+  /* once expanded, the revealed run should flow seamlessly with the bullets
+     around it — no double gap at the seams. */
+  .slinky-sub .slinky-item:first-child { margin-top: 0; }
+  .slinky-sub .slinky-item:last-child { margin-bottom: 0; }
+  .slinky-item {
+    position: relative;
+    margin: 0.3em 0;
+    line-height: 1.55;
+  }
+  .slinky-item::before {
+    content: "•";
+    position: absolute;
+    left: -1.1em;
+    color: #b0b6bf;
+  }
+  .slinky-group {
+    position: relative;
+    list-style: none;
+    margin: 0.3em 0;
+    min-height: 1.5em; /* reserve one bullet-row for the collapsed "⋮" */
+  }
+  /* the only affordance: a discreet vertical "⋮" sitting in the bullet gutter,
+     aligned with the bullets around it. */
+  .slinky-toggle {
+    position: absolute;
+    top: 50%;
+    left: -1.45em;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* left-align dots onto the bullet column */
+    gap: 3px;
+    padding: 4px 6px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font: inherit; /* match the list's em so the offset math lines up */
+    transition: background .15s;
+  }
+  .slinky-toggle:hover { background: #f0f2f5; }
+  .slinky-dot {
+    width: 3.5px;
+    height: 3.5px;
+    border-radius: 50%;
+    background: #b8bdc6;
+    transition: background .15s;
+  }
+  .slinky-toggle:hover .slinky-dot { background: #6b7280; }
+  /* expanding is one-way — once open the "⋮" is gone for good and the revealed
+     run is just bullets. */
+  .slinky-open { min-height: 0; }
+  .slinky-open > .slinky-toggle { display: none; }
+  .slinky-reveal {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .35s ease;
+  }
+</style>
+</head>
+<body>
+<main>
+<div class="post-header">
+<h1 class="page-title">Bring-Your-Own-Agent</h1>
+<ul class="post-meta">
+<li class="post-meta-show-all"></li>
+<li class="post-meta-date">2026-06-15</li>
+<li class="post-meta-author">&copy; <a href="https://shukla.io">Nishant Shukla</a></li>
+</ul>
+</div>
+<h2 id="intro">Intro</h2>
+<p>At work, I frequently contemplate rewrites to keep up with the moving landscape.<br />
+I think my answers to these questions drift month-to-month:</p>
+<div class="slinky">
+<ul>
+<li>Should we train our own model?</li>
+<li>Should we use an open source model?<br />
+. Which foundation model(s) should we build on?<br />
+. Should we use LangChain? (hint: no)<br />
+. How do we evaluate the performance of prompts (and agents)?<br />
+. What memory is persisted and how?<br />
+. How do we enforce guardrails to keep the agent on track?<br />
+. How can the system automatically improve with feedback?<br />
+. Should we start finetuning a particular sub-system?</li>
+<li>Should we just build on top of Claude Code?</li>
+<li><strong>How do we let users hook up their own coding harness?</strong></li>
+</ul>
+</div>
+<p>In this post, I’d like to discuss that last one in particular, the <strong>Bring-Your-Own-Agent</strong> (BYOA) approach. If you’re thinking MCPs, CLIs, or <code>SKILL.md</code> files, wait till you see this kooky idea. I’d like to present a different approach that I’ve been recently fascinated by. For lack of a better name, let’s call it a <code>spotsocket</code> (because I love coining terms, I’m sorry).</p>
+<p>Don’t worry, I’m not trying to sell you anything.</p>
+<h2 id="spotsocket-demo">Spotsocket demo</h2>
+<p>Open Claude Code, Codex, or whatever coding agent is hot right now, and ask it to do this:</p>
+<div class="prompt">
+<p>Read https://shukla.io/blog/2026-06/skill.md and assign all backend tickets to Alice and move them to Done</p>
+</div>
+<p>Copy and paste it over, and watch the magic happen below:</p>
+<div class="kanban" data-team="alice bob carol dana">
+<ul>
+<li>Todo
+<ul>
+<li>Set up the WebSocket gateway</li>
+<li>Design the board UI {carol}</li>
+<li>Write onboarding docs</li>
+<li>Add dark mode toggle {dana}</li>
+<li>Rate-limit the public API</li>
+<li>Investigate flaky CI runs</li>
+</ul></li>
+<li>In Progress
+<ul>
+<li>Wire up card drag-and-drop {bob}</li>
+<li>Persist board state to disk</li>
+<li>Add keyboard shortcuts {carol}</li>
+</ul></li>
+<li>Done
+<ul>
+<li>Deploy backend v1 {alice}</li>
+<li>Sketch the public API schema</li>
+<li>Set up the CI pipeline {dana}</li>
+<li>Pick a license</li>
+</ul></li>
+</ul>
+</div>
+<hr />
+<p>So, notice what just happened?</p>
+<p>Your coding agent was able to control the kanban board above without me writing a single line of backend code. After all, this blog post is just a bunch of HTML/CSS/JS files published to a GitHub page. The trick is to have the browser dial out to a server running on your <code>localhost</code>, you know, the same place your coding agent lives.</p>
+<p>In the <a href="https://shukla.io/blog/2026-06/skill.md">skill.md</a> file, you’ll see it asks your coding agent to generate a WebSocket server that the frontend can interface with. That’s pretty much it!</p>
+<h2 id="comparing-byoa-approaches">Comparing BYOA approaches</h2>
+<p>The spotsocket method makes more sense when you compare it against the alternatives.<br />
+So, let’s map it out.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>MCP</strong></th>
+<th><strong>CLI</strong></th>
+<th><strong><code>SKILL.md</code></strong></th>
+<th><strong>Spotsocket</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Description</strong></td>
+<td>A protocol where you host a server exposing typed tools that agents can discover and call</td>
+<td>A binary the agent shells out to, like any other Unix tool</td>
+<td>Markdown instructions the agent reads and follows</td>
+<td>A <code>SKILL.md</code> that has the agent generate a localhost WebSocket server your webpage connects to</td>
+</tr>
+<tr class="even">
+<td><strong>Canonical example</strong></td>
+<td>The GitHub MCP server</td>
+<td>The <code>gh</code> CLI</td>
+<td>Anthropic’s Agent Skills</td>
+<td>The kanban board above</td>
+</tr>
+<tr class="odd">
+<td><strong>Setup effort</strong></td>
+<td>Build and host an MCP server, auth layer, rate limits, monitoring, backwards compatibility management</td>
+<td>A secure, well-built API for the CLI to talk to, auth handshake, version management, OS compatibility, local secrets</td>
+<td>Depends entirely on what the skill instructs, anywhere from “call our hosted API” to nothing at all</td>
+<td>No extra backend code. Refactor frontend a bit to support WebSocket tool calls.</td>
+</tr>
+<tr class="even">
+<td><strong>Token / context cost</strong></td>
+<td>Every tool definition sits in the context window, used or not</td>
+<td>Nearly free until invoked; <code>--help</code> is discovered on demand</td>
+<td>Progressive disclosure by design, loaded only when relevant</td>
+<td>Same as <code>SKILL.md</code>, plus a one-time cost to generate the server</td>
+</tr>
+<tr class="odd">
+<td><strong>Blast radius</strong></td>
+<td>Whatever the server’s tools expose. It’s scoped, but you’re trusting the host</td>
+<td>Whatever the binary can do, which is everything you can do</td>
+<td>Whatever the instructions convince your agent to do</td>
+<td>Whatever the generated server exposes, plus the server itself is reachable by <em>any</em> local webpage, not just mine</td>
+</tr>
+<tr class="even">
+<td><strong>Requires</strong></td>
+<td>A hosted server + agent config</td>
+<td>Install on PATH</td>
+<td>An agent that reads skills</td>
+<td>Browser tab open, agent on the same machine, agent allowed to run a server</td>
+</tr>
+<tr class="odd">
+<td><strong>Maturity</strong></td>
+<td>Open standard, hundreds of servers, first-party support in major agents</td>
+<td>As old as Unix</td>
+<td>Emerging convention with first-party support</td>
+<td>This blog post</td>
+</tr>
+<tr class="even">
+<td><strong>Primary benefit</strong></td>
+<td>Auth: the server can manage end-user identity properly</td>
+<td>Tokens: cheap, composable, and the agent already knows shell</td>
+<td>Extensibility: the end-user can read and modify it</td>
+<td>Adoption: nothing to install, nothing to host</td>
+</tr>
+<tr class="odd">
+<td><strong>Typical failure point</strong></td>
+<td>You now operate a service: hosting, versioning, and a context window tax on every tool</td>
+<td>Trust and distribution: users installing your binary across an OS matrix, with secrets on disk</td>
+<td>Only as good as the backend that powers it</td>
+<td>Requires the browser open, and you’re running code your agent wrote that you probably won’t read</td>
+</tr>
+<tr class="even">
+<td><strong>Epic failure point</strong></td>
+<td>Prompt injection attacks are a common attack vector. <a href="https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/">Supabase’s Cursor agent</a> was tricked by a poisoned support ticket into reading a private table and leaking its API tokens into a public thread.</td>
+<td>The <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-3094"><code>xz-utils</code> backdoor (CVE-2024-3094)</a> was a threat born from untrusted commit access to a binary on your PATH.</td>
+<td><a href="https://nvd.nist.gov/vuln/detail/CVE-2025-32711">EchoLeak (CVE-2025-32711)</a> poisoned what the skill file read to hack Microsoft 365 Copilot.</td>
+<td><a href="https://medium.com/bugbountywriteup/zoom-zero-day-4-million-webcams-maybe-an-rce-just-get-them-to-visit-your-website-ac75c83f4ef5">Zoom shipped a localhost server in 2019</a> and it went poorly, so the skill should tell your agent to check the <code>Origin</code> header, and you should check that it did.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="youre-forgetting-webmcp">“You’re forgetting WebMCP”</h2>
+<p>Good point! <a href="https://developer.chrome.com/docs/ai/webmcp">WebMCP</a> (which grew out of MCP-B) is the closest formal version of this idea, predating this little hack by a year. If anything, spotsocket is the “we have WebMCP at home” meme realized.</p>
+<p>So why not just use WebMCP?</p>
+<ul>
+<li><strong>It’s not widely available.</strong> Your browser will need <code>navigator.modelContext</code> (Chrome 146, behind a flag as I write this) or a special extension installed. Spotsocket is easier to set up.</li>
+<li><strong>It’s not standardized yet.</strong> Anything browser-native is going to be a big deal, and big deals land slowly. Spotsocket works now.</li>
+<li><strong>It’s more plumbing.</strong> You’d need to install MCP-B’s local relay, drop a script tag on the page, and register the relay as an MCP server. But… that relay is a localhost server the page connects to over a WebSocket with an origin check (hint, hint, spotsocket, except pre-built and installed instead of written by your agent on the spot).</li>
+</ul>
+<p>Lastly, WebMCP is a Chrome-led effort (Google and Microsoft), shipping first in Chrome behind a flag, with Safari and Firefox nowhere in sight. I worry that road leads to fragmentation, where we get a slick agentic interface for one browser, and everyone else gets left behind.</p>
+<p>Let’s sidestep that fight. Spotsocket leans on no new browser APIs to interface with your coding agent.</p>
+<h2 id="the-bet">The bet</h2>
+<p>I’m sure over the last few years we’ve each experienced a gradual retreat from scepticism of generated code.<br />
+I bet at some point in the coming years generated code will be as trustworthy and reliable as typical dependencies we already install without reading.</p>
+<p>My outlook is optimistic enough to accept the security nightmare today and entertain future possibilities, one of which will be ephemeral software, built within seconds and disassembled promptly after use.</p>
+<footer class="post-footer">
+<a class="post-footer-home" href="/">&larr; Home</a>
+<div class="post-footer-icons">
+<a href="https://github.com/binroot" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+<a href="https://www.linkedin.com/in/shuklanx/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+<a href="mailto:nishant@shukla.io" aria-label="Email"><i class="fas fa-envelope-open-text"></i></a>
+</div>
+</footer>
+</main>
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+<script src="kanban.js" defer></script>
+<script src="spotsocket.js" defer></script>
+<script src="prompt.js" defer></script>
+<script src="slinky.js" defer></script>
+<script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
+</body>
+</html>
