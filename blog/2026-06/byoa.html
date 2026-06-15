@@ -303,7 +303,7 @@
   main {
     max-width: 720px;
     margin: 2em auto;
-    padding: 0 1em 60vh;
+    padding: 0 1em 4em;
   }
   /* In-body section headers use Dosis. The post title (.page-title) uses
      Boldonse, the heavy display face. */
@@ -847,7 +847,7 @@ I think my answers to these questions drift month-to-month:</p>
 <h2 id="spotsocket-demo">Spotsocket demo</h2>
 <p>Open Claude Code, Codex, or whatever coding agent is hot right now, and ask it to do this:</p>
 <div class="prompt">
-<p>Read https://shukla.io/blog/2026-06/skill.md and assign all backend tickets to Alice and move them to Done</p>
+<p>Read <code>https://shukla.io/blog/2026-06/skill.md</code> to set up a spotsocket and assign all backend tickets (inferred from their titles) to Alice and move them to Done</p>
 </div>
 <p>Copy and paste it over, and watch the magic happen below:</p>
 <div class="kanban" data-team="alice bob carol dana">
@@ -969,7 +969,7 @@ So, let’s map it out.</p>
 <td>Prompt injection attacks are a common attack vector. <a href="https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/">Supabase’s Cursor agent</a> was tricked by a poisoned support ticket into reading a private table and leaking its API tokens into a public thread.</td>
 <td>The <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-3094"><code>xz-utils</code> backdoor (CVE-2024-3094)</a> was a threat born from untrusted commit access to a binary on your PATH.</td>
 <td><a href="https://nvd.nist.gov/vuln/detail/CVE-2025-32711">EchoLeak (CVE-2025-32711)</a> poisoned what the skill file read to hack Microsoft 365 Copilot.</td>
-<td><a href="https://medium.com/bugbountywriteup/zoom-zero-day-4-million-webcams-maybe-an-rce-just-get-them-to-visit-your-website-ac75c83f4ef5">Zoom shipped a localhost server in 2019</a> and it went poorly, so the skill should tell your agent to check the <code>Origin</code> header, and you should check that it did.</td>
+<td><a href="https://medium.com/bugbountywriteup/zoom-zero-day-4-million-webcams-maybe-an-rce-just-get-them-to-visit-your-website-ac75c83f4ef5">Zoom shipped a localhost server in 2019</a>, and it went poorly, so the skill should tell your agent to check the <code>Origin</code> header, and you should check that it did.</td>
 </tr>
 </tbody>
 </table>
@@ -984,8 +984,7 @@ So, let’s map it out.</p>
 <p>Lastly, WebMCP is a Chrome-led effort (Google and Microsoft), shipping first in Chrome behind a flag, with Safari and Firefox nowhere in sight. I worry that road leads to fragmentation, where we get a slick agentic interface for one browser, and everyone else gets left behind.</p>
 <p>Let’s sidestep that fight. Spotsocket leans on no new browser APIs to interface with your coding agent.</p>
 <h2 id="the-bet">The bet</h2>
-<p>I’m sure over the last few years we’ve each experienced a gradual retreat from scepticism of generated code.<br />
-I bet at some point in the coming years generated code will be as trustworthy and reliable as typical dependencies we already install without reading.</p>
+<p>I’m sure over the last few years we’ve each experienced a gradual retreat from skepticism of generated code. I bet at some point in the coming years generated code will be as trustworthy and reliable as typical dependencies we already install without reading.</p>
 <p>My outlook is optimistic enough to accept the security nightmare today and entertain future possibilities, one of which will be ephemeral software, built within seconds and disassembled promptly after use.</p>
 <footer class="post-footer">
 <a class="post-footer-home" href="/">&larr; Home</a>
@@ -1001,6 +1000,17 @@ I bet at some point in the coming years generated code will be as trustworthy an
 <script src="spotsocket.js" defer></script>
 <script src="prompt.js" defer></script>
 <script src="slinky.js" defer></script>
+<script>
+  // Open every link in a new tab (except same-page #anchors). Runs on
+  // DOMContentLoaded, after the deferred component scripts, so dynamically
+  // added links (e.g. the linkified prompt URL) are covered too.
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('a[href]:not([href^="#"])').forEach((a) => {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
+  });
+</script>
 <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
 </body>
 </html>

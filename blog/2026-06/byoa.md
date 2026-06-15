@@ -35,7 +35,7 @@ Don't worry, I'm not trying to sell you anything.
 Open Claude Code, Codex, or whatever coding agent is hot right now, and ask it to do this:
 
 :::prompt
-Read https://shukla.io/blog/2026-06/skill.md and assign all backend tickets to Alice and move them to Done
+Read `https://shukla.io/blog/2026-06/skill.md` to set up a spotsocket and assign all backend tickets (inferred from their titles) to Alice and move them to Done
 :::
 
 Copy and paste it over, and watch the magic happen below:
@@ -84,7 +84,7 @@ So, let's map it out.
 | **Maturity** | Open standard, hundreds of servers, first-party support in major agents | As old as Unix | Emerging convention with first-party support | This blog post |
 | **Primary benefit** | Auth: the server can manage end-user identity properly | Tokens: cheap, composable, and the agent already knows shell | Extensibility: the end-user can read and modify it | Adoption: nothing to install, nothing to host |
 | **Typical failure point** | You now operate a service: hosting, versioning, and a context window tax on every tool | Trust and distribution: users installing your binary across an OS matrix, with secrets on disk | Only as good as the backend that powers it | Requires the browser open, and you're running code your agent wrote that you probably won't read |
-| **Epic failure point** | Prompt injection attacks are a common attack vector. [Supabase's Cursor agent](https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/) was tricked by a poisoned support ticket into reading a private table and leaking its API tokens into a public thread. | The [`xz-utils` backdoor (CVE-2024-3094)](https://nvd.nist.gov/vuln/detail/CVE-2024-3094) was a threat born from untrusted commit access to a binary on your PATH. | [EchoLeak (CVE-2025-32711)](https://nvd.nist.gov/vuln/detail/CVE-2025-32711) poisoned what the skill file read to hack Microsoft 365 Copilot. | [Zoom shipped a localhost server in 2019](https://medium.com/bugbountywriteup/zoom-zero-day-4-million-webcams-maybe-an-rce-just-get-them-to-visit-your-website-ac75c83f4ef5) and it went poorly, so the skill should tell your agent to check the `Origin` header, and you should check that it did. |
+| **Epic failure point** | Prompt injection attacks are a common attack vector. [Supabase's Cursor agent](https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/) was tricked by a poisoned support ticket into reading a private table and leaking its API tokens into a public thread. | The [`xz-utils` backdoor (CVE-2024-3094)](https://nvd.nist.gov/vuln/detail/CVE-2024-3094) was a threat born from untrusted commit access to a binary on your PATH. | [EchoLeak (CVE-2025-32711)](https://nvd.nist.gov/vuln/detail/CVE-2025-32711) poisoned what the skill file read to hack Microsoft 365 Copilot. | [Zoom shipped a localhost server in 2019](https://medium.com/bugbountywriteup/zoom-zero-day-4-million-webcams-maybe-an-rce-just-get-them-to-visit-your-website-ac75c83f4ef5), and it went poorly, so the skill should tell your agent to check the `Origin` header, and you should check that it did. |
 
 # "You're forgetting WebMCP"
 
@@ -103,7 +103,6 @@ Let's sidestep that fight. Spotsocket leans on no new browser APIs to interface 
 
 # The bet
 
-I'm sure over the last few years we've each experienced a gradual retreat from scepticism of generated code.
-I bet at some point in the coming years generated code will be as trustworthy and reliable as typical dependencies we already install without reading.
+I'm sure over the last few years we've each experienced a gradual retreat from skepticism of generated code. I bet at some point in the coming years generated code will be as trustworthy and reliable as typical dependencies we already install without reading.
 
 My outlook is optimistic enough to accept the security nightmare today and entertain future possibilities, one of which will be ephemeral software, built within seconds and disassembled promptly after use. 

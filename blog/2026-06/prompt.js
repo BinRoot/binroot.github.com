@@ -6,9 +6,41 @@
   const ICON_DONE =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
+  // Turn bare URLs into clickable links *without* touching the prompt text.
+  // The copy button captures textContent first, and an anchor's text is the
+  // URL itself, so the copied prompt stays exactly as authored.
+  const URL_RE = /https?:\/\/[^\s<]+[^\s<.,;:!?)]/g;
+  const linkify = (root) => {
+    const nodes = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(n) {
+        if (n.parentElement && n.parentElement.closest('a')) return NodeFilter.FILTER_REJECT;
+        return /https?:\/\//.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      },
+    });
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      const s = node.nodeValue;
+      const frag = document.createDocumentFragment();
+      let last = 0, m;
+      URL_RE.lastIndex = 0;
+      while ((m = URL_RE.exec(s)) !== null) {
+        if (m.index > last) frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+        const a = document.createElement('a');
+        a.href = m[0];
+        a.textContent = m[0];
+        frag.appendChild(a);
+        last = m.index + m[0].length;
+      }
+      if (last < s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  };
+
   document.querySelectorAll('div.prompt').forEach((el) => {
     const text = el.textContent.trim();
 
+    linkify(el);
     // Open any links in the prompt in a new tab.
     el.querySelectorAll('a').forEach((a) => {
       a.target = '_blank';
