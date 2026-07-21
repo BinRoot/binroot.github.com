@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 15 Jun 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jul 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Spatial languages</title>
+      <link>https://shukla.io/blog/2026-07/cccx.html</link>
+      <guid>https://shukla.io/blog/2026-07/cccx.html</guid>
+      <pubDate>Wed, 22 Jul 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      Writing code in 2D: vertical operands, quantum uncomputation puzzles, and a 3-bit adder in two expressions.
+      ]]></description>
+    </item>
 
     <item>
       <title>Bring-Your-Own-Agent</title>
