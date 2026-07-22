@@ -6,7 +6,7 @@
 <meta property="og:site_name" content="Nishant Shukla">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="Spatial languages: writing code in 2D">
-<meta property="og:description" content="Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in two expressions.">
+<meta property="og:description" content="Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in a single 2D expression.">
 <meta property="og:url" content="https://shukla.io/blog/2026-07/cccx.html">
 <meta property="og:image" content="https://shukla.io/blog/2026-07/coop.jpg">
 <meta property="og:image:width" content="1200">
@@ -16,7 +16,7 @@
 <meta property="article:author" content="Nishant Shukla">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Spatial languages: writing code in 2D">
-<meta name="twitter:description" content="Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in two expressions.">
+<meta name="twitter:description" content="Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in a single 2D expression.">
 <meta name="twitter:image" content="https://shukla.io/blog/2026-07/coop.jpg">
 <script type="application/ld+json">
 {
@@ -29,7 +29,7 @@
     "@type": "WebPage",
     "@id": "https://shukla.io/blog/2026-07/cccx.html"
   },
-  "description": "Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in two expressions.",
+  "description": "Writing code in 2D: a spatial programming language with vertical operands, quantum uncomputation puzzles, and a 3-bit adder in a single 2D expression.",
   "keywords": "spatial programming language, 2D programming language, quantum computing, uncomputation, borrowed ancilla, Toffoli gate, CCCX, reversible computing, ripple-carry adder, Qiskit, Befunge, Orca, Hexagony, ladder logic",
   "datePublished": "2026-07-22",
   "dateModified": "2026-07-22",
@@ -117,6 +117,9 @@
     margin: 1.8em 0;
     padding: 1.4em 1.6em;
   }
+  /* Image captions stay in the markup for alt text but don't render;
+     the photo speaks for itself. */
+  figure > figcaption { display: none; }
   /* Inline code gets a chip background so `and` reads as code mid-sentence
      (matches the site template's treatment). Blocks are excluded. */
   :not(pre) > code {

@@ -7,7 +7,9 @@
 // lattice (ink background, white cells, gaps as lines); adjacent pieces
 // overlap by one line width so they read as one grid. When the viewport has
 // no margin to hang into, the tail floats inside the column instead and the
-// opening text wraps around it.
+// opening text wraps around it. On phones the tail only peeks below the bar
+// and fades out, as if the word keeps going off the page, so the text gets
+// its full width back right away.
 (() => {
   const ACROSS = 'spatial';
   const DOWN = 'languages';
@@ -68,6 +70,20 @@
       margin-bottom: 14px;
     }
     .cw ~ h2 { clear: left; }
+
+    /* Peek mode (phones): the tail shows a couple of cells and dissolves,
+       and nothing wraps around it. The negative bottom margin hands the
+       masked-out region back to the flow. */
+    .cw-peek .cw-rail {
+      position: static;
+      float: none;
+      margin-top: calc(-1 * var(--bw));
+      margin-bottom: calc(-1 * (var(--cw) + var(--bw)));
+      max-height: calc(2.5 * (var(--cw) + var(--bw)));
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 88%);
+      mask-image: linear-gradient(to bottom, #000 20%, transparent 88%);
+    }
 
     /* Pandoc's default stylesheet centers the title block and pads it with
        4em below — undo both so the body opens snug inside the corner. */
@@ -142,10 +158,20 @@
   }
 
   // Hang the frame in the left margin when it fits, sized up to 44px cells;
-  // otherwise keep it inside the column.
+  // otherwise keep it inside the column. Phones get peek mode: the tail
+  // fades out under the bar and the meta drops into the flow.
   const update = () => {
-    h1.classList.remove('cw-out', 'cw-in');
+    h1.classList.remove('cw-out', 'cw-in', 'cw-peek');
     h1.style.removeProperty('--cw-o');
+    if (meta) {
+      meta.classList.remove('cw-meta-flow');
+      meta.style.top = '';
+    }
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      h1.classList.add('cw-peek');
+      if (meta) meta.classList.add('cw-meta-flow');
+      return;
+    }
     const avail = h1.getBoundingClientRect().left;
     const cw = Math.min(44, Math.floor((avail - GAP) / COLS) - BW);
     if (cw >= 30) {
@@ -155,7 +181,6 @@
       h1.classList.add('cw-in');
     }
     if (meta) {
-      meta.classList.remove('cw-meta-flow');
       const bar = across.getBoundingClientRect();
       const top = bar.top - header.getBoundingClientRect().top;
       meta.style.top = `${top + bar.height / 2 - meta.offsetHeight / 2}px`;
