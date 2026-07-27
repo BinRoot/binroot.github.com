@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Quantum Oracle Engineering</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <meta name="description" content="A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.">
+  <link rel="canonical" href="https://shukla.io/quantum-oracle-engineering/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nishant Shukla">
+  <meta property="og:title" content="Quantum Oracle Engineering">
+  <meta property="og:description" content="A Programmer's Guide to Building the Right Oracle. Twelve lessons, each debunking a commonly held belief about quantum computing.">
+  <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Quantum Oracle Engineering">
+  <meta name="twitter:description" content="A Programmer's Guide to Building the Right Oracle. Twelve lessons, each debunking a commonly held belief about quantum computing.">
+  <style>
+  body {
+    max-width: 64em;
+    margin: 0 auto;
+    padding: 4em 2em;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fcfcfa;
+    color: #1a1a1a;
+  }
+  header#title-block-header {
+    text-align: center;
+    margin: 1em 0 0;
+  }
+  h1.title {
+    font-size: 2.1em;
+    font-weight: normal;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+  h1:not(.title) {
+    font-size: 1.5em;
+    font-weight: normal;
+    color: #55534e;
+    text-align: center;
+    line-height: 1.3;
+    margin: 0.4em 0 0.6em;
+  }
+  .venue {
+    text-align: center;
+    color: #6b6b66;
+    margin: 0 0 3em;
+  }
+  .venue p {
+    margin: 0;
+  }
+  .venue a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  .intro {
+    max-width: 36em;
+    margin: 0 auto 3.5em;
+    font-size: 1.05em;
+    line-height: 1.65;
+  }
+  .intro p {
+    margin: 0;
+  }
+  .agenda {
+    max-width: 36em;
+    margin: 4.5em auto 0;
+  }
+  .agenda h2 {
+    font-size: 0.95em;
+    font-weight: normal;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6b6b66;
+    margin: 0 0 1em;
+  }
+  .agenda p {
+    margin: 0.3em 0;
+  }
+  .agenda p:last-child {
+    margin-top: 1.2em;
+    font-size: 0.92em;
+    color: #55534e;
+  }
+  .pagefoot {
+    margin-top: 4.5em;
+    padding-top: 1.5em;
+    border-top: 1px solid #d8d5cd;
+    text-align: center;
+    font-size: 0.9em;
+    color: #6b6b66;
+  }
+  .pagefoot a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  .pagefoot p {
+    margin: 0;
+  }
+  .lessons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5em 2em;
+  }
+  .lesson {
+    border-top: 1px solid #d8d5cd;
+    padding-top: 1.2em;
+    display: flex;
+    flex-direction: column;
+  }
+  .lesson h2 {
+    font-size: 1.15em;
+    font-weight: normal;
+    font-style: italic;
+    line-height: 1.55;
+    margin: 0 0 0.6em;
+  }
+  .lesson ul {
+    margin: 0 0 1em;
+    padding-left: 1.1em;
+    font-size: 0.92em;
+    line-height: 1.5;
+    color: #55534e;
+  }
+  .lesson li {
+    margin: 0.15em 0;
+  }
+  .lesson strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .lesson button {
+    margin-top: auto;
+    align-self: flex-start;
+    padding: 0.45em 1.1em;
+    font-family: inherit;
+    font-size: 0.72em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid #c9c6bd;
+    color: #a09d94;
+    cursor: not-allowed;
+  }
+  .lesson button.coming {
+    border-color: #8a877f;
+    color: #3d3b36;
+  }
+  @media (max-width: 700px) {
+    .lessons {
+      grid-template-columns: 1fr;
+    }
+  }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Quantum Oracle Engineering</h1>
+</header>
+<h1 id="a-programmers-guide-to-building-the-right-oracle">A Programmer’s
+Guide to Building the Right Oracle</h1>
+<div class="venue">
+<p>A tutorial at <a href="https://qce.quantum.ieee.org/2026/">IEEE
+Quantum Week 2026 (QCE26)</a>, Toronto. Taught by <a
+href="https://shukla.io">Nishant Shukla</a>.</p>
+</div>
+<div class="intro">
+<p>Most quantum speedup claims depend on an oracle that exists only on
+paper. This course teaches the craft of building practical quantum
+circuits from scratch. Each lesson debunks a commonly held belief.</p>
+</div>
+<div class="lessons">
+<section id="myth-1.-quantum-computing-is-a-natural-fit-for-ai."
+class="lesson">
+<h2>Myth 1. “Quantum computing is a natural fit for AI.”</h2>
+<ul>
+<li>most AI problems don’t qualify</li>
+<li>CPU, GPU, <strong>QPU</strong>: different jobs</li>
+<li>the speedup is narrow: <strong>sampling</strong></li>
+<li><strong>three questions</strong> to ask first</li>
+<li>famous overpromises, dissected</li>
+<li>knowing when to walk away</li>
+</ul>
+<button class="coming" disabled>
+Coming Sept 1
+</button>
+</section>
+<section id="myth-2.-monte-carlo-gets-a-quadratic-quantum-speedup."
+class="lesson">
+<h2>Myth 2. “Monte Carlo gets a quadratic quantum speedup.”</h2>
+<ul>
+<li>the folklore, with <strong>fine print</strong></li>
+<li>the trick: <strong>precision on averages</strong></li>
+<li><strong>Go</strong> flunks: wrong kind of dice</li>
+<li><strong>bandits</strong> flunk: too cheap to matter</li>
+<li>so we invented a game</li>
+<li><strong>close calls</strong> are where quantum wins</li>
+</ul>
+<button class="coming" disabled>
+Coming Sept 1
+</button>
+</section>
+<section id="myth-3.-its-just-an-implementation-detail." class="lesson">
+<h2>Myth 3. “It’s just an implementation detail.”</h2>
+<ul>
+<li>“<strong>assume the oracle exists</strong>,” says every paper</li>
+<li>we stop assuming and build it</li>
+<li>a game board made of qubits</li>
+<li>all the randomness, <strong>loaded up front</strong></li>
+<li>picking moves without <strong>skewing the odds</strong></li>
+<li>the <strong>scratch work</strong> starts piling up</li>
+</ul>
+<button class="coming" disabled>
+Coming Sept 1
+</button>
+</section>
+<section id="myth-4.-reversibility-is-just-bookkeeping." class="lesson">
+<h2>Myth 4. “Reversibility is just bookkeeping.”</h2>
+<ul>
+<li>the finished circuit must <strong>run backward</strong></li>
+<li>every cell updates <strong>at once</strong>, or bugs</li>
+<li>the <strong>self-flip trap</strong></li>
+<li><strong>snapshot</strong> the board, then swap</li>
+<li>one qubit holds the score</li>
+<li>the full bill, in qubits</li>
+</ul>
+<button class="coming" disabled>
+Coming Sept 1
+</button>
+</section>
+<section id="myth-5.-data-you-never-read-cant-hurt-you." class="lesson">
+<h2>Myth 5. “Data you never read can’t hurt you.”</h2>
+<ul>
+<li>there is <strong>no delete</strong></li>
+<li>leftover junk stays <strong>tied to your answer</strong></li>
+<li>and quietly poisons it</li>
+<li>forgetting means <strong>undoing history</strong></li>
+<li>compute, use, <strong>uncompute</strong></li>
+<li>clean scratch still doesn’t mean right answer</li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-6.-measurement-destroys-the-computation."
+class="lesson">
+<h2>Myth 6. “Measurement destroys the computation.”</h2>
+<ul>
+<li>the rule every course teaches</li>
+<li>production circuits break it daily</li>
+<li><strong>measure the garbage</strong> on purpose</li>
+<li>patch the damage with <strong>phase fixes</strong></li>
+<li><strong>cheapest eraser</strong> there is</li>
+<li><strong>machine-checked</strong> rules for when it’s safe</li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section
+id="myth-7.-if-every-step-is-classical-the-process-is-classical."
+class="lesson">
+<h2>Myth 7. “If every step is classical, the process is classical.”</h2>
+<ul>
+<li>every step runs fine classically</li>
+<li>all of them together: <strong>impossible</strong></li>
+<li>the <strong>memory bill</strong> grows per step</li>
+<li><strong>zero or linear</strong>, nothing between</li>
+<li>a <strong>tabletop test</strong> catches fakers</li>
+<li>fakers fail it fast</li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-8.-if-youve-tested-every-input-it-works."
+class="lesson">
+<h2>Myth 8. “If you’ve tested every input, it works.”</h2>
+<ul>
+<li>circuits that ace every test, wrongly</li>
+<li><strong>hidden phases</strong>, invisible to truth tables</li>
+<li>full checking costs <strong>2^n</strong></li>
+<li>three tiny cautionary circuits</li>
+<li>returning a <strong>borrowed qubit</strong> isn’t enough</li>
+<li>you need <strong>proof, not vibes</strong></li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-9.-if-you-return-it-as-you-found-it-no-harm-done."
+class="lesson">
+<h2>Myth 9. “If you return it as you found it, no harm done.”</h2>
+<ul>
+<li><strong>contracts</strong> for things nobody may inspect</li>
+<li>clean, borrowed, <strong>conditionally clean</strong></li>
+<li>promises checked where blocks meet</li>
+<li>the compiler keeps a <strong>ledger</strong></li>
+<li>Rust’s <strong>borrow checker</strong>, but for qubits</li>
+<li>mismatched promises, no deal</li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-10.-the-tools-will-catch-up." class="lesson">
+<h2>Myth 10. “The tools will catch up.”</h2>
+<ul>
+<li>checkers read circuits <strong>gate by gate</strong></li>
+<li>works great, until <strong>Toffoli</strong> walks in</li>
+<li>then rulebooks blow up exponentially</li>
+<li>a <strong>theorem</strong>, not a hunch</li>
+<li><strong>escape hatch</strong>: one proof per circuit family</li>
+<li>know which side of the wall you’re on</li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-11.-someone-would-have-noticed-by-now."
+class="lesson">
+<h2>Myth 11. “Someone would have noticed by now.”</h2>
+<ul>
+<li>nobody can eyeball a quantum circuit</li>
+<li>so every block ships with a <strong>seal</strong></li>
+<li>a <strong>proof kernel</strong> replays it in milliseconds</li>
+<li>strangers’ code, safely composed</li>
+<li>catches sneaky changes between versions</li>
+<li><strong>npm, but with receipts</strong></li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+<section id="myth-12.-scale-is-all-you-need." class="lesson">
+<h2>Myth 12. “Scale is all you need.”</h2>
+<ul>
+<li>the <strong>reigning faith</strong> of the AI era</li>
+<li>what the evidence says</li>
+<li>where quantum could fit in AI</li>
+<li><strong>chapter 1’s questions</strong>, aimed at the hype</li>
+<li><strong>wall-clock math</strong>, not vibes</li>
+<li>how to judge the <strong>next miracle</strong></li>
+</ul>
+<button disabled>
+Coming soon
+</button>
+</section>
+</div>
+<section id="live-tutorial-agenda" class="agenda">
+<h2>Live Tutorial Agenda</h2>
+<p>Session 1 (90 minutes): Myths 1 and 2, identifying a problem worth
+accelerating.</p>
+<p>Session 2 (90 minutes): Myths 3 and 4, building the rollout
+oracle.</p>
+<p>For practitioners and researchers comfortable with qubits, controlled
+gates, and circuit diagrams. A pre-read on amplitude estimation is
+included in the materials.</p>
+</section>
+<div class="pagefoot">
+<p><a href="https://shukla.io">Nishant Shukla</a> · <a
+href="mailto:nishant@shukla.io">nishant@shukla.io</a></p>
+</div>
+</body>
+</html>
