@@ -1,0 +1,244 @@
+/* slides.css -- presentation styling for the lesson decks.
+   Shares the palette and typography of the course index page. */
+
+:root {
+  --bg: #fcfcfa;
+  --ink: #1a1a1a;
+  --dim: #55534e;
+  --faint: #6b6b66;
+  --rule: #d8d5cd;
+  --note-bg: #f4f2ec;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* pandoc emits this when a document sets `title`; the decks use `pagetitle`,
+   but hide it so either front matter works. */
+#title-block-header { display: none; }
+
+#deck {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Slides stack in one box and cut instantly.  They stay laid out rather than
+   `display: none`, so MathJax measures real widths, and switching cannot leave
+   the deck parked between two of them the way scrolling could. */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vh 10vw 12vh;
+  /* Nothing in a deck scrolls.  A slide too tall for the viewport clips, which
+     is an authoring signal, not something to hand the audience a scrollbar for. */
+  overflow: hidden;
+  font-size: clamp(1.05rem, 1.9vw, 1.9rem);
+  line-height: 1.6;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.slide.current {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Centering is text-align plus auto margins on the blocks.  Not
+   `align-items: center`, which shrink-wraps each child and collapses the
+   34em measure into a narrow column. */
+.slide.center { text-align: center; }
+
+.slide h1 {
+  font-size: 2.1em;
+  font-weight: normal;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  margin: 0 0 1em;
+}
+.slide h2 {
+  font-size: 1.3em;
+  font-weight: normal;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--dim);
+  margin: 0 0 0.9em;
+}
+.slide h3 {
+  font-size: 1em;
+  font-weight: normal;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 0.8em;
+}
+.slide p,
+.slide ul,
+.slide ol,
+.slide blockquote {
+  max-width: 34em;
+  margin: 0 0 0.85em;
+}
+.slide.center p,
+.slide.center ul,
+.slide.center ol {
+  margin-left: auto;
+  margin-right: auto;
+}
+.slide ul, .slide ol { padding-left: 1.3em; }
+.slide li { margin: 0.35em 0; }
+.slide strong { font-weight: 600; }
+.slide em { font-style: italic; }
+.slide a { color: inherit; text-decoration: underline; }
+.slide code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.82em;
+}
+.slide pre {
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.7em;
+  line-height: 1.45;
+  padding: 0.8em 1em;
+  border-left: 2px solid var(--rule);
+}
+.slide blockquote {
+  padding-left: 1em;
+  border-left: 2px solid var(--rule);
+  color: var(--dim);
+  font-style: italic;
+}
+.slide img, .slide svg { max-width: 100%; height: auto; }
+.slide table { border-collapse: collapse; font-size: 0.8em; }
+.slide th, .slide td {
+  padding: 0.35em 0.9em 0.35em 0;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Incremental reveal.  Opacity rather than display, so the layout never
+   shifts as steps appear.  No transition: steps snap on. */
+.step { opacity: 0; }
+.step.shown { opacity: 1; }
+
+/* Speaker notes, off until `n`. */
+.notes { display: none; }
+body.notes-on .notes {
+  display: block;
+  max-width: 34em;
+  margin-top: 1.4em;
+  padding: 0.7em 1em;
+  border: 1px dashed var(--rule);
+  background: var(--note-bg);
+  color: var(--dim);
+  font-size: 0.6em;
+  line-height: 1.55;
+  text-align: left;
+}
+body.notes-on .notes > :last-child { margin-bottom: 0; }
+
+/* Fixed chrome, all of it built by slides.js. */
+.chrome {
+  position: fixed;
+  z-index: 10;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  color: var(--faint);
+}
+#progress {
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ink);
+}
+#counter { right: 1.4rem; bottom: 1rem; }
+#timer {
+  left: 1.4rem;
+  bottom: 1rem;
+  display: none;
+  font-variant-numeric: tabular-nums;
+}
+body.timer-on #timer { display: block; }
+
+#outline, #help {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  padding: 8vh 10vw;
+  overflow-y: auto;
+  background: var(--bg);
+}
+body.outline-on #outline, body.help-on #help { display: block; }
+
+#outline h2, #help h2 {
+  font-size: 0.85rem;
+  font-weight: normal;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 1.4em;
+}
+#outline ol { margin: 0; padding-left: 2.2em; }
+#outline li { margin: 0.5em 0; }
+#outline button {
+  padding: 0;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+}
+#outline button:hover, #outline button:focus-visible {
+  border-bottom-color: var(--ink);
+  outline: none;
+}
+#outline li.current button { font-style: italic; color: var(--dim); }
+
+#help dl {
+  display: grid;
+  grid-template-columns: 8em 1fr;
+  gap: 0.55em 1.5em;
+  margin: 0;
+  font-size: 0.95rem;
+}
+#help dt { color: var(--faint); }
+#help dd { margin: 0; }
+
+@media (max-width: 700px) {
+  .slide { padding: 6vh 7vw 12vh; }
+}
+
+/* Print to PDF as a conference backup: one slide per page, all steps shown. */
+@media print {
+  html, body { height: auto; overflow: visible; }
+  #deck { height: auto; overflow: visible; }
+  .slide {
+    position: static;
+    visibility: visible;
+    opacity: 1;
+    height: 100vh;
+    padding: 6vh 8vw;
+    font-size: 13pt;
+    page-break-after: always;
+    break-after: page;
+  }
+  .step { opacity: 1 !important; }
+  .chrome, #outline, #help, .notes { display: none !important; }
+}
