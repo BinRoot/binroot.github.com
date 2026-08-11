@@ -179,12 +179,33 @@
     data-utcoffset="-7"
     defer
   ></script>
+  <link rel="preload" href="font/ubuntu-roman.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="signup.js" defer></script>
   <style>
+  /* Ubuntu, subset and instanced locally; see font/LICENCE.txt.  Two variable
+     files cover every weight the page asks for, so `strong` at 600 costs no
+     extra request.  `Ubuntu` sits behind the alias in the stack: a Linux
+     visitor with the system font installed sees no swap at all. */
+  @font-face {
+    font-family: 'Ubuntu Web';
+    src: url('font/ubuntu-roman.woff2') format('woff2');
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Ubuntu Web';
+    src: url('font/ubuntu-italic.woff2') format('woff2');
+    font-weight: 300 700;
+    font-style: italic;
+    font-display: swap;
+  }
   body {
     max-width: 64em;
     margin: 0 auto;
     padding: 4em 2em;
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: 'Ubuntu Web', Ubuntu, system-ui, sans-serif;
+    font-size: 0.97em;
     background: #fcfcfa;
     color: #1a1a1a;
   }
@@ -222,7 +243,7 @@
     max-width: 36em;
     margin: 0 auto 3.5em;
     font-size: 1.05em;
-    line-height: 1.65;
+    line-height: 1.7;
   }
   .intro p {
     margin: 0;
@@ -268,13 +289,31 @@
     gap: 1.5em 2em;
   }
   .lesson {
+    position: relative;
+    isolation: isolate;
     border-top: 1px solid #d8d5cd;
     padding-top: 1.2em;
     display: flex;
     flex-direction: column;
   }
+  /* The illustration follows its heading in the source, so a screen reader
+     announces the lesson before its picture, but `order` floats it to the top
+     of the card, where the artwork does the work of catching an eye. */
+  .lesson .art {
+    order: -1;
+    margin: 0 0 1em;
+  }
+  .lesson .art img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* The one place the serif stays.  Each title is a claim held at arm's length,
+     and Georgia's italic reads as a quoted voice where a sans italic reads as
+     plain emphasis. */
   .lesson h2 {
-    font-size: 1.15em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.2em;
     font-weight: normal;
     font-style: italic;
     line-height: 1.55;
@@ -284,7 +323,7 @@
     margin: 0 0 1em;
     padding-left: 1.1em;
     font-size: 0.92em;
-    line-height: 1.5;
+    line-height: 1.55;
     color: #55534e;
   }
   .lesson li {
@@ -311,9 +350,140 @@
     border-color: #8a877f;
     color: #3d3b36;
   }
+
+  /* signup.js builds this row and everything below it.  The row inherits the
+     auto top margin that used to pin the lone chip to the bottom of the card. */
+  .lesson .act {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+  .lesson .act button {
+    margin-top: 0;
+  }
+  .lesson .notify,
+  .signup button {
+    cursor: pointer;
+    color: #55534e;
+  }
+  .signup {
+    display: contents;
+  }
+  .signup input[type="email"] {
+    flex: 1 1 8em;
+    min-width: 0;
+    padding: 0.42em 0.6em;
+    font-family: inherit;
+    font-size: 0.78em;
+    color: #1a1a1a;
+    background: #fff;
+    border: 1px solid #c9c6bd;
+  }
+  .signup input[type="email"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  /* Seen only by something filling in fields it cannot see. */
+  .signup .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .signup .note,
+  .lesson .done {
+    font-size: 0.78em;
+    color: #6b6b66;
+  }
+  .signup .note {
+    flex: 1 0 100%;
+    margin: 0;
+  }
+  .signup .note a {
+    color: inherit;
+  }
+
+  /* Every card carries the flat background colour of its own illustration as
+     --accent, set in index.md beside the picture it was sampled from.  Nothing
+     shows it until you point at the card, and then the colour bleeds out of the
+     frame and fills the card behind the text.  `multiply` is what hides the
+     seam: white multiplied by any backdrop is that backdrop, so the artwork's
+     white margin dissolves into whatever is behind it, the page normally and
+     the wash on hover, instead of sitting on either as a white square. */
+  .lesson .art img {
+    mix-blend-mode: multiply;
+  }
+  /* The plate is what the artwork multiplies against, which is why `.lesson`
+     isolates: the blend stops at the card instead of reaching the whole page.
+     It is always painted, and wears the page's own colour until you point at
+     the card.  It has to be opaque rather than a wash faded up from zero,
+     because multiply against a transparent backdrop is a no-op: a plate at
+     `opacity: 0` switches the blending off in the resting state, which is the
+     state the page is in almost all of the time. */
+  .lesson::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 -0.9em -0.9em;
+    border-radius: 3px;
+    background: #fcfcfa;
+  }
+  .lesson:is(:hover, :focus-within)::before {
+    background: color-mix(in oklab, var(--accent) 9%, #fcfcfa);
+    box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 22%, transparent);
+  }
+  .lesson:is(:hover, :focus-within) {
+    border-top-color: var(--accent);
+  }
+  .lesson:is(:hover, :focus-within) button {
+    border-color: var(--accent);
+  }
+  .lesson:is(:hover, :focus-within) button.coming {
+    color: var(--accent);
+  }
+  .lesson,
+  .lesson::before {
+    transition: background-color 160ms ease, border-color 160ms ease,
+                box-shadow 160ms ease;
+  }
+  .filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  /* The colour change is not motion and stays; only the lift is conditional. */
+  @media (prefers-reduced-motion: no-preference) {
+    .lesson {
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+    /* Only the card under the pointer pays for the filter, which is repainted
+       every frame it is applied. */
+    .lesson:is(:hover, :focus-within) .art img {
+      filter: url(#boil);
+    }
+    .lesson:is(:hover, :focus-within) {
+      transform: translateY(-2px);
+    }
+  }
+  /* A phone has no pointer to hover with, so the accent would never appear at
+     all.  Hand those visitors the colour outright, on the rule above the card. */
+  @media (hover: none) {
+    .lesson {
+      border-top-color: var(--accent);
+    }
+  }
   @media (max-width: 700px) {
     .lessons {
       grid-template-columns: 1fr;
+    }
+    /* One column gives the artwork the full page width, which would cost a
+       screenful of scrolling per lesson.  Hold it near its three-column size. */
+    .lesson .art {
+      max-width: 16em;
     }
   }
   </style>
@@ -336,8 +506,11 @@ circuits from scratch. Each lesson debunks a commonly held belief.</p>
 </div>
 <div class="lessons">
 <section id="myth-1.-quantum-computing-is-a-natural-fit-for-ai."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-01" style="--accent: #456AAD">
 <h2>Myth 1. “Quantum computing is a natural fit for AI.”</h2>
+<figure class="art">
+<img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>most AI problems don’t qualify</li>
 <li>CPU, GPU, <strong>QPU</strong>: different jobs</li>
@@ -351,8 +524,11 @@ Coming Sept 1
 </button>
 </section>
 <section id="myth-2.-monte-carlo-gets-a-quadratic-quantum-speedup."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-02" style="--accent: #4D8C55">
 <h2>Myth 2. “Monte Carlo gets a quadratic quantum speedup.”</h2>
+<figure class="art">
+<img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>the folklore, with <strong>fine print</strong></li>
 <li>the trick: <strong>precision on averages</strong></li>
@@ -365,8 +541,12 @@ class="lesson">
 Coming Sept 1
 </button>
 </section>
-<section id="myth-3.-its-just-an-implementation-detail." class="lesson">
+<section id="myth-3.-its-just-an-implementation-detail." class="lesson"
+data-lesson="qoe-lesson-03" style="--accent: #C35523">
 <h2>Myth 3. “It’s just an implementation detail.”</h2>
+<figure class="art">
+<img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>“<strong>assume the oracle exists</strong>,” says every paper</li>
 <li>we stop assuming and build it</li>
@@ -379,8 +559,12 @@ Coming Sept 1
 Coming Sept 1
 </button>
 </section>
-<section id="myth-4.-reversibility-is-just-bookkeeping." class="lesson">
+<section id="myth-4.-reversibility-is-just-bookkeeping." class="lesson"
+data-lesson="qoe-lesson-04" style="--accent: #F03836">
 <h2>Myth 4. “Reversibility is just bookkeeping.”</h2>
+<figure class="art">
+<img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>the finished circuit must <strong>run backward</strong></li>
 <li>every cell updates <strong>at once</strong>, or bugs</li>
@@ -393,8 +577,12 @@ Coming Sept 1
 Coming Sept 1
 </button>
 </section>
-<section id="myth-5.-data-you-never-read-cant-hurt-you." class="lesson">
+<section id="myth-5.-data-you-never-read-cant-hurt-you." class="lesson"
+data-lesson="qoe-lesson-05" style="--accent: #7E874C">
 <h2>Myth 5. “Data you never read can’t hurt you.”</h2>
+<figure class="art">
+<img src="img/myth05.png" alt="A trash can overflowing with bags that nobody has hauled away" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>there is <strong>no delete</strong></li>
 <li>leftover junk stays <strong>tied to your answer</strong></li>
@@ -408,8 +596,11 @@ Coming soon
 </button>
 </section>
 <section id="myth-6.-measurement-destroys-the-computation."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-06" style="--accent: #B6D792">
 <h2>Myth 6. “Measurement destroys the computation.”</h2>
+<figure class="art">
+<img src="img/myth06.png" alt="A cracked jar of water patched with bandages, still leaking" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>the rule every course teaches</li>
 <li>production circuits break it daily</li>
@@ -424,8 +615,11 @@ Coming soon
 </section>
 <section
 id="myth-7.-if-every-step-is-classical-the-process-is-classical."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-07" style="--accent: #761D01">
 <h2>Myth 7. “If every step is classical, the process is classical.”</h2>
+<figure class="art">
+<img src="img/myth07.png" alt="Interlocking gears packed edge to edge with no room to spare" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>every step runs fine classically</li>
 <li>all of them together: <strong>impossible</strong></li>
@@ -439,8 +633,11 @@ Coming soon
 </button>
 </section>
 <section id="myth-8.-if-youve-tested-every-input-it-works."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-08" style="--accent: #D9EB4E">
 <h2>Myth 8. “If you’ve tested every input, it works.”</h2>
+<figure class="art">
+<img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>circuits that ace every test, wrongly</li>
 <li><strong>hidden phases</strong>, invisible to truth tables</li>
@@ -454,8 +651,11 @@ Coming soon
 </button>
 </section>
 <section id="myth-9.-if-you-return-it-as-you-found-it-no-harm-done."
-class="lesson">
+class="lesson" data-lesson="qoe-lesson-09" style="--accent: #966B55">
 <h2>Myth 9. “If you return it as you found it, no harm done.”</h2>
+<figure class="art">
+<img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li><strong>contracts</strong> for things nobody may inspect</li>
 <li>clean, borrowed, <strong>conditionally clean</strong></li>
@@ -468,8 +668,12 @@ class="lesson">
 Coming soon
 </button>
 </section>
-<section id="myth-10.-the-tools-will-catch-up." class="lesson">
+<section id="myth-10.-the-tools-will-catch-up." class="lesson"
+data-lesson="qoe-lesson-10" style="--accent: #9598CA">
 <h2>Myth 10. “The tools will catch up.”</h2>
+<figure class="art">
+<img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can file them" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>checkers read circuits <strong>gate by gate</strong></li>
 <li>works great, until <strong>Toffoli</strong> walks in</li>
@@ -482,9 +686,12 @@ Coming soon
 Coming soon
 </button>
 </section>
-<section id="myth-11.-someone-would-have-noticed-by-now."
-class="lesson">
+<section id="myth-11.-someone-would-have-noticed-by-now." class="lesson"
+data-lesson="qoe-lesson-11" style="--accent: #92BBA8">
 <h2>Myth 11. “Someone would have noticed by now.”</h2>
+<figure class="art">
+<img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>nobody can eyeball a quantum circuit</li>
 <li>so every block ships with a <strong>seal</strong></li>
@@ -497,8 +704,12 @@ class="lesson">
 Coming soon
 </button>
 </section>
-<section id="myth-12.-scale-is-all-you-need." class="lesson">
+<section id="myth-12.-scale-is-all-you-need." class="lesson"
+data-lesson="qoe-lesson-12" style="--accent: #9F4668">
 <h2>Myth 12. “Scale is all you need.”</h2>
+<figure class="art">
+<img src="img/myth12.png" alt="An oversized box balanced on a stack of much smaller ones" width="600" height="600" loading="lazy">
+</figure>
 <ul>
 <li>the <strong>reigning faith</strong> of the AI era</li>
 <li>what the evidence says</li>
@@ -526,5 +737,44 @@ included in the materials.</p>
 <p><a href="https://shukla.io">Nishant Shukla</a> · <a
 href="mailto:nishant@shukla.io">nishant@shukla.io</a></p>
 </div>
+<!-- The boil: noise displacing the artwork a couple of pixels, reseeded four
+     times a second, so a pointed-at illustration wobbles the way hand-drawn
+     animation does.  It has to live in the body; an <svg> in <head> ends the
+     head element as far as the parser is concerned. -->
+<svg class="filters" aria-hidden="true" focusable="false">
+<!-- Mid grey means "displace by nothing", so the map is grey everywhere and
+       noisy only well inside the drawn frame, which every illustration puts
+       26px (4.3%) from its edge.  The blurred rectangle fades the noise back
+       to grey before it reaches the ink, so the frame and the margin outside
+       it hold still while the picture inside them moves.  sRGB interpolation
+       is required, not decoration: in the default linearRGB, #808080 is not
+       the neutral value and the whole image drifts to one side.
+
+       primitiveUnits are object-bound so every length below is a fraction of
+       the card and the effect holds its proportions at any width.  Do not
+       write these as percentages: a percentage subregion is ignored here, the
+       flood silently covers the whole region, and the mask stops working with
+       no error anywhere.  The displacement scale is a fraction too, so 0.007
+       is the ~2px it reads as on a 290px card. -->
+<filter id="boil" x="0" y="0" width="100%" height="100%"
+          color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+<feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="raw">
+<animate attributeName="seed" values="1;2;3;4" dur="0.5s" calcMode="discrete" repeatCount="indefinite"/>
+</feTurbulence>
+<!-- feTurbulence writes noise into the alpha channel too; force it opaque
+         so the rectangle below is the only thing masking it. -->
+<feColorMatrix in="raw" type="matrix" result="noise"
+                   values="1 0 0 0 0
+                           0 1 0 0 0
+                           0 0 1 0 0
+                           0 0 0 0 1"/>
+<feFlood flood-color="#808080" result="still"/>
+<feFlood flood-color="#ffffff" x="0.08" y="0.08" width="0.84" height="0.84" result="inside"/>
+<feGaussianBlur in="inside" stdDeviation="0.025" result="edge"/>
+<feComposite in="noise" in2="edge" operator="in" result="inner"/>
+<feComposite in="inner" in2="still" operator="over" result="map"/>
+<feDisplacementMap in="SourceGraphic" in2="map" scale="0.007" xChannelSelector="R" yChannelSelector="G"/>
+</filter>
+</svg>
 </body>
 </html>

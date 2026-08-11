@@ -12,13 +12,39 @@
 
 * { box-sizing: border-box; }
 
+/* Ubuntu, subset and instanced locally; see font/LICENCE.txt.  Paths are
+   relative to this stylesheet, so they resolve the same from every deck.
+   Projected at a distance, in a room with the lights up, the sans carries
+   further than the serif the index page reads in. */
+@font-face {
+  font-family: 'Ubuntu Web';
+  src: url('font/ubuntu-roman.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ubuntu Web';
+  src: url('font/ubuntu-italic.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ubuntu Web Mono';
+  src: url('font/ubuntu-mono.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
   background: var(--bg);
   color: var(--ink);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Ubuntu Web', Ubuntu, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -68,7 +94,11 @@ html, body {
   letter-spacing: 0.01em;
   margin: 0 0 1em;
 }
+/* Every deck spends its one h2 on the myth it is about to take apart, so this
+   is the same quoted claim the index page sets, and it keeps the same serif
+   italic voice there. */
 .slide h2 {
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.3em;
   font-weight: normal;
   font-style: italic;
@@ -103,7 +133,7 @@ html, body {
 .slide em { font-style: italic; }
 .slide a { color: inherit; text-decoration: underline; }
 .slide code {
-  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, Menlo, Consolas, monospace;
   font-size: 0.82em;
 }
 .slide pre {
