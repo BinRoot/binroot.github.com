@@ -16,7 +16,7 @@ Each lesson debunks a commonly held belief.
 :::: {.lessons}
 
 ::: {.lesson data-lesson="qoe-lesson-01" style="--accent: #456AAD"}
-### Myth 1. "Quantum computing is a natural fit for AI."
+### 1. A different computer
 
 <figure class="art"><img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy"></figure>
 
@@ -31,22 +31,22 @@ Each lesson debunks a commonly held belief.
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-02" style="--accent: #4D8C55"}
-### Myth 2. "Monte Carlo gets a quadratic quantum speedup."
+### 2. Practical speedups
 
 <figure class="art"><img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy"></figure>
 
 - the folklore, with **fine print**
 - the trick: **precision on averages**
-- **Go** flunks: wrong kind of dice
-- **bandits** flunk: too cheap to matter
-- so we invented a game
-- **close calls** are where quantum wins
+- how the **square root** actually happens
+- proof the classical way **can't keep up**
+- **Go** flunks, **bandits** flunk
+- so we invented a game of **close calls**
 
 <button class="coming" disabled>Coming Sept 1</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-03" style="--accent: #C35523"}
-### Myth 3. "It's just an implementation detail."
+### 3. Ship it
 
 <figure class="art"><img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy"></figure>
 
@@ -61,7 +61,7 @@ Each lesson debunks a commonly held belief.
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-04" style="--accent: #F03836"}
-### Myth 4. "Reversibility is just bookkeeping."
+### 4. Qubit care
 
 <figure class="art"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></figure>
 
@@ -76,7 +76,7 @@ Each lesson debunks a commonly held belief.
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-05" style="--accent: #7E874C"}
-### Myth 5. "Data you never read can't hurt you."
+### 5. Garbage collection
 
 <figure class="art"><img src="img/myth05.png" alt="A trash can overflowing with bags that nobody has hauled away" width="600" height="600" loading="lazy"></figure>
 
@@ -91,104 +91,104 @@ Each lesson debunks a commonly held belief.
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-06" style="--accent: #B6D792"}
-### Myth 6. "Measurement destroys the computation."
+### 6. Peek and patch
 
 <figure class="art"><img src="img/myth06.png" alt="A cracked jar of water patched with bandages, still leaking" width="600" height="600" loading="lazy"></figure>
 
-- the rule every course teaches
-- production circuits break it daily
+- the rule every course teaches: **never look**
+- production circuits **look anyway**
 - **measure the garbage** on purpose
 - patch the damage with **phase fixes**
 - **cheapest eraser** there is
-- **machine-checked** rules for when it's safe
+- machine-checked rules for when it's safe
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-07" style="--accent: #761D01"}
-### Myth 7. "If every step is classical, the process is classical."
+### 7. Other people's memory
 
-<figure class="art"><img src="img/myth07.png" alt="Interlocking gears packed edge to edge with no room to spare" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy"></figure>
 
-- every step runs fine classically
-- all of them together: **impossible**
-- the **memory bill** grows per step
-- **zero or linear**, nothing between
-- a **tabletop test** catches fakers
-- fakers fail it fast
+- scratch you can use but **never inspect**
+- **clean, borrowed, conditionally clean**
+- returning it as you found it **isn't enough**
+- promises checked **where blocks meet**
+- Rust's **borrow checker**, but for qubits
+- mismatched promises, **no deal**
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-08" style="--accent: #D9EB4E"}
-### Myth 8. "If you've tested every input, it works."
+### 8. Show your work
 
-<figure class="art"><img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy"></figure>
 
-- circuits that ace every test, wrongly
+- circuits that **ace every test**, wrongly
 - **hidden phases**, invisible to truth tables
-- full checking costs **2^n**
-- three tiny cautionary circuits
-- returning a **borrowed qubit** isn't enough
-- you need **proof, not vibes**
+- checking everything costs **2^n**
+- escape hatch: **one proof per circuit family**
+- every block ships with a **seal**, replayed in milliseconds
+- strangers' code, **safely composed**
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-09" style="--accent: #966B55"}
-### Myth 9. "If you return it as you found it, no harm done."
+### 9. The impossible flipbook
 
-<figure class="art"><img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth07.png" alt="Interlocking gears packed edge to edge with no room to spare" width="600" height="600" loading="lazy"></figure>
 
-- **contracts** for things nobody may inspect
-- clean, borrowed, **conditionally clean**
-- promises checked where blocks meet
-- the compiler keeps a **ledger**
-- Rust's **borrow checker**, but for qubits
-- mismatched promises, no deal
+- every page is a **classical** drawing
+- the animation is **impossible**
+- each step has a model; they **refuse to glue**
+- one story per step, **no story overall**
+- where the quantum actually **lives**
+- and the gap has a **price**
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-10" style="--accent: #9598CA"}
-### Myth 10. "The tools will catch up."
+### 10. No bulk discount
 
 <figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can file them" width="600" height="600" loading="lazy"></figure>
 
-- checkers read circuits **gate by gate**
-- works great, until **Toffoli** walks in
-- then rulebooks blow up exponentially
-- a **theorem**, not a hunch
-- **escape hatch**: one proof per circuit family
-- know which side of the wall you're on
+- buying in bulk should get cheaper
+- it doesn't: **zero or linear**, nothing between
+- no **amortizing**, no compressing, no caching
+- copy 1,000,000 costs what copy 1 cost
+- a **law**, not a hunch
+- why the flipbook can't be **fixed**
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-11" style="--accent: #92BBA8"}
-### Myth 11. "Someone would have noticed by now."
+### 11. Spot the fake
 
-<figure class="art"><img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy"></figure>
 
-- nobody can eyeball a quantum circuit
-- so every block ships with a **seal**
-- a **proof kernel** replays it in milliseconds
-- strangers' code, safely composed
-- catches sneaky changes between versions
-- **npm, but with receipts**
+- a **tabletop test** for quantum claims
+- no lab, no tomography
+- fakers pay the **memory bill** or fold
+- works on **any** black box
+- benchmarks that can't be **gamed**
+- pretenders fail **fast**
 
 <button disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-12" style="--accent: #9F4668"}
-### Myth 12. "Scale is all you need."
+### 12. The next miracle
 
 <figure class="art"><img src="img/myth12.png" alt="An oversized box balanced on a stack of much smaller ones" width="600" height="600" loading="lazy"></figure>
 
 - the **reigning faith** of the AI era
 - what the evidence says
 - where quantum could fit in AI
-- **chapter 1's questions**, aimed at the hype
+- **lesson 1's questions**, aimed at the hype
 - **wall-clock math**, not vibes
 - how to judge the **next miracle**
 
@@ -200,16 +200,16 @@ Each lesson debunks a commonly held belief.
 ::: {.agenda}
 ### Live Tutorial Agenda
 
-Session 1 (90 minutes): Myths 1 and 2, identifying a problem worth accelerating.
+Session 1 (90 minutes): Lessons 1 and 2, identifying a problem worth accelerating.
 
-Session 2 (90 minutes): Myths 3 and 4, building the rollout oracle.
+Session 2 (90 minutes): Lessons 3 and 4, building the rollout oracle.
 
 For practitioners and researchers comfortable with qubits, controlled gates,
 and circuit diagrams. A pre-read on amplitude estimation is included in the materials.
 :::
 
 ::: {.pagefoot}
-[Nishant Shukla](https://shukla.io) · [nishant@shukla.io](mailto:nishant@shukla.io)
+[Nishant Shukla](https://shukla.io) · [nishant@shukla.io](mailto:nishant@shukla.io) · Art by [Lazybuns](https://lazybunsart.carrd.co)
 :::
 
 <!-- The boil: noise displacing the artwork a couple of pixels, reseeded four
@@ -224,7 +224,6 @@ and circuit diagrams. A pre-read on amplitude estimation is included in the mate
        it hold still while the picture inside them moves.  sRGB interpolation
        is required, not decoration: in the default linearRGB, #808080 is not
        the neutral value and the whole image drifts to one side.
-
        primitiveUnits are object-bound so every length below is a fraction of
        the card and the effect holds its proportions at any width.  Do not
        write these as percentages: a percentage subregion is ignored here, the
@@ -249,5 +248,35 @@ and circuit diagrams. A pre-read on amplitude estimation is included in the mate
     <feComposite in="noise" in2="edge" operator="in" result="inner"/>
     <feComposite in="inner" in2="still" operator="over" result="map"/>
     <feDisplacementMap in="SourceGraphic" in2="map" scale="0.007" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- The same boil, retuned for the narrow layout, where the artwork renders
+       at 16em instead of a 290px card.  Two numbers differ and they have to,
+       because both resist being made proportional:
+       `scale` is a fraction of the element, so it already shrinks with the
+       art, but the smaller render also squeezes a 600px source harder, which
+       smooths the ink and leaves less edge for a displacement to move.  The
+       result measured 0.28x as much frame-to-frame motion as the desktop card.
+       `baseFrequency` ignores primitiveUnits and stays in user space, so a
+       smaller element gets fewer, larger noise cells across it, turning a boil
+       into a slow warp.  Raising it restores the cell count.
+       0.008 and 0.020 were picked by sweeping both against the desktop card
+       and measuring motion between two seeds; this pair lands at 0.95x.  A
+       filter cannot inherit another's primitives, so the chain is repeated. -->
+  <filter id="boil-narrow" x="0" y="0" width="100%" height="100%"
+          color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+    <feTurbulence type="fractalNoise" baseFrequency="0.020" numOctaves="2" seed="4" result="raw">
+      <animate attributeName="seed" values="1;2;3;4" dur="0.5s" calcMode="discrete" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix in="raw" type="matrix" result="noise"
+                   values="1 0 0 0 0
+                           0 1 0 0 0
+                           0 0 1 0 0
+                           0 0 0 0 1"/>
+    <feFlood flood-color="#808080" result="still"/>
+    <feFlood flood-color="#ffffff" x="0.08" y="0.08" width="0.84" height="0.84" result="inside"/>
+    <feGaussianBlur in="inside" stdDeviation="0.025" result="edge"/>
+    <feComposite in="noise" in2="edge" operator="in" result="inner"/>
+    <feComposite in="inner" in2="still" operator="over" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.008" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
 </svg>

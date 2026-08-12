@@ -16,6 +16,7 @@
 ></script>
 <link rel="preload" href="font/ubuntu-roman.woff2" as="font" type="font/woff2" crossorigin>
 <script src="signup.js" defer></script>
+<script src="spotlight.js" defer></script>
 <style>
 /* Ubuntu, subset and instanced locally; see font/LICENCE.txt.  Two variable
    files cover every weight the page asks for, so `strong` at 600 costs no
@@ -266,18 +267,41 @@ h1:not(.title) {
   border-radius: 3px;
   background: #fcfcfa;
 }
-.lesson:is(:hover, :focus-within)::before {
-  background: color-mix(in oklab, var(--accent) 9%, #fcfcfa);
-  box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 22%, transparent);
-}
-.lesson:is(:hover, :focus-within) {
+/* The lit state, defined once and only once.  A card reaches it by being
+   pointed at, by holding focus, or by spotlight.js marking it while a phone
+   scrolls.  Everything the state does is nested here, so the wash, the rule,
+   the buttons and the boil cannot drift apart the way they do when each lives
+   in its own rule with the selector copied across all of them. */
+.lesson:is(:hover, :focus-within, .lit) {
   border-top-color: var(--accent);
-}
-.lesson:is(:hover, :focus-within) button {
-  border-color: var(--accent);
-}
-.lesson:is(:hover, :focus-within) button.coming {
-  color: var(--accent);
+
+  &::before {
+    background: color-mix(in oklab, var(--accent) 9%, #fcfcfa);
+    box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 22%, transparent);
+  }
+  & button {
+    border-color: var(--accent);
+  }
+  & button.coming {
+    color: var(--accent);
+  }
+
+  /* Both of these are motion, so both sit behind the same guard: the card
+     lifts, and the artwork boils inside its frame. */
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-2px);
+
+    & .art img {
+      filter: url(#boil);
+    }
+    /* Same effect, retuned for the size the art renders at here; see the two
+       filters in index.md for why one set of numbers cannot serve both. */
+    @media (max-width: 700px) {
+      & .art img {
+        filter: url(#boil-narrow);
+      }
+    }
+  }
 }
 .lesson,
 .lesson::before {
@@ -290,18 +314,11 @@ h1:not(.title) {
   height: 0;
   overflow: hidden;
 }
-/* The colour change is not motion and stays; only the lift is conditional. */
+/* The colour change is not motion and stays; the lift and boil are declared
+   with the lit state above and are the only things this guard removes. */
 @media (prefers-reduced-motion: no-preference) {
   .lesson {
     transition: transform 160ms ease, border-color 160ms ease;
-  }
-  /* Only the card under the pointer pays for the filter, which is repainted
-     every frame it is applied. */
-  .lesson:is(:hover, :focus-within) .art img {
-    filter: url(#boil);
-  }
-  .lesson:is(:hover, :focus-within) {
-    transform: translateY(-2px);
   }
 }
 /* A phone has no pointer to hover with, so the accent would never appear at
@@ -310,10 +327,34 @@ h1:not(.title) {
   .lesson {
     border-top-color: var(--accent);
   }
+  /* spotlight.js lights one card at a time, so the rest go back to grey and
+     the lit one actually stands out.  Without JavaScript this rule never
+     applies and every rule keeps its colour, which is the better fallback. */
+  .lit-active .lesson:not(.lit) {
+    border-top-color: #d8d5cd;
+  }
 }
 @media (max-width: 700px) {
   .lessons {
     grid-template-columns: 1fr;
+  }
+  /* One column is wide enough that left-aligned cards read as a ragged strip
+     down the page, so centre the contents.  `align-items` does the work: the
+     card is already a flex column, and centring stops each block stretching,
+     so every one of them shrinks to its own width and sits in the middle. */
+  .lesson {
+    align-items: center;
+    text-align: center;
+  }
+  /* The list is centred as a block but keeps its text ranged left, so the
+     bullets stay in one column instead of fanning out around the centre. */
+  .lesson ul {
+    text-align: left;
+  }
+  /* Without signup.js the chip is a direct child, and it carries an
+     align-self of its own that would otherwise pull it back to the edge. */
+  .lesson > button {
+    align-self: center;
   }
   /* One column gives the artwork the full page width, which would cost a
      screenful of scrolling per lesson.  Hold it near its three-column size. */

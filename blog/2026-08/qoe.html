@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Nishant Shukla" />
+  <meta name="dcterms.date" content="2026-08-15" />
+  <title>What’s in the box?</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+  html {
+    font: 18px/1.6 'Ubuntu', system-ui, sans-serif;
+    background: #fdfdf8;
+    color: #1a1a1a;
+  }
+  body {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem;
+  }
+  h1, h2, h3 {
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  header#title-block-header {
+    margin-bottom: 2.5rem;
+  }
+  h1.title {
+    margin-bottom: 0.25rem;
+  }
+  p.author, p.date {
+    margin: 0;
+    color: #666;
+  }
+  a {
+    color: #0b5394;
+  }
+  code, pre {
+    font-family: 'Courier New', monospace;
+    background: #f0efe8;
+  }
+  pre {
+    padding: 0.75rem;
+    overflow-x: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">What’s in the box?</h1>
+<p class="author"><a href="https://shukla.io">Nishant Shukla</a></p>
+<p class="date">2026-08-15</p>
+</header>
+<p>As we’re reading and writing fewer lines of code, there’s a
+collective feeling of <strong>dread</strong>. You just know something’s
+missing. Where’s that sense of <em>click</em> when types match or that
+pride when the code becomes the documentation?</p>
+<p>Coding agents are pretty good at “getting the job done.” But, what if
+the “job” was never about writing the code, but instead about
+understanding it. What if engineering an idea into code was itself the
+outcome to appreciate? Quantum has these properties (for now); you can
+go wild designing algorithms that nobody today can run. That means you
+can wallow in code.</p>
+<p>So, where do you start? Don’t make my mistake… I started reading
+papers and they skip over the “fun” parts!</p>
+<div class="oracle-collage">
+
+</div>
+<p><img src="img/pepe-silvia.webp" alt="Charlie Day gesturing wildly at a wall of pinned papers connected by red string" width="1400" height="700"></p>
+<p>After getting stuck on a <a
+href="https://arxiv.org/pdf/2301.08243">JEPA</a>-esque prototype, I went
+deep in quantum: wrote a few research papers (<a
+href="https://arxiv.org/abs/2604.25962?utm_source=chatgpt.com">QCE
+2026</a> accepted, POPL 2027 submitted, Quantum drafted), submitted a
+Unitary Foundation microgrant for an open source ancilla linter, and got
+an opportunity to present a <a
+href="https://qce.quantum.ieee.org/2026/qce26-schedule/tutorial-schedule/#149-1">tutorial
+at Quantum Week</a>.</p>
+<p>I’d like to invite you to an open online course based on that IEEE
+Quantum Week talk, <a
+href="https://shukla.io/quantum-oracle-engineering/">Introduction to
+Quantum Oracle Engineering</a>. Now enrolling!</p>
+<script src="collage.js?v=1786498755"></script>
+</body>
+</html>

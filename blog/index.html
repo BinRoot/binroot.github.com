@@ -47,9 +47,9 @@
         document.querySelectorAll('.post-card[data-date]').forEach(card => {
           const posted = new Date(card.dataset.date).getTime();
           const age = now - posted;
-          // Treat the window as [-1 day, +30 days] so a future-dated post
-          // (publishing tomorrow due to timezone) still gets the badge.
-          if (age >= -1 * 24 * 60 * 60 * 1000 && age < THIRTY_DAYS) {
+          // Anything future-dated is by definition new, so only the
+          // trailing edge is checked: the badge drops off after 30 days.
+          if (age < THIRTY_DAYS) {
             const title = card.querySelector('.post-title');
             if (title) {
               const badge = document.createElement('span');
@@ -80,6 +80,14 @@
             </nav>
 
             <h1 class="title mb-5">Blog</h1>
+
+            <a class="post-card" href="2026-08/qoe.html" data-date="2026-08-15">
+              <span class="post-main">
+                <span class="post-title">What's in the box?</span>
+                <span class="post-desc">Seventeen years of papers saying "assume oracle access," circled in red pen. Plus a 12-lesson course that opens the box.</span>
+              </span>
+              <span class="post-date">August 2026</span>
+            </a>
 
             <a class="post-card" href="2026-07/cccx.html" data-date="2026-07-22">
               <span class="post-main">
