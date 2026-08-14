@@ -16,6 +16,56 @@
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxr2yhqaUXG8XAyJwCDnCvGAdkFMxskuEkavIIYyUj5VRSMLpk_2IkcqNAEXn5OKn0DPQ/exec';
   const CONTACT = 'nishant@shukla.io';
 
+  // The mailing-list field above the grid: static markup, wired here to the
+  // same sheet as the lesson chips.
+  const listForm = document.querySelector('.subscribe-form');
+  if (listForm) {
+    const email = listForm.querySelector('input[type="email"]');
+    const send = listForm.querySelector('button');
+
+    const trap = document.createElement('input');
+    trap.type = 'text';
+    trap.className = 'trap';
+    trap.tabIndex = -1;
+    trap.autocomplete = 'off';
+    trap.setAttribute('aria-hidden', 'true');
+
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.setAttribute('role', 'status');
+
+    listForm.append(trap, note);
+
+    listForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (send.disabled) return;
+      send.disabled = true;
+      send.classList.add('busy');
+
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          body: JSON.stringify({ email: email.value, note: 'all lessons', company: trap.value })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          listForm.replaceWith(done(data.message));
+        } else {
+          note.textContent = data.message;
+          send.disabled = false;
+          send.classList.remove('busy');
+        }
+      } catch (err) {
+        note.replaceChildren(
+          document.createTextNode('could not reach the list. '),
+          mailtoLink('all lessons')
+        );
+        send.disabled = false;
+        send.classList.remove('busy');
+      }
+    });
+  }
+
   document.querySelectorAll('.lesson').forEach(card => {
     const lesson = card.dataset.lesson;
     const chip = card.querySelector('button');
@@ -78,7 +128,7 @@
       e.preventDefault();
       if (send.disabled) return;
       send.disabled = true;
-      note.textContent = 'sending';
+      send.classList.add('busy');
 
       try {
         const res = await fetch(ENDPOINT, {
@@ -93,6 +143,7 @@
         } else {
           note.textContent = data.message;
           send.disabled = false;
+          send.classList.remove('busy');
         }
       } catch (err) {
         // Blocked, offline, or the deployment moved.  Never swallow it: hand
@@ -102,6 +153,7 @@
           mailtoLink(lesson)
         );
         send.disabled = false;
+        send.classList.remove('busy');
       }
     });
   }

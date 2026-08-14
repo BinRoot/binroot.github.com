@@ -5,6 +5,10 @@ SLIDE_DEPS := slides.lua slides.css slides.js
 # stylesheet or script is never served from a stale browser cache.
 ASSET_VER  := $(shell cat slides.css slides.js | cksum | cut -d' ' -f1)
 
+# Same treatment for the landing page's own scripts, spliced into a generated
+# copy of the header at build time.
+PAGE_VER   := $(shell cat signup.js spotlight.js | cksum | cut -d' ' -f1)
+
 # A deck is any subdirectory holding a slides.md, so directory names stay free
 # to be keyword slugs.  The slug is the URL, and nothing encodes lesson order:
 # reordering the course renames nothing.
@@ -15,8 +19,9 @@ PAGES := index.html $(DECK_HTML)
 
 all: $(PAGES)
 
-index.html: index.md header.html
-	pandoc $< -o $@ --standalone --shift-heading-level-by=-1 -H header.html
+index.html: index.md header.html signup.js spotlight.js
+	sed -E 's/src="([a-z]+\.js)"/src="\1?v=$(PAGE_VER)"/g' header.html > header.gen.html
+	pandoc $< -o $@ --standalone --shift-heading-level-by=-1 -H header.gen.html
 
 # Two blanked template variables: `mathjax` would otherwise inject a polyfill.io
 # script tag (the MathJax script itself still comes through), and `document-css`
@@ -29,6 +34,6 @@ index.html: index.md header.html
 	  --variable=mathjax= --variable=document-css=
 
 clean:
-	rm -f $(PAGES)
+	rm -f $(PAGES) header.gen.html
 
 .PHONY: all clean

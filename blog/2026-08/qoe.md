@@ -6,7 +6,7 @@ date: 2026-08-15
 
 As we're reading and writing fewer lines of code, there's a collective feeling of **dread**. You just know something's missing. Where's that sense of _click_ when types match or that pride when the code becomes the documentation?
 
-Coding agents are pretty good at "getting the job done." But, what if the "job" was never about writing the code, but instead about understanding it. What if engineering an idea into code was itself the outcome to appreciate? Quantum has these properties (for now); you can go wild designing algorithms that nobody today can run. That means you can wallow in code.
+Coding agents are pretty good at "getting the job done." But, what if the "job" was never about writing the code, but instead about understanding it. What if engineering an idea into code was itself the outcome to appreciate? **Quantum** has these properties (for now); you can go wild designing algorithms that nobody today can run. That means you can wallow in code.
 
 So, where do you start? Don't make my mistake... I started reading papers and they skip over the "fun" parts!
 

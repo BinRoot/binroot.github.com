@@ -180,8 +180,8 @@
     defer
   ></script>
   <link rel="preload" href="font/ubuntu-roman.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="signup.js" defer></script>
-  <script src="spotlight.js" defer></script>
+  <script src="signup.js?v=3756951768" defer></script>
+  <script src="spotlight.js?v=3756951768" defer></script>
   <style>
   /* Ubuntu, subset and instanced locally; see font/LICENCE.txt.  Two variable
      files cover every weight the page asks for, so `strong` at 600 costs no
@@ -248,6 +248,102 @@
   }
   .intro p {
     margin: 0;
+  }
+  /* The mailing-list field above the grid, wired by signup.js to the same
+     sheet as the per-lesson chips. */
+  .subscribe {
+    --accent: #C35523;
+    margin: 0 auto 3.5em;
+  }
+  .subscribe-form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    max-width: 26em;
+    margin: 0 auto;
+  }
+  .subscribe-form input[type="email"] {
+    flex: 1 1 12em;
+    min-width: 0;
+    padding: 0.7em 0.9em;
+    font-family: inherit;
+    font-size: 0.95em;
+    color: #1a1a1a;
+    background: #fff;
+    border: 1px solid #c9c6bd;
+    border-radius: 4px;
+  }
+  .subscribe-form input[type="email"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .subscribe-form button {
+    padding: 0.7em 1.4em;
+    font-family: inherit;
+    font-size: 0.85em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+  .subscribe-form button:hover,
+  .subscribe-form button:focus-visible {
+    box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 40%, transparent);
+
+    @media (prefers-reduced-motion: no-preference) {
+      transform: translateY(-2px);
+    }
+  }
+  /* In flight, the pressed button itself carries the feedback: the label
+     yields to a spinner, and the disabled state blocks a second submit. */
+  button.busy {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+  }
+  button.busy::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 1em;
+    height: 1em;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: busy-spin 0.7s linear infinite;
+  }
+  .signup button.busy::after {
+    border-color: rgba(85, 83, 78, 0.35);
+    border-top-color: #55534e;
+  }
+  @keyframes busy-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    button.busy::after {
+      animation-duration: 2s;
+    }
+  }
+  .subscribe-form .note {
+    flex: 1 0 100%;
+    margin: 0;
+    font-size: 0.85em;
+    color: #6b6b66;
+  }
+  .subscribe-form .note a {
+    color: inherit;
+  }
+  .subscribe .done {
+    display: block;
+    text-align: center;
+    font-size: 0.95em;
+    color: var(--accent);
   }
   .agenda {
     max-width: 36em;
@@ -387,7 +483,8 @@
     outline-offset: 1px;
   }
   /* Seen only by something filling in fields it cannot see. */
-  .signup .trap {
+  .signup .trap,
+  .subscribe-form .trap {
     position: absolute;
     left: -9999px;
     width: 1px;
@@ -536,14 +633,19 @@
 <h1 id="a-programmers-guide-to-building-the-right-oracle">A Programmer’s
 Guide to Building the Right Oracle</h1>
 <div class="venue">
-<p>A tutorial at <a href="https://qce.quantum.ieee.org/2026/">IEEE
-Quantum Week 2026 (QCE26)</a>, Toronto. Taught by <a
-href="https://shukla.io">Nishant Shukla</a>.</p>
+<p><a href="https://qce.quantum.ieee.org/2026/">IEEE Quantum Week 2026
+(QCE26)</a>, Toronto, Canada.</p>
 </div>
 <div class="intro">
 <p>Most quantum speedup claims depend on an oracle that exists only on
 paper. This course teaches the craft of building practical quantum
-circuits from scratch. Each lesson debunks a commonly held belief.</p>
+circuits from scratch.</p>
+</div>
+<div class="subscribe">
+<form class="subscribe-form">
+<input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+<button type="submit">Notify me</button>
+</form>
 </div>
 <div class="lessons">
 <section id="a-different-computer" class="lesson"
@@ -579,7 +681,7 @@ data-lesson="qoe-lesson-02" style="--accent: #4D8C55">
 <li>so we invented a game of <strong>close calls</strong></li>
 </ul>
 <button class="coming" disabled>
-Coming Sept 1
+Coming Sept 8
 </button>
 </section>
 <section id="ship-it" class="lesson" data-lesson="qoe-lesson-03"
@@ -597,7 +699,7 @@ style="--accent: #C35523">
 <li>the <strong>scratch work</strong> starts piling up</li>
 </ul>
 <button class="coming" disabled>
-Coming Sept 1
+Coming Sept 15
 </button>
 </section>
 <section id="qubit-care" class="lesson" data-lesson="qoe-lesson-04"
@@ -615,7 +717,7 @@ style="--accent: #F03836">
 <li>the full bill, in qubits</li>
 </ul>
 <button class="coming" disabled>
-Coming Sept 1
+Coming Sept 22
 </button>
 </section>
 <section id="garbage-collection" class="lesson"
@@ -632,8 +734,8 @@ data-lesson="qoe-lesson-05" style="--accent: #7E874C">
 <li>compute, use, <strong>uncompute</strong></li>
 <li>clean scratch still doesn’t mean right answer</li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Sept 29
 </button>
 </section>
 <section id="peek-and-patch" class="lesson" data-lesson="qoe-lesson-06"
@@ -650,8 +752,8 @@ style="--accent: #B6D792">
 <li><strong>cheapest eraser</strong> there is</li>
 <li>machine-checked rules for when it’s safe</li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Oct 6
 </button>
 </section>
 <section id="other-peoples-memory" class="lesson"
@@ -668,8 +770,8 @@ data-lesson="qoe-lesson-07" style="--accent: #761D01">
 <li>Rust’s <strong>borrow checker</strong>, but for qubits</li>
 <li>mismatched promises, <strong>no deal</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Oct 13
 </button>
 </section>
 <section id="show-your-work" class="lesson" data-lesson="qoe-lesson-08"
@@ -687,8 +789,8 @@ style="--accent: #D9EB4E">
 milliseconds</li>
 <li>strangers’ code, <strong>safely composed</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Oct 20
 </button>
 </section>
 <section id="the-impossible-flipbook" class="lesson"
@@ -705,8 +807,8 @@ data-lesson="qoe-lesson-09" style="--accent: #966B55">
 <li>where the quantum actually <strong>lives</strong></li>
 <li>and the gap has a <strong>price</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Oct 27
 </button>
 </section>
 <section id="no-bulk-discount" class="lesson"
@@ -723,8 +825,8 @@ data-lesson="qoe-lesson-10" style="--accent: #9598CA">
 <li>a <strong>law</strong>, not a hunch</li>
 <li>why the flipbook can’t be <strong>fixed</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Nov 3
 </button>
 </section>
 <section id="spot-the-fake" class="lesson" data-lesson="qoe-lesson-11"
@@ -741,8 +843,8 @@ style="--accent: #92BBA8">
 <li>benchmarks that can’t be <strong>gamed</strong></li>
 <li>pretenders fail <strong>fast</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Nov 10
 </button>
 </section>
 <section id="the-next-miracle" class="lesson"
@@ -755,12 +857,12 @@ data-lesson="qoe-lesson-12" style="--accent: #9F4668">
 <li>the <strong>reigning faith</strong> of the AI era</li>
 <li>what the evidence says</li>
 <li>where quantum could fit in AI</li>
-<li><strong>lesson 1’s questions</strong>, aimed at the hype</li>
-<li><strong>wall-clock math</strong>, not vibes</li>
+<li><strong>lesson 1’s questions</strong>, aimed at the headlines</li>
+<li><strong>wall-clock math</strong>, not gut feel</li>
 <li>how to judge the <strong>next miracle</strong></li>
 </ul>
-<button disabled>
-Coming soon
+<button class="coming" disabled>
+Coming Nov 17
 </button>
 </section>
 </div>
@@ -775,8 +877,7 @@ gates, and circuit diagrams. A pre-read on amplitude estimation is
 included in the materials.</p>
 </section>
 <div class="pagefoot">
-<p><a href="https://shukla.io">Nishant Shukla</a> · <a
-href="mailto:nishant@shukla.io">nishant@shukla.io</a> · Art by <a
+<p>Taught by <a href="https://shukla.io">Nishant Shukla</a> · Art by <a
 href="https://lazybunsart.carrd.co">Lazybuns</a></p>
 </div>
 <!-- The boil: noise displacing the artwork a couple of pixels, reseeded four

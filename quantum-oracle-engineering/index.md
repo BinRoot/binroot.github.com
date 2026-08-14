@@ -3,14 +3,19 @@
 ## A Programmer's Guide to Building the Right Oracle
 
 ::: {.venue}
-A tutorial at [IEEE Quantum Week 2026 (QCE26)](https://qce.quantum.ieee.org/2026/), Toronto.
-Taught by [Nishant Shukla](https://shukla.io).
+[IEEE Quantum Week 2026 (QCE26)](https://qce.quantum.ieee.org/2026/), Toronto, Canada.
 :::
 
 ::: {.intro}
 Most quantum speedup claims depend on an oracle that exists only on paper.
 This course teaches the craft of building practical quantum circuits from scratch.
-Each lesson debunks a commonly held belief.
+:::
+
+::: {.subscribe}
+<form class="subscribe-form">
+<input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+<button type="submit">Notify me</button>
+</form>
 :::
 
 :::: {.lessons}
@@ -42,7 +47,7 @@ Each lesson debunks a commonly held belief.
 - **Go** flunks, **bandits** flunk
 - so we invented a game of **close calls**
 
-<button class="coming" disabled>Coming Sept 1</button>
+<button class="coming" disabled>Coming Sept 8</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-03" style="--accent: #C35523"}
@@ -57,7 +62,7 @@ Each lesson debunks a commonly held belief.
 - picking moves without **skewing the odds**
 - the **scratch work** starts piling up
 
-<button class="coming" disabled>Coming Sept 1</button>
+<button class="coming" disabled>Coming Sept 15</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-04" style="--accent: #F03836"}
@@ -72,7 +77,7 @@ Each lesson debunks a commonly held belief.
 - one qubit holds the score
 - the full bill, in qubits
 
-<button class="coming" disabled>Coming Sept 1</button>
+<button class="coming" disabled>Coming Sept 22</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-05" style="--accent: #7E874C"}
@@ -87,7 +92,7 @@ Each lesson debunks a commonly held belief.
 - compute, use, **uncompute**
 - clean scratch still doesn't mean right answer
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Sept 29</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-06" style="--accent: #B6D792"}
@@ -102,7 +107,7 @@ Each lesson debunks a commonly held belief.
 - **cheapest eraser** there is
 - machine-checked rules for when it's safe
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Oct 6</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-07" style="--accent: #761D01"}
@@ -117,7 +122,7 @@ Each lesson debunks a commonly held belief.
 - Rust's **borrow checker**, but for qubits
 - mismatched promises, **no deal**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Oct 13</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-08" style="--accent: #D9EB4E"}
@@ -132,7 +137,7 @@ Each lesson debunks a commonly held belief.
 - every block ships with a **seal**, replayed in milliseconds
 - strangers' code, **safely composed**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Oct 20</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-09" style="--accent: #966B55"}
@@ -147,7 +152,7 @@ Each lesson debunks a commonly held belief.
 - where the quantum actually **lives**
 - and the gap has a **price**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Oct 27</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-10" style="--accent: #9598CA"}
@@ -162,7 +167,7 @@ Each lesson debunks a commonly held belief.
 - a **law**, not a hunch
 - why the flipbook can't be **fixed**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Nov 3</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-11" style="--accent: #92BBA8"}
@@ -177,7 +182,7 @@ Each lesson debunks a commonly held belief.
 - benchmarks that can't be **gamed**
 - pretenders fail **fast**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Nov 10</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-12" style="--accent: #9F4668"}
@@ -188,11 +193,11 @@ Each lesson debunks a commonly held belief.
 - the **reigning faith** of the AI era
 - what the evidence says
 - where quantum could fit in AI
-- **lesson 1's questions**, aimed at the hype
-- **wall-clock math**, not vibes
+- **lesson 1's questions**, aimed at the headlines
+- **wall-clock math**, not gut feel
 - how to judge the **next miracle**
 
-<button disabled>Coming soon</button>
+<button class="coming" disabled>Coming Nov 17</button>
 :::
 
 ::::
@@ -209,7 +214,7 @@ and circuit diagrams. A pre-read on amplitude estimation is included in the mate
 :::
 
 ::: {.pagefoot}
-[Nishant Shukla](https://shukla.io) · [nishant@shukla.io](mailto:nishant@shukla.io) · Art by [Lazybuns](https://lazybunsart.carrd.co)
+Taught by [Nishant Shukla](https://shukla.io) · Art by [Lazybuns](https://lazybunsart.carrd.co)
 :::
 
 <!-- The boil: noise displacing the artwork a couple of pixels, reseeded four
