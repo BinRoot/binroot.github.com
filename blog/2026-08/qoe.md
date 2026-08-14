@@ -14,6 +14,8 @@ So, where do you start? Don't make my mistake... I started reading papers and th
 
 <img src="img/pepe-silvia.webp" alt="Charlie Day gesturing wildly at a wall of pinned papers connected by red string" width="1400" height="700">
 
-After getting stuck on a [JEPA](https://arxiv.org/pdf/2301.08243)-esque prototype, I went deep in quantum: wrote a few research papers ([QCE 2026](https://arxiv.org/abs/2604.25962?utm_source=chatgpt.com) accepted, POPL 2027 submitted, Quantum drafted), submitted a Unitary Foundation microgrant for an open source ancilla linter, and got an opportunity to present a [tutorial at Quantum Week](https://qce.quantum.ieee.org/2026/qce26-schedule/tutorial-schedule/#149-1). 
+After getting stuck on a [JEPA](https://arxiv.org/pdf/2301.08243)-esque prototype, I went deep in quantum: wrote a few research papers ([QCE 2026](https://arxiv.org/abs/2604.25962?utm_source=chatgpt.com) accepted, POPL submitted, Quantum drafted), submitted a [Unitary Foundation](https://unitary.foundation) microgrant, and got an opportunity to present a [tutorial at IEEE Quantum Week 2026](https://qce.quantum.ieee.org/2026/qce26-schedule/tutorial-schedule/#149-1). 
 
-I'd like to invite you to an open online course based on that IEEE Quantum Week talk, [Introduction to Quantum Oracle Engineering](https://shukla.io/quantum-oracle-engineering/). Now enrolling!
+For those that can't make it to Quantum Week this year, I'll be uploading slides and speaker notes here every week: [Introduction to Quantum Oracle Engineering](https://shukla.io/quantum-oracle-engineering/). 
+
+Now enrolling!

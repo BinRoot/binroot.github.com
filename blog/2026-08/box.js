@@ -204,8 +204,11 @@
     const W = VW, H = VH;
     let p = 0;
     if (tail) {
+      // Hold the box shut until the last of the article has folded away over
+      // the ceiling: content ends padding-bottom (0.18H + 16px) above the
+      // tail, and reaches the ceiling crease 0.64H of scroll later.
       const u = H - tail.getBoundingClientRect().top;
-      p = clamp01((u - 0.35 * H) / (1.05 * H));
+      p = clamp01((u - 0.55 * H) / (1.05 * H));
     }
     const big = OPEN_A * smooth(clamp01(p / 0.55));
     const small = OPEN_A * smooth(clamp01((p - 0.35) / 0.65));
