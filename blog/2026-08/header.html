@@ -48,8 +48,9 @@ img {
   max-width: 100%;
   height: auto;
 }
-html {
+html, body {
   overflow-x: hidden;
+  overflow-x: clip;
 }
 body {
   padding-top: calc(18vh + 56px);
@@ -62,7 +63,11 @@ h1.title {
 }
 .box-bg {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: -1;
   pointer-events: none;
 }
@@ -76,7 +81,11 @@ h1.title {
 }
 .box-out {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: -3;
   pointer-events: none;
 }

@@ -30,6 +30,31 @@
   const RING_DEPTHS = [4, 8, 11.5, 14.5, 17, 19, 20.7].map((v) => v / 22);
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Mobile URL bars resize the viewport continuously while the page scrolls;
+  // geometry based on live innerHeight makes every crease crawl. All math
+  // uses the large-viewport height, measured once through a probe (the fixed
+  // layers are 100lvh tall to match), and refreshed only on a real resize:
+  // a width change or an orientation-sized height jump.
+  const probe = document.createElement('div');
+  probe.style.cssText =
+    'position:fixed;top:0;width:0;height:100vh;height:100lvh;' +
+    'visibility:hidden;pointer-events:none;';
+  document.body.appendChild(probe);
+  let VW = innerWidth;
+  let VH = probe.offsetHeight || innerHeight;
+  const remeasure = () => {
+    const w = innerWidth, h = probe.offsetHeight || innerHeight;
+    if (w === VW && Math.abs(h - VH) < 150) return false;
+    VW = w;
+    VH = h;
+    return true;
+  };
+  const resizeHooks = [];
+  addEventListener('resize', () => {
+    if (!remeasure()) return;
+    for (const hook of resizeHooks) hook();
+  }, { passive: true });
+
   const px = (v) => v.toFixed(2) + 'px';
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const smooth = (t) => t * t * (3 - 2 * t);
@@ -118,7 +143,7 @@
 
   let geo = null;
   const buildBox = () => {
-    const W = innerWidth, H = innerHeight;
+    const W = VW, H = VH;
     const col = document.body.offsetWidth;
     const x0 = Math.max(2, ((W - col) / 2 - GUTTER) / W * 100);
     const x1 = 100 - x0;
@@ -176,7 +201,7 @@
   let tail = null, credit = null, cta = null, flying = false;
   const applyOpen = () => {
     if (!geo) return;
-    const W = innerWidth, H = innerHeight;
+    const W = VW, H = VH;
     let p = 0;
     if (tail) {
       const u = H - tail.getBoundingClientRect().top;
@@ -257,10 +282,10 @@
 
   buildBox();
   let bt;
-  addEventListener('resize', () => {
+  resizeHooks.push(() => {
     clearTimeout(bt);
     bt = setTimeout(buildBox, 120);
-  }, { passive: true });
+  });
 
   // ---- scroll fold ----
   if (RM) return;
@@ -320,7 +345,7 @@
     proj(ex, ey) + ` translateY(${px(c)}) rotateX(${ang}deg) translateY(${px(-c)})`;
 
   const apply = () => {
-    const W = innerWidth, H = innerHeight, sy = scrollY;
+    const W = VW, H = VH, sy = scrollY;
     const c1 = CT * H, c2 = CB * H;
     for (const t of targets) {
       const vt = t.absTop - sy, h = t.h;
@@ -359,7 +384,7 @@
     requestAnimationFrame(() => { tick = false; apply(); });
   };
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { measure(); onScroll(); }, { passive: true });
+  resizeHooks.push(() => { measure(); onScroll(); });
   addEventListener('load', () => { measure(); apply(); });
   measure();
   apply();

@@ -215,8 +215,9 @@
     max-width: 100%;
     height: auto;
   }
-  html {
+  html, body {
     overflow-x: hidden;
+    overflow-x: clip;
   }
   body {
     padding-top: calc(18vh + 56px);
@@ -229,7 +230,11 @@
   }
   .box-bg {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    height: 100lvh;
     z-index: -1;
     pointer-events: none;
   }
@@ -243,7 +248,11 @@
   }
   .box-out {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    height: 100lvh;
     z-index: -3;
     pointer-events: none;
   }
@@ -430,8 +439,8 @@ at Quantum Week</a>.</p>
 Quantum Week talk, <a
 href="https://shukla.io/quantum-oracle-engineering/">Introduction to
 Quantum Oracle Engineering</a>. Now enrolling!</p>
-<script src="collage.js?v=1786647127"></script>
-<script src="box.js?v=1786647127"></script>
+<script src="collage.js?v=1786673781"></script>
+<script src="box.js?v=1786673781"></script>
 <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7"></script>
 </body>
 </html>
