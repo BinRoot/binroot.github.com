@@ -27,7 +27,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - most AI problems don't qualify
 - CPU, GPU, **QPU**: different jobs
-- the speedup is narrow: **sampling**
+- for AI, the speedup is narrow: **sampling**
 - **three questions** to ask first
 - famous overpromises, dissected
 - knowing when to walk away
@@ -43,7 +43,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - the folklore, with **fine print**
 - the trick: **precision on averages**
 - how the **square root** actually happens
-- proof the classical way **can't keep up**
+- a query-counting **proof**: classical can't keep up
 - **Go** flunks, **bandits** flunk
 - so we invented a game of **close calls**
 
@@ -56,7 +56,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 <figure class="art"><img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy"></figure>
 
 - "**assume the oracle exists**," says every paper
-- we stop assuming and build it
+- we stop assuming and build it, **gate by gate**
 - a game board made of qubits
 - all the randomness, **loaded up front**
 - picking moves without **skewing the odds**
@@ -134,7 +134,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - **hidden phases**, invisible to truth tables
 - checking everything costs **2^n**
 - escape hatch: **one proof per circuit family**
-- every block ships with a **seal**, replayed in milliseconds
+- every block ships with a **seal**, checked in milliseconds
 - strangers' code, **safely composed**
 
 <button class="coming" disabled>Coming Oct 20</button>
@@ -147,10 +147,10 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - every page is a **classical** drawing
 - the animation is **impossible**
-- each step has a model; they **refuse to glue**
+- each step has a **classical model**; they refuse to glue
 - one story per step, **no story overall**
 - where the quantum actually **lives**
-- and the gap has a **price**
+- and the gap has a price, in **coherent memory**
 
 <button class="coming" disabled>Coming Oct 27</button>
 :::
@@ -161,10 +161,10 @@ This course teaches the craft of building practical quantum circuits from scratc
 <figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can file them" width="600" height="600" loading="lazy"></figure>
 
 - buying in bulk should get cheaper
-- it doesn't: **zero or linear**, nothing between
+- it doesn't: **qubits of memory**, zero or linear, nothing between
 - no **amortizing**, no compressing, no caching
 - copy 1,000,000 costs what copy 1 cost
-- a **law**, not a hunch
+- a **theorem**, not a hunch
 - why the flipbook can't be **fixed**
 
 <button class="coming" disabled>Coming Nov 3</button>
@@ -177,10 +177,10 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - a **tabletop test** for quantum claims
 - no lab, no tomography
-- fakers pay the **memory bill** or fold
-- works on **any** black box
+- fakers pay the **qubit memory bill** or fold
+- any implementation, **no peeking inside**
 - benchmarks that can't be **gamed**
-- pretenders fail **fast**
+- pretenders fail **exponentially fast**
 
 <button class="coming" disabled>Coming Nov 10</button>
 :::
