@@ -1,0 +1,399 @@
+<style>
+#convergence-map{
+  --n-bg:#fff; --n-line:#d7dae0; --n-text:#16181c; --n-mute:#6b7280;
+  --edge:#9aa1ab; --a1:#3b6ef6; --a2:#0d8f82; --alarm:#cf3f22;
+  --focus:#16181c;
+  --cvg-w:min(960px,calc(100vw - 48px));
+  width:var(--cvg-w); margin:2.4rem 0 2.4rem calc(50% - var(--cvg-w)/2);
+  box-sizing:border-box; position:relative; padding:0; border:0; background:none;
+  font-family:'Ubuntu',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--n-text);
+  -webkit-text-size-adjust:100%;
+}
+#convergence-map *{box-sizing:border-box}
+#convergence-map{color-scheme:light}
+
+.cvg-stage{
+  display:grid; grid-template-columns:280px minmax(180px,1fr) 280px;
+  grid-template-rows:auto auto; row-gap:30px; position:relative;
+}
+.cvg-col{display:flex; flex-direction:column; gap:9px; min-width:0}
+.cvg-causes{grid-column:1; grid-row:1}
+.cvg-symptoms{grid-column:3; grid-row:1; justify-content:center}
+.cvg-terminal{grid-column:2 / span 2; grid-row:2; justify-self:stretch}
+.cvg-bundle,.cvg-drop{display:none}
+
+.cvg-edges{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:0}
+.cvg-edge,.cvg-tedge,.cvg-pulse{fill:none; stroke-linecap:round}
+.cvg-edge{stroke:var(--edge); stroke-width:1; opacity:.5; transition:opacity .18s ease, stroke .18s ease, stroke-width .18s ease}
+.cvg-edge.is-hot{opacity:.9; stroke-width:1.6}
+.cvg-tedge{stroke:var(--alarm); stroke-width:1.2; opacity:.55}
+.cvg-pulse{stroke:var(--edge); stroke-width:2.4; opacity:0}
+
+.cvg-node{
+  position:relative; z-index:1; display:block; width:100%; text-align:left;
+  font:inherit; cursor:pointer; appearance:none;
+  background:var(--n-bg); color:var(--n-text);
+  border:1px solid var(--n-line); border-radius:8px; padding:9px 12px;
+  transition:transform .14s ease, opacity .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.cvg-label{display:block; font-size:15px; line-height:1.3; font-weight:500}
+.cvg-tag{display:block; font-size:10.5px; line-height:1.35; margin-top:3px; color:var(--n-mute); opacity:.85}
+.cvg-node:hover{transform:translateY(-1px); border-color:var(--n-mute); box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.cvg-node:focus{outline:none}
+.cvg-node:focus-visible{outline:2px dashed var(--focus); outline-offset:3px; opacity:1 !important}
+
+.cvg-terminal{
+  background:var(--n-bg); border:1.5px solid var(--alarm); border-radius:8px;
+  color:var(--alarm); padding:13px 16px; text-align:center;
+  font-size:12.5px; font-weight:700; letter-spacing:.09em; line-height:1.45;
+  position:relative; z-index:1;
+}
+
+.cvg[data-sel] .cvg-node{opacity:.15}
+.cvg[data-sel] .cvg-node.is-sel,.cvg[data-sel] .cvg-node.is-lit{opacity:1}
+.cvg[data-sel] .cvg-edge{opacity:.12; stroke-width:1}
+.cvg[data-sel="cause"] .cvg-node.is-sel{border-color:var(--a1); background:color-mix(in srgb,var(--a1) 9%,var(--n-bg))}
+.cvg[data-sel="cause"] .cvg-node.is-lit{border-color:var(--a2)}
+.cvg[data-sel="symptom"] .cvg-node.is-sel{border-color:var(--a2); background:color-mix(in srgb,var(--a2) 10%,var(--n-bg))}
+.cvg[data-sel="symptom"] .cvg-node.is-lit{border-color:var(--a1)}
+.cvg-edge.is-active{
+  opacity:1 !important; stroke-width:2.5; stroke-dasharray:var(--len);
+  animation:cvg-draw 400ms ease-out both; filter:drop-shadow(0 0 4px currentColor);
+}
+.cvg[data-sel="cause"] .cvg-edge.is-active{stroke:var(--a1); color:var(--a1)}
+.cvg[data-sel="symptom"] .cvg-edge.is-active{stroke:var(--a2); color:var(--a2)}
+@keyframes cvg-draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+.cvg-pulse.is-pulsing{opacity:.4; stroke-dasharray:14px var(--len); animation:cvg-pulse 1.9s linear}
+@keyframes cvg-pulse{from{stroke-dashoffset:14px}to{stroke-dashoffset:calc(-1 * var(--len))}}
+
+.cvg-card{
+  position:absolute; z-index:3; width:300px;
+  background:var(--n-bg); border:1px solid var(--n-line); border-radius:8px;
+  padding:12px 14px; box-shadow:0 6px 22px rgba(0,0,0,.13); font-size:13px;
+}
+.cvg-card[hidden]{display:none}
+.cvg-card-title{font-size:13px; font-weight:700; margin-bottom:9px}
+.cvg-card dl{margin:0; display:grid; gap:7px}
+.cvg-card dt{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--n-mute);
+}
+.cvg-card dd{margin:1px 0 0; font-size:12.5px; line-height:1.4}
+.cvg-card.is-badge{
+  width:auto; white-space:nowrap; font-size:12.5px; font-weight:500;
+  padding:8px 12px; border-color:var(--a2);
+}
+.cvg-card.is-wrap{white-space:normal}
+.cvg-card.is-docked{
+  position:relative; left:auto !important; right:auto !important; top:auto !important;
+  width:100%; white-space:normal; margin-top:14px; box-shadow:none;
+}
+.cvg-hint{display:none; margin-top:14px; font-size:11.5px; color:var(--n-mute); letter-spacing:.04em}
+.cvg.is-ready .cvg-hint{display:block}
+.cvg.is-touched .cvg-hint{display:none}
+
+@media (max-width:899px){
+  .cvg-stage{grid-template-columns:1fr minmax(140px,.7fr) 1fr}
+  .cvg-label{font-size:13.5px}
+  .cvg-node{padding:7px 10px}
+  .cvg-card{width:250px; font-size:12px}
+}
+@media (max-width:599px){
+  .cvg-stage{display:block; row-gap:0}
+  .cvg-edges{display:none}
+  .cvg-col{gap:7px}
+  .cvg-bundle{display:block; width:100%; height:58px; margin:4px 0; overflow:visible}
+  .cvg-bundle path{fill:none; stroke:var(--edge); stroke-width:1.2; opacity:.5; transition:opacity .2s ease, stroke .2s ease}
+  .cvg[data-sel] .cvg-bundle path{opacity:.1}
+  .cvg-bundle path.is-active{opacity:1; stroke-width:2.4}
+  .cvg-bundle .cvg-in.is-active{stroke:var(--a1)}
+  .cvg-bundle .cvg-out.is-active{stroke:var(--a2)}
+  .cvg-drop{display:block; width:2px; height:22px; margin:6px auto; background:var(--alarm); opacity:.6}
+  .cvg-terminal{font-size:11px; letter-spacing:.06em}
+}
+@media (prefers-reduced-motion:reduce){
+  #convergence-map *{animation:none !important; transition:none !important}
+  .cvg-pulse{display:none}
+}
+</style>
+
+<div id="convergence-map" class="cvg">
+  <div class="cvg-stage">
+    <svg class="cvg-edges" role="img" focusable="false"
+         aria-label="Seven possible causes converge onto four observed symptoms, and all four symptoms are attributed to the model."></svg>
+
+    <div class="cvg-col cvg-causes">
+      <button type="button" class="cvg-node" data-id="spec" aria-pressed="false"><span class="cvg-label">Task specification</span><span class="cvg-tag">ambiguous prose</span></button>
+      <button type="button" class="cvg-node" data-id="policy" aria-pressed="false"><span class="cvg-label">Agent policy</span><span class="cvg-tag">overconstrained rules</span></button>
+      <button type="button" class="cvg-node" data-id="planning" aria-pressed="false"><span class="cvg-label">Planning &amp; reasoning</span><span class="cvg-tag">actual model error</span></button>
+      <button type="button" class="cvg-node" data-id="contract" aria-pressed="false"><span class="cvg-label">Tool contract</span><span class="cvg-tag">docs &ne; behavior</span></button>
+      <button type="button" class="cvg-node" data-id="impl" aria-pressed="false"><span class="cvg-label">Tool implementation</span><span class="cvg-tag">partial side effects</span></button>
+      <button type="button" class="cvg-node" data-id="state" aria-pressed="false"><span class="cvg-label">Environment state</span><span class="cvg-tag">undefined / drifting</span></button>
+      <button type="button" class="cvg-node" data-id="verifier" aria-pressed="false"><span class="cvg-label">Verifier</span><span class="cvg-tag">unsatisfiable checks</span></button>
+    </div>
+
+    <svg class="cvg-bundle" viewBox="0 0 200 58" preserveAspectRatio="none" aria-hidden="true">
+      <path class="cvg-in" data-id="spec"     d="M10 1 Q10 26 100 26"/>
+      <path class="cvg-in" data-id="policy"   d="M40 1 Q40 26 100 26"/>
+      <path class="cvg-in" data-id="planning" d="M70 1 Q70 26 100 26"/>
+      <path class="cvg-in" data-id="contract" d="M100 1 L100 26"/>
+      <path class="cvg-in" data-id="impl"     d="M130 1 Q130 26 100 26"/>
+      <path class="cvg-in" data-id="state"    d="M160 1 Q160 26 100 26"/>
+      <path class="cvg-in" data-id="verifier" d="M190 1 Q190 26 100 26"/>
+      <path class="cvg-out" data-id="disobey" d="M100 32 C100 48 25 42 25 57"/>
+      <path class="cvg-out" data-id="flaky"   d="M100 32 C100 48 75 42 75 57"/>
+      <path class="cvg-out" data-id="ceiling" d="M100 32 C100 48 125 42 125 57"/>
+      <path class="cvg-out" data-id="dumb"    d="M100 32 C100 48 175 42 175 57"/>
+    </svg>
+
+    <div class="cvg-col cvg-symptoms">
+      <button type="button" class="cvg-node" data-id="disobey" aria-pressed="false"><span class="cvg-label">&ldquo;Won&rsquo;t follow instructions&rdquo;</span></button>
+      <button type="button" class="cvg-node" data-id="flaky" aria-pressed="false"><span class="cvg-label">&ldquo;Flaky: passes sometimes&rdquo;</span></button>
+      <button type="button" class="cvg-node" data-id="ceiling" aria-pressed="false"><span class="cvg-label">&ldquo;Hits a hard ceiling&rdquo;</span></button>
+      <button type="button" class="cvg-node" data-id="dumb" aria-pressed="false"><span class="cvg-label">&ldquo;Just not smart enough&rdquo;</span></button>
+    </div>
+
+    <div class="cvg-drop" aria-hidden="true"></div>
+    <div class="cvg-terminal">ALL OF THE ABOVE GET BLAMED ON THE MODEL</div>
+  </div>
+
+  <p class="cvg-hint">click a node</p>
+  <div class="cvg-card" role="status" aria-live="polite" hidden></div>
+</div>
+
+<script>
+(function(){
+  var root = document.getElementById('convergence-map');
+  if(!root || !root.querySelector) return;
+
+  var DETAIL = {
+    spec:     ['Two valid readings of one sentence','Same trajectory, different answer, ~50% pass','4 identical runs → 2 pass, 2 fail'],
+    policy:   ['Rules forbid the only working strategy','Agent aborts early, does almost nothing','“Exactly one lookup, never infer” → 18 runs ended in ≤3 calls'],
+    planning: ['Model picks the wrong step','Wrong step','The only cause that is actually the model'],
+    contract: ['Documentation contradicts the server','Careful agents refuse; reckless agents pass','Docs contradict the server'],
+    impl:     ['Write commits, response errors','Retry storms, duplicate records','Row count 22 → 23 across a “failed” call'],
+    state:    ['“Now” is never defined','Agent refuses to schedule anything','Relative dates with no reference clock'],
+    verifier: ['Check can never pass','Ceiling no model crosses','Integer 1 compared to string “1”']
+  };
+  var LINKS = {
+    spec:['flaky','dumb'], policy:['disobey','ceiling'], planning:['dumb','flaky'],
+    contract:['disobey','dumb'], impl:['flaky','ceiling'], state:['flaky','ceiling'],
+    verifier:['ceiling','dumb']
+  };
+  var CAUSE_IDS = Object.keys(LINKS);
+  var REVERSE = {};
+  CAUSE_IDS.forEach(function(c){
+    LINKS[c].forEach(function(s){ (REVERSE[s] = REVERSE[s] || []).push(c); });
+  });
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var stage = root.querySelector('.cvg-stage');
+  var svg = root.querySelector('.cvg-edges');
+  var card = root.querySelector('.cvg-card');
+  var terminal = root.querySelector('.cvg-terminal');
+  var bundle = root.querySelectorAll('.cvg-bundle path');
+  var causeCol = root.querySelector('.cvg-causes');
+  var symCol = root.querySelector('.cvg-symptoms');
+  var nodes = {}, node;
+  var nodeList = root.querySelectorAll('.cvg-node');
+  for(var i=0;i<nodeList.length;i++){ nodes[nodeList[i].dataset.id] = nodeList[i]; }
+
+  var edges = [], tedges = [], sel = null, selKind = null;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function mk(cls){ var p = document.createElementNS(NS,'path'); p.setAttribute('class',cls); return p; }
+
+  function build(){
+    var pulseLayer = document.createElementNS(NS,'g');
+    CAUSE_IDS.forEach(function(from){
+      LINKS[from].forEach(function(to){
+        var e = {from:from, to:to, path:mk('cvg-edge'), pulse:mk('cvg-pulse')};
+        svg.appendChild(e.path); pulseLayer.appendChild(e.pulse); edges.push(e);
+      });
+    });
+    ['disobey','flaky','ceiling','dumb'].forEach(function(to){
+      var t = {to:to, path:mk('cvg-tedge'), pulse:mk('cvg-pulse')};
+      svg.insertBefore(t.path, svg.firstChild); pulseLayer.appendChild(t.pulse); tedges.push(t);
+    });
+    svg.appendChild(pulseLayer);
+  }
+
+  function box(el, base){
+    var r = el.getBoundingClientRect();
+    return {l:r.left-base.left, r:r.right-base.left, t:r.top-base.top, b:r.bottom-base.top,
+            cx:(r.left+r.right)/2-base.left, cy:(r.top+r.bottom)/2-base.top};
+  }
+
+  function layout(){
+    if(!stage.offsetWidth) return;
+    var base = stage.getBoundingClientRect();
+    svg.setAttribute('viewBox', '0 0 ' + base.width + ' ' + base.height);
+    var p = {};
+    for(var id in nodes){ p[id] = box(nodes[id], base); }
+    var term = box(terminal, base);
+
+    function set(o, d){
+      o.path.setAttribute('d', d); o.pulse.setAttribute('d', d);
+      var len = o.path.getTotalLength();
+      o.path.style.setProperty('--len', len + 'px');
+      o.pulse.style.setProperty('--len', len + 'px');
+    }
+    edges.forEach(function(e){
+      var a = p[e.from], b = p[e.to];
+      var dx = Math.max(40, (b.l - a.r) * 0.48);
+      set(e, 'M' + a.r + ' ' + a.cy + ' C' + (a.r+dx) + ' ' + a.cy + ' ' + (b.l-dx) + ' ' + b.cy + ' ' + b.l + ' ' + b.cy);
+    });
+    // Symptom-to-terminal edges leave through the left edge of the symptom column
+    // rather than dropping straight down, so they never run behind the nodes
+    // stacked underneath (which show through once those nodes dim).
+    tedges.forEach(function(t){
+      var a = p[t.to], x0 = a.l, y0 = a.b - 8;
+      var c1 = x0 - Math.max(60, (x0 - term.cx) * 0.9);
+      var c2 = term.t - Math.max(26, (term.t - y0) * 0.45);
+      set(t, 'M' + x0 + ' ' + y0 + ' C' + c1 + ' ' + y0 + ' ' + term.cx + ' ' + c2 + ' ' + term.cx + ' ' + term.t);
+    });
+    if(sel) place();
+  }
+
+  function clearAll(){
+    for(var id in nodes){
+      nodes[id].classList.remove('is-sel','is-lit');
+      nodes[id].setAttribute('aria-pressed','false');
+    }
+    edges.forEach(function(e){ e.path.classList.remove('is-active','is-hot'); });
+    for(var i=0;i<bundle.length;i++){ bundle[i].classList.remove('is-active'); }
+    card.hidden = true;
+    delete root.dataset.sel;
+    sel = null; selKind = null;
+  }
+
+  function bundleOn(cls, id){
+    for(var i=0;i<bundle.length;i++){
+      if(bundle[i].classList.contains(cls) && bundle[i].dataset.id === id) bundle[i].classList.add('is-active');
+    }
+  }
+
+  // The card is absolutely positioned against #convergence-map's padding box, so
+  // offsets are measured from there, not from the stage. Available room is measured
+  // against the opposite column so the card never lands on top of a lit node.
+  function place(){
+    card.style.cssText = '';
+    card.classList.remove('is-docked','is-wrap');
+    var host = root.getBoundingClientRect();
+    var padL = host.left + root.clientLeft, padT = host.top + root.clientTop;
+    var padR = padL + root.clientWidth;
+    var sBox = stage.getBoundingClientRect();
+    var nb = nodes[sel].getBoundingClientRect();
+    var gap = 16, x, avail;
+
+    if(selKind === 'cause'){
+      x = nb.right + gap;
+      avail = symCol.getBoundingClientRect().left - gap - x;
+    } else {
+      x = nb.left - gap;
+      avail = x - causeCol.getBoundingClientRect().right - gap;
+    }
+    if(sBox.width < 620 || avail < 190){ card.classList.add('is-docked'); return; }
+
+    if(selKind === 'cause'){
+      card.style.left = (x - padL) + 'px';
+      card.style.width = Math.min(300, avail) + 'px';
+    } else {
+      card.style.right = (padR - x) + 'px';
+      if(card.offsetWidth > avail){ card.classList.add('is-wrap'); card.style.width = avail + 'px'; }
+    }
+    var top = nb.top + nb.height/2 - card.offsetHeight/2;
+    top = Math.max(sBox.top, Math.min(top, sBox.bottom - card.offsetHeight));
+    card.style.top = (top - padT) + 'px';
+  }
+
+  function select(id, kind){
+    clearAll();
+    root.classList.add('is-touched');
+    sel = id; selKind = kind;
+    root.dataset.sel = kind;
+    nodes[id].classList.add('is-sel');
+    nodes[id].setAttribute('aria-pressed','true');
+
+    var others = kind === 'cause' ? LINKS[id] : REVERSE[id];
+    others.forEach(function(o){ nodes[o].classList.add('is-lit'); });
+    bundleOn(kind === 'cause' ? 'cvg-in' : 'cvg-out', id);
+    others.forEach(function(o){ bundleOn(kind === 'cause' ? 'cvg-out' : 'cvg-in', o); });
+
+    var hot = edges.filter(function(e){ return kind === 'cause' ? e.from === id : e.to === id; });
+    svg.getBoundingClientRect();
+    hot.forEach(function(e){ e.path.classList.add('is-active'); });
+
+    if(kind === 'cause'){
+      var d = DETAIL[id];
+      card.className = 'cvg-card';
+      card.innerHTML = '<div class="cvg-card-title"></div><dl>' +
+        '<div><dt>fails</dt><dd class="f"></dd></div>' +
+        '<div><dt>symptom</dt><dd class="l"></dd></div>' +
+        '<div><dt>example</dt><dd class="e"></dd></div></dl>';
+      card.querySelector('.cvg-card-title').textContent = nodes[id].querySelector('.cvg-label').textContent;
+      card.querySelector('.f').textContent = d[0];
+      card.querySelector('.l').textContent = d[1];
+      card.querySelector('.e').textContent = d[2];
+    } else {
+      card.className = 'cvg-card is-badge';
+      card.textContent = nodes[id].querySelector('.cvg-label').textContent +
+        ' ← ' + others.length + ' possible cause' + (others.length === 1 ? '' : 's');
+    }
+    card.hidden = false;
+    place();
+  }
+
+  function hover(id, on){
+    if(sel) return;
+    edges.forEach(function(e){
+      if(e.from === id || e.to === id) e.path.classList.toggle('is-hot', on);
+    });
+  }
+
+  build();
+
+  for(var j=0;j<nodeList.length;j++){
+    (function(n){
+      var id = n.dataset.id, kind = LINKS[id] ? 'cause' : 'symptom';
+      n.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if(sel === id) clearAll(); else select(id, kind);
+      });
+      n.addEventListener('mouseenter', function(){ hover(id, true); });
+      n.addEventListener('mouseleave', function(){ hover(id, false); });
+      n.addEventListener('focus', function(){ hover(id, true); });
+      n.addEventListener('blur', function(){ hover(id, false); });
+    })(nodeList[j]);
+  }
+
+  card.addEventListener('click', function(ev){ ev.stopPropagation(); });
+  document.addEventListener('click', function(){ if(sel) clearAll(); });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape' && sel){ var n = nodes[sel]; clearAll(); n.focus(); }
+  });
+
+  if(window.ResizeObserver){ new ResizeObserver(layout).observe(stage); }
+  window.addEventListener('resize', layout);
+  layout();
+  root.classList.add('is-ready');
+
+  if(!reduced){
+    var fire = function(o, next){
+      o.pulse.classList.remove('is-pulsing');
+      o.pulse.getBoundingClientRect();
+      o.pulse.classList.add('is-pulsing');
+      setTimeout(function(){ o.pulse.classList.remove('is-pulsing'); if(next) next(); }, 1900);
+    };
+    setInterval(function(){
+      if(sel || document.hidden || stage.offsetWidth < 600) return;
+      var e = edges[Math.floor(Math.random() * edges.length)];
+      fire(e, function(){
+        var t = tedges.filter(function(x){ return x.to === e.to; })[0];
+        if(t && !sel) fire(t);
+      });
+    }, 2000);
+  }
+})();
+</script>

@@ -1,0 +1,71 @@
+<style>
+a[data-zoom] img{cursor:zoom-in}
+dialog.zoom-lb, dialog.zoom-lb *{box-sizing:border-box}
+dialog.zoom-lb{
+  width:100%; height:100%; max-width:100%; max-height:100%;
+  border:0; padding:24px; background:transparent; overflow:auto;
+  font-family:'Ubuntu',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* `safe` centring falls back to start alignment when the image is bigger than
+   the viewport, so the top-left stays reachable instead of overflowing off-screen. */
+dialog.zoom-lb[open]{display:flex; flex-direction:column; align-items:safe center; justify-content:safe center; gap:12px}
+dialog.zoom-lb::backdrop{background:rgba(16,16,18,.9)}
+/* Always 1:1. The inline chart already renders at its natural width on a wide
+   window, so a fit-to-viewport lightbox would zoom it *down*. Pan instead. */
+.zoom-lb img{
+  display:block; flex:none; background:#fff; border-radius:4px;
+  max-width:none; max-height:none;
+}
+.zoom-lb a{color:#c9ccd2; font-size:12px; text-decoration:none; border-bottom:1px solid #6c7178; flex:none}
+.zoom-lb a:hover{color:#fff}
+.zoom-close{
+  position:fixed; top:10px; right:14px; z-index:1;
+  appearance:none; background:none; border:0; cursor:pointer;
+  color:#c9ccd2; font:400 30px/1 system-ui,sans-serif; padding:2px 12px 6px;
+  background:rgba(16,16,18,.72); border-radius:7px;
+}
+.zoom-close:hover{color:#fff}
+.zoom-close:focus-visible,.zoom-lb a:focus-visible{outline:2px solid #fff; outline-offset:2px}
+@media (max-width:820px){
+  dialog.zoom-lb{padding:14px}
+}
+</style>
+
+<dialog class="zoom-lb" aria-label="Enlarged image">
+  <button type="button" class="zoom-close" aria-label="Close">&times;</button>
+  <img alt="">
+  <a target="_blank" rel="noopener"></a>
+</dialog>
+
+<script>
+(function(){
+  var dlg = document.querySelector('dialog.zoom-lb');
+  var links = document.querySelectorAll('a[data-zoom]');
+  if(!dlg || !dlg.showModal || !links.length) return;
+
+  var full = dlg.querySelector('img');
+  var src = dlg.querySelector('a');
+  var close = dlg.querySelector('.zoom-close');
+
+  for(var i=0;i<links.length;i++){
+    links[i].addEventListener('click', function(ev){
+      // let cmd/ctrl/shift/middle clicks fall through to the href
+      if(ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+      var img = this.querySelector('img');
+      if(!img) return;
+      ev.preventDefault();
+      full.src = img.currentSrc || img.src;
+      full.alt = img.alt;
+      src.href = this.href;
+      src.textContent = this.hostname;
+      dlg.showModal();
+      dlg.scrollTop = 0;
+    });
+  }
+
+  // Any click dismisses except the source link. On narrow screens the enlarged
+  // image fills the viewport, so there is no backdrop left to aim at.
+  dlg.addEventListener('click', function(ev){ if(!ev.target.closest('a')) dlg.close(); });
+  dlg.addEventListener('close', function(){ full.removeAttribute('src'); });
+})();
+</script>

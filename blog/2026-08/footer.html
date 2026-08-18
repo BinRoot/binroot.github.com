@@ -1,0 +1,138 @@
+<style>
+#post-footer{
+  --pf-ink:#16181c; --pf-mute:#6b7280; --pf-line:#d7dae0;
+  margin:4rem 0 1.5rem; padding-top:1.2rem; border-top:1px solid var(--pf-line);
+  display:flex; align-items:center; gap:14px 22px; flex-wrap:wrap;
+  font-family:'Ubuntu',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:13px; color:var(--pf-mute); color-scheme:light;
+}
+#post-footer *{box-sizing:border-box}
+#post-footer a{color:var(--pf-mute); text-decoration:none; border-bottom:1px solid var(--pf-line)}
+#post-footer a:hover{color:var(--pf-ink); border-bottom-color:var(--pf-mute)}
+#post-footer a:focus-visible{outline:2px dashed var(--pf-ink); outline-offset:3px}
+.pf-links{display:flex; gap:12px}
+.pf-sub{display:flex; gap:6px; margin:0 0 0 auto}
+.pf-sub input[type=email]{
+  font:inherit; font-size:12.5px; padding:5px 9px; width:180px;
+  border:1px solid var(--pf-line); border-radius:6px; background:#fff; color:var(--pf-ink);
+}
+.pf-sub input[type=email]:focus-visible{outline:none; border-color:var(--pf-mute)}
+.pf-sub button{
+  font:inherit; font-size:12.5px; padding:5px 12px; cursor:pointer;
+  border:1px solid var(--pf-ink); border-radius:6px; background:var(--pf-ink); color:#fff;
+}
+.pf-sub button:hover{opacity:.85}
+.pf-sub button:disabled{opacity:.4; cursor:default}
+.pf-sub button:focus-visible{outline:2px dashed var(--pf-ink); outline-offset:3px}
+/* honeypot: off-screen rather than display:none, so bots still fill it */
+.pf-sub .pf-trap{position:absolute; left:-9999px; width:1px; height:1px; opacity:0}
+.pf-note{flex:1 0 100%; margin:4px 0 0; font-size:12px; color:var(--pf-mute)}
+.pf-done{margin-left:auto; font-size:12.5px; color:var(--pf-ink)}
+/* Next-read card, below the footer so it is the last thing on the page. */
+#post-next{
+  --pn-ink:#16181c; --pn-mute:#6b7280; --pn-line:#d7dae0;
+  margin:2.6rem 0 3rem; color-scheme:light;
+  font-family:'Ubuntu',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+#post-next *{box-sizing:border-box}
+.pn-label{font-size:11px; color:var(--pn-mute); letter-spacing:.06em; margin:0 0 8px}
+.pn-card{
+  display:grid; grid-template-columns:1fr auto; gap:3px 14px; align-items:baseline;
+  padding:14px 16px; border:1px solid var(--pn-line); border-radius:8px;
+  background:#fff; text-decoration:none; color:inherit;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .14s ease;
+}
+.pn-card:hover{border-color:var(--pn-mute); box-shadow:0 3px 12px rgba(0,0,0,.06); transform:translateY(-1px)}
+.pn-card:focus-visible{outline:2px dashed var(--pn-ink); outline-offset:3px}
+.pn-title{font-size:15px; font-weight:500; color:var(--pn-ink)}
+.pn-date{font-size:11.5px; color:var(--pn-mute); white-space:nowrap}
+.pn-desc{grid-column:1 / -1; font-size:12.5px; line-height:1.45; color:var(--pn-mute); margin-top:3px}
+@media (max-width:420px){
+  .pn-card{grid-template-columns:1fr}
+  .pn-date{margin-top:2px}
+}
+@media (max-width:520px){
+  .pf-sub{margin-left:0; flex:1 0 100%}
+  .pf-sub input[type=email]{flex:1; width:auto}
+}
+</style>
+
+<footer id="post-footer">
+  <a href="/">home</a>
+  <span class="pf-links">
+    <a href="mailto:nishant@shukla.io">email</a>
+    <a href="https://github.com/binroot" target="_blank" rel="noopener">github</a>
+    <a href="https://www.linkedin.com/in/shuklanx/" target="_blank" rel="noopener">linkedin</a>
+    <a href="/blog/rss.xml">rss</a>
+  </span>
+  <form class="pf-sub">
+    <input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+    <button type="submit">subscribe</button>
+  </form>
+</footer>
+
+<aside id="post-next">
+  <p class="pn-label">you may also like</p>
+  <a class="pn-card" href="/blog/2026-06/byoa.html">
+    <span class="pn-title">Bring-Your-Own-Agent</span>
+    <span class="pn-date">June 2026</span>
+    <span class="pn-desc">No backend, no install: a webpage that borrows your local coding agent over a localhost WebSocket.</span>
+  </a>
+</aside>
+
+<script>
+/* Same capture as quantum-oracle-engineering/signup.js: the body stays a plain
+   string with no Content-Type header, so the browser skips the CORS preflight.
+   Setting application/json makes it send OPTIONS first, which Apps Script does
+   not answer, and the failure reads like a permissions bug. */
+(function(){
+  'use strict';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxr2yhqaUXG8XAyJwCDnCvGAdkFMxskuEkavIIYyUj5VRSMLpk_2IkcqNAEXn5OKn0DPQ/exec';
+  var CONTACT = 'nishant@shukla.io';
+  var NOTE = 'blog/gym';
+
+  var form = document.querySelector('#post-footer .pf-sub');
+  if(!form) return;
+  var email = form.querySelector('input[type=email]');
+  var send = form.querySelector('button');
+
+  var trap = document.createElement('input');
+  trap.type = 'text'; trap.className = 'pf-trap'; trap.tabIndex = -1;
+  trap.autocomplete = 'off'; trap.setAttribute('aria-hidden','true');
+
+  var note = document.createElement('p');
+  note.className = 'pf-note'; note.setAttribute('role','status');
+
+  form.appendChild(trap);
+  form.parentNode.appendChild(note);
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(send.disabled) return;
+    send.disabled = true;
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({ email: email.value, note: NOTE, company: trap.value })
+    }).then(function(res){ return res.json(); }).then(function(data){
+      if(data.ok){
+        var span = document.createElement('span');
+        span.className = 'pf-done';
+        span.setAttribute('role','status');
+        span.textContent = data.message;
+        form.replaceWith(span);
+        note.remove();
+      } else {
+        note.textContent = data.message;
+        send.disabled = false;
+      }
+    }).catch(function(){
+      var a = document.createElement('a');
+      a.href = 'mailto:' + CONTACT + '?subject=' + encodeURIComponent('Subscribe');
+      a.textContent = 'email me instead';
+      note.replaceChildren(document.createTextNode('could not reach the list. '), a);
+      send.disabled = false;
+    });
+  });
+})();
+</script>

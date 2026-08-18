@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 15 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Who benchmarks the benchmark?</title>
+      <link>https://shukla.io/blog/2026-08/gym.html</link>
+      <guid>https://shukla.io/blog/2026-08/gym.html</guid>
+      <pubDate>Tue, 18 Aug 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      26.2% to 100% without touching the model. Six ways a benchmark measures itself instead of the agent.
+      ]]></description>
+    </item>
 
     <item>
       <title>What's in the box?</title>
