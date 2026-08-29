@@ -6,6 +6,8 @@
 [IEEE Quantum Week 2026 (QCE26)](https://qce.quantum.ieee.org/2026/), Toronto, Canada.
 :::
 
+<div class="spectrum" aria-hidden="true"></div>
+
 ::: {.intro}
 Most quantum speedup claims depend on an oracle that exists only on paper.
 This course teaches the craft of building practical quantum circuits from scratch.
@@ -20,6 +22,8 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 :::: {.lessons}
 
+<p class="act">Choose the problem, build the oracle</p>
+
 ::: {.lesson data-lesson="qoe-lesson-01" style="--accent: #456AAD"}
 ### 1. A different computer
 
@@ -27,7 +31,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - most AI problems don't qualify
 - CPU, GPU, **QPU**: different jobs
-- for AI, the speedup is narrow: **sampling**
+- for AI search, test one lever: **coherent precision**
 - **three questions** to ask first
 - famous overpromises, dissected
 - knowing when to walk away
@@ -36,7 +40,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-02" style="--accent: #4D8C55"}
-### 2. Practical speedups
+### 2. The Monte Carlo speedup
 
 <figure class="art"><img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy"></figure>
 
@@ -44,7 +48,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - the trick: **precision on averages**
 - how the **square root** actually happens
 - a query-counting **proof**: classical can't keep up
-- **Go** flunks, **bandits** flunk
+- **Go** flunks, a **sampled bandit** flunks
 - so we invented a game of **close calls**
 
 <button class="coming" disabled>Coming Sept 8</button>
@@ -66,7 +70,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-04" style="--accent: #F03836"}
-### 4. Qubit care
+### 4. Reversible by design
 
 <figure class="art"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></figure>
 
@@ -80,10 +84,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 <button class="coming" disabled>Coming Sept 22</button>
 :::
 
+<p class="act">Make it correct</p>
+
 ::: {.lesson data-lesson="qoe-lesson-05" style="--accent: #7E874C"}
 ### 5. Garbage collection
 
-<figure class="art"><img src="img/myth05.png" alt="A trash can overflowing with bags that nobody has hauled away" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth05.png" alt="A trash can overflowing with bags that were never hauled away" width="600" height="600" loading="lazy"></figure>
 
 - there is **no delete**
 - leftover junk stays **tied to your answer**
@@ -96,12 +102,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-06" style="--accent: #B6D792"}
-### 6. Peek and patch
+### 6. Measure to erase
 
 <figure class="art"><img src="img/myth06.png" alt="A cracked jar of water patched with bandages, still leaking" width="600" height="600" loading="lazy"></figure>
 
-- the rule every course teaches: **never look**
-- production circuits **look anyway**
+- the rule every course teaches: **never peek**
+- production circuits **peek anyway**
 - **measure the garbage** on purpose
 - patch the damage with **phase fixes**
 - **cheapest eraser** there is
@@ -111,9 +117,9 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-07" style="--accent: #761D01"}
-### 7. Other people's memory
+### 7. Calling conventions
 
-<figure class="art"><img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbour" width="600" height="600" loading="lazy"></figure>
 
 - scratch you can use but **never inspect**
 - **clean, borrowed, conditionally clean**
@@ -126,7 +132,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-08" style="--accent: #D9EB4E"}
-### 8. Show your work
+### 8. Proof-carrying circuits
 
 <figure class="art"><img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy"></figure>
 
@@ -140,10 +146,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 <button class="coming" disabled>Coming Oct 20</button>
 :::
 
-::: {.lesson data-lesson="qoe-lesson-09" style="--accent: #966B55"}
-### 9. The impossible flipbook
+<p class="act">Price it, test it, judge it</p>
 
-<figure class="art"><img src="img/myth07.png" alt="Interlocking gears packed edge to edge with no room to spare" width="600" height="600" loading="lazy"></figure>
+::: {.lesson data-lesson="qoe-lesson-09" style="--accent: #966B55"}
+### 9. Where the quantum lives
+
+<figure class="art"><img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy"></figure>
 
 - every page is a **classical** drawing
 - the animation is **impossible**
@@ -156,9 +164,9 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-10" style="--accent: #9598CA"}
-### 10. No bulk discount
+### 10. All or nothing
 
-<figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can file them" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth12.png" alt="One oversized box balanced on a stack of small ones: each piece is cheap, the whole is not" width="600" height="600" loading="lazy"></figure>
 
 - buying in bulk should get cheaper
 - it doesn't: **qubits of memory**, zero or linear, nothing between
@@ -171,7 +179,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-11" style="--accent: #92BBA8"}
-### 11. Spot the fake
+### 11. Test, don't trust
 
 <figure class="art"><img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy"></figure>
 
@@ -186,9 +194,9 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-12" style="--accent: #9F4668"}
-### 12. The next miracle
+### 12. Audit the next claim
 
-<figure class="art"><img src="img/myth12.png" alt="An oversized box balanced on a stack of much smaller ones" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can check them" width="600" height="600" loading="lazy"></figure>
 
 - the **reigning faith** of the AI era
 - what the evidence says
@@ -210,7 +218,7 @@ Session 1 (90 minutes): Lessons 1 and 2, identifying a problem worth acceleratin
 Session 2 (90 minutes): Lessons 3 and 4, building the rollout oracle.
 
 For practitioners and researchers comfortable with qubits, controlled gates,
-and circuit diagrams. A pre-read on amplitude estimation is included in the materials.
+and circuit diagrams.
 :::
 
 ::: {.pagefoot}

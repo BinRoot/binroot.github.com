@@ -3,11 +3,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Nishant Shukla">
 <meta property="og:title" content="Quantum Oracle Engineering">
-<meta property="og:description" content="A Programmer's Guide to Building the Right Oracle. Twelve lessons, each debunking a commonly held belief about quantum computing.">
+<meta property="og:description" content="A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.">
 <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Quantum Oracle Engineering">
-<meta name="twitter:description" content="A Programmer's Guide to Building the Right Oracle. Twelve lessons, each debunking a commonly held belief about quantum computing.">
+<meta name="twitter:description" content="A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.">
 <script
   src="https://cdn.counter.dev/script.js"
   data-id="476c224d-08f5-44d4-a25a-005e5c890f79"
@@ -370,8 +370,6 @@ button.busy::after {
    the buttons and the boil cannot drift apart the way they do when each lives
    in its own rule with the selector copied across all of them. */
 .lesson:is(:hover, :focus-within, .lit) {
-  border-top-color: var(--accent);
-
   &::before {
     background: color-mix(in oklab, var(--accent) 9%, #fcfcfa);
     box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 22%, transparent);
@@ -415,20 +413,7 @@ button.busy::after {
    with the lit state above and are the only things this guard removes. */
 @media (prefers-reduced-motion: no-preference) {
   .lesson {
-    transition: transform 160ms ease, border-color 160ms ease;
-  }
-}
-/* A phone has no pointer to hover with, so the accent would never appear at
-   all.  Hand those visitors the colour outright, on the rule above the card. */
-@media (hover: none) {
-  .lesson {
-    border-top-color: var(--accent);
-  }
-  /* spotlight.js lights one card at a time, so the rest go back to grey and
-     the lit one actually stands out.  Without JavaScript this rule never
-     applies and every rule keeps its colour, which is the better fallback. */
-  .lit-active .lesson:not(.lit) {
-    border-top-color: #d8d5cd;
+    transition: transform 160ms ease;
   }
 }
 @media (max-width: 700px) {
@@ -458,5 +443,183 @@ button.busy::after {
   .lesson .art {
     max-width: 16em;
   }
+}
+
+/* ── 2026 refinement pass ─────────────────────────────────────────────
+   Typography leads.  Fluid sizes via clamp(), balanced headings, a pretty
+   text wrap on prose, generous vertical rhythm.  Everything below overrides
+   the base rules above by coming later in the sheet; nothing here needs
+   JavaScript, and every motion sits behind prefers-reduced-motion. */
+:root {
+  --paper: #fcfcfa;
+  --ink: #1a1a1a;
+  --dim: #55534e;
+  --faint: #6b6b66;
+  --rule: #d8d5cd;
+  /* the twelve card accents, in lesson order, for the spectrum rule */
+  --spectrum: #456AAD, #4D8C55, #C35523, #F03836, #7E874C, #B6D792,
+              #761D01, #D9EB4E, #966B55, #9598CA, #92BBA8, #9F4668;
+}
+body {
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.1rem);
+  line-height: 1.6;
+  padding: clamp(2.5em, 6vh, 4.5em) clamp(1.1em, 4vw, 2.5em) 4em;
+}
+h1.title {
+  font-size: clamp(2.1rem, 1.3rem + 3.6vw, 3.9rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+/* The subtitle takes the serif italic the lesson titles use, so the page's
+   two voices, the plain sans and the quoted serif, are both set on line one. */
+h1:not(.title) {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: clamp(1.15rem, 0.9rem + 1.1vw, 1.7rem);
+  color: var(--dim);
+  margin: 0.55em auto 0.9em;
+  max-width: 30em;
+  text-wrap: balance;
+}
+.venue {
+  font-size: 0.82em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 2.2em;
+}
+.venue a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+.venue a:hover { border-bottom-color: var(--dim); }
+/* The signature: one thin rule carrying all twelve lesson colours in order,
+   the course's arc compressed to a line.  Hard stops, no blending. */
+.spectrum {
+  height: 4px;
+  max-width: 34em;
+  margin: 0 auto 3em;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    #456AAD 0 8.33%, #4D8C55 0 16.66%, #C35523 0 25%, #F03836 0 33.33%,
+    #7E874C 0 41.66%, #B6D792 0 50%, #761D01 0 58.33%, #D9EB4E 0 66.66%,
+    #966B55 0 75%, #9598CA 0 83.33%, #92BBA8 0 91.66%, #9F4668 0 100%);
+}
+.intro {
+  max-width: 34em;
+  font-size: clamp(1.05rem, 1rem + 0.35vw, 1.3rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+  margin-bottom: 2.6em;
+}
+/* One prominent call to action.  The field and the button share one pill
+   outline; on a narrow screen they stack and the button goes full width. */
+.subscribe-form {
+  max-width: 30em;
+  gap: 0.5em;
+}
+.subscribe-form input[type="email"] {
+  padding: 0.85em 1.1em;
+  border-radius: 999px;
+  font-size: 1em;
+}
+/* The one action on the page gets its own colour, a vermilion hotter than any
+   card accent, and a resting glow so it reads as the action before anyone
+   hovers.  White on the gradient's midpoint stays above 4.5:1. */
+.subscribe { --accent: #D63A1E; }
+.subscribe-form button {
+  padding: 0.9em 1.7em;
+  border-radius: 999px;
+  font-size: 0.82em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  background: linear-gradient(135deg, #E0471E, #C9401C);
+  border-color: #C9401C;
+  box-shadow: 0 4px 14px color-mix(in oklab, #D63A1E 32%, transparent);
+}
+.subscribe-form button:hover,
+.subscribe-form button:focus-visible {
+  background: linear-gradient(135deg, #E8552A, #D63A1E);
+  box-shadow: 0 8px 22px color-mix(in oklab, #D63A1E 48%, transparent);
+}
+@media (max-width: 480px) {
+  .subscribe-form { flex-direction: column; }
+  .subscribe-form input[type="email"], .subscribe-form button { width: 100%; flex: none; }
+}
+
+/* ── The grid: columns from the container, acts as row headers ── */
+/* The grid breaks out of the 64em text column to as much as 76em so that on
+   a wide screen each act is exactly one row of four cards: three acts, three
+   rows.  Narrower screens fall to three, two, then one column on their own. */
+.lessons {
+  container-type: inline-size;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.2em 2.2em;
+  margin-top: 1em;
+  /* cqw against the root, not vw: vw counts the vertical scrollbar and
+     would leave the grid a scrollbar's width too wide. */
+  margin-inline: calc(50% - min(38em, 50cqw - 1.25em));
+}
+html { container-type: inline-size; }
+/* Four across, two across, one across: every act stays a whole block, never
+   three cards and an orphan. */
+@media (min-width: 1280px) { .lessons { grid-template-columns: repeat(4, 1fr); } }
+/* In the two-across range the cards get wide; the art stays a picture, not a poster. */
+.lesson img { max-width: min(100%, 22em); margin-inline: auto; display: block; }
+@media (max-width: 700px)  { .lessons { grid-template-columns: 1fr; margin-inline: 0; } }
+.lessons > .act {
+  grid-column: 1 / -1;
+  margin: 1.6em 0 -0.6em;
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+}
+.lessons > .act:first-child { margin-top: 0; }
+.lessons > .act::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  translate: 0 -0.35em;
+}
+.lesson h2 {
+  font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.4rem);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+.lesson ul { line-height: 1.5; }
+/* Chips as pills; the date is the status, "notify me" the action. */
+.lesson button, .signup button, .signup input[type="email"] {
+  border-radius: 999px;
+}
+.lesson button { padding: 0.5em 1.1em; }
+.lesson .notify { border-color: #c9c6bd; }
+/* Scroll-driven reveal, pure CSS, progressive enhancement: each card rises
+   into place as it enters the viewport.  It animates `translate`, not
+   `transform`, so the hover lift on `transform` above is untouched. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lesson {
+      animation: card-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 45%;
+    }
+  }
+}
+@keyframes card-rise {
+  from { opacity: 0.15; translate: 0 1.6em; }
+  to   { opacity: 1;    translate: 0 0; }
+}
+.agenda { margin-top: 5em; }
+.agenda h2 { font-size: 0.78em; letter-spacing: 0.16em; }
+.agenda p { text-wrap: pretty; }
+.pagefoot { margin-top: 5em; }
+@media (max-width: 700px) {
+  .lessons > .act { justify-content: center; }
+  .lessons > .act::after { display: none; }
+  .venue { margin-bottom: 1.8em; }
 }
 </style>
