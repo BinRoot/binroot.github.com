@@ -831,13 +831,14 @@ data-lesson="qoe-lesson-01" style="--accent: #456AAD">
 <img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>most AI problems don’t qualify</li>
-<li>CPU, GPU, <strong>QPU</strong>: different jobs</li>
-<li>for AI search, test one lever: <strong>coherent
-precision</strong></li>
-<li><strong>three questions</strong> to ask first</li>
-<li>famous overpromises, dissected</li>
-<li>knowing when to walk away</li>
+<li><strong>CPU, GPU, QPU</strong>: three devices, three workloads</li>
+<li>the QPU’s job: <strong>fewer samples</strong> for an average</li>
+<li><strong>Θ(1/ε)</strong> queries in place of <strong>Θ(1/ε²)</strong>
+samples</li>
+<li><strong>three questions</strong>: task randomness, precision, oracle
+cost</li>
+<li>Grover on a database loses to <strong>data loading</strong></li>
+<li>break-even: <strong>t_oracle &lt; t_roll / (C·P·g)</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 1
@@ -850,14 +851,17 @@ data-lesson="qoe-lesson-02" style="--accent: #4D8C55">
 <img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>the folklore, with <strong>fine print</strong></li>
-<li>the trick: <strong>precision on averages</strong></li>
-<li>how the <strong>square root</strong> actually happens</li>
-<li>a query-counting <strong>proof</strong>: classical can’t keep
-up</li>
-<li><strong>Go</strong> flunks, a <strong>sampled bandit</strong>
-flunks</li>
-<li>so we invented a game of <strong>close calls</strong></li>
+<li>a <strong>query count</strong> is not a runtime</li>
+<li>the payoff qubit’s angle <strong>encodes the win
+probability</strong></li>
+<li><strong>amplitude estimation</strong> reads that angle to precision
+ε</li>
+<li>best of k arms: <strong>Ω(k/ε²)</strong> samples vs
+<strong>Õ(√k/ε)</strong> queries</li>
+<li><strong>Go</strong> fails question 1, the <strong>bandit</strong>
+fails question 3</li>
+<li><strong>Sway</strong>: gaps of 10⁻⁴ on a 32×32 board</li>
+<li>the same oracle shape fits an <strong>epidemic model</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 8
@@ -870,12 +874,15 @@ style="--accent: #C35523">
 <img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>“<strong>assume the oracle exists</strong>,” says every paper</li>
-<li>we stop assuming and build it, <strong>gate by gate</strong></li>
-<li>a game board made of qubits</li>
-<li>all the randomness, <strong>loaded up front</strong></li>
-<li>picking moves without <strong>skewing the odds</strong></li>
-<li>the <strong>scratch work</strong> starts piling up</li>
+<li>the contract: board, two moves, randomness tape, <strong>payoff
+qubit</strong></li>
+<li>one round: Black places, White places, <strong>every stone
+rolls</strong></li>
+<li>the <strong>register layout</strong> in Qiskit</li>
+<li>a uniform move choice over the <strong>legal cells</strong></li>
+<li>the d20 as a <strong>5-bit comparison</strong> against a neighbour
+count</li>
+<li>3×3, two rounds: <strong>169 qubits</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 15
@@ -888,12 +895,16 @@ data-lesson="qoe-lesson-04" style="--accent: #F03836">
 <img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>the finished circuit must <strong>run backward</strong></li>
-<li>every cell updates <strong>at once</strong>, or bugs</li>
-<li>the <strong>self-flip trap</strong></li>
-<li><strong>snapshot</strong> the board, then swap</li>
-<li>one qubit holds the score</li>
-<li>the full bill, in qubits</li>
+<li>amplitude estimation runs the rollout <strong>forward and
+backward</strong></li>
+<li>decide from the old board, write to a <strong>shadow board</strong>,
+swap</li>
+<li><strong>in-place updates</strong> read a neighbour that already
+flipped</li>
+<li>erase <strong>move-selection scratch</strong> before the board
+changes</li>
+<li>one <strong>payoff qubit</strong>, everything else inverted</li>
+<li>the <strong>qubit and gate bill</strong> as the board grows</li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 22
@@ -909,12 +920,13 @@ data-lesson="qoe-lesson-05" style="--accent: #7E874C">
 <img src="img/myth05.png" alt="A trash can overflowing with bags that were never hauled away" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>there is <strong>no delete</strong></li>
-<li>leftover junk stays <strong>tied to your answer</strong></li>
-<li>and quietly poisons it</li>
-<li>forgetting means <strong>undoing history</strong></li>
-<li>compute, use, <strong>uncompute</strong></li>
-<li>clean scratch still doesn’t mean right answer</li>
+<li>reversible circuits have <strong>no delete</strong></li>
+<li>entangled scratch <strong>breaks interference</strong></li>
+<li><strong>Bennett</strong>: compute, copy out, uncompute</li>
+<li>the inverse must see the <strong>same inputs</strong> as the forward
+pass</li>
+<li><strong>peak scratch</strong> sets the qubit bill</li>
+<li>clean scratch is <strong>necessary, not sufficient</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 29
@@ -927,12 +939,14 @@ data-lesson="qoe-lesson-06" style="--accent: #B6D792">
 <img src="img/myth06.png" alt="A cracked jar of water patched with bandages, still leaking" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>the rule every course teaches: <strong>never peek</strong></li>
-<li>production circuits <strong>peek anyway</strong></li>
-<li><strong>measure the garbage</strong> on purpose</li>
-<li>patch the damage with <strong>phase fixes</strong></li>
-<li><strong>cheapest eraser</strong> there is</li>
-<li>machine-checked rules for when it’s safe</li>
+<li>the textbook says <strong>never measure</strong> mid-circuit</li>
+<li>compilers measure scratch to <strong>reclaim qubits</strong></li>
+<li>Gidney’s <strong>AND†</strong>: an X-basis measurement instead of a
+Toffoli</li>
+<li>a random sign, fixed by <strong>one phase gate</strong></li>
+<li><strong>half the T gates</strong> of an adder</li>
+<li>safe when scratch holds a <strong>basis function</strong> of the
+data</li>
 </ul>
 <button class="coming" disabled>
 Coming Oct 6
@@ -945,12 +959,15 @@ data-lesson="qoe-lesson-07" style="--accent: #761D01">
 <img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbour" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>scratch you can use but <strong>never inspect</strong></li>
-<li><strong>clean, borrowed, conditionally clean</strong></li>
-<li>returning it as you found it <strong>isn’t enough</strong></li>
-<li>promises checked <strong>where blocks meet</strong></li>
-<li>Rust’s <strong>borrow checker</strong>, but for qubits</li>
-<li>mismatched promises, <strong>no deal</strong></li>
+<li>three scratch classes: <strong>clean, borrowed, conditionally
+clean</strong></li>
+<li>Qiskit passes the reuse condition as <strong>unchecked
+convention</strong></li>
+<li>a block can <strong>destroy its own condition</strong></li>
+<li>two correct blocks, one <strong>unguaranteed boundary</strong></li>
+<li><strong>restoration types</strong>: Hoare contracts over
+subspaces</li>
+<li>a 12-bit oracle: <strong>20 qubits to 13</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Oct 13
@@ -963,13 +980,14 @@ data-lesson="qoe-lesson-08" style="--accent: #D9EB4E">
 <img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>circuits that <strong>ace every test</strong>, wrongly</li>
-<li><strong>hidden phases</strong>, invisible to truth tables</li>
-<li>checking everything costs <strong>2^n</strong></li>
-<li>escape hatch: <strong>one proof per circuit family</strong></li>
-<li>every block ships with a <strong>seal</strong>, checked in
+<li>truth tables <strong>cannot see a phase</strong></li>
+<li>full-basis checking costs <strong>2ⁿ</strong></li>
+<li>certificates replayed by a <strong>Lean kernel</strong></li>
+<li>gate-by-gate checking needs <strong>closure</strong> under the gate
+set</li>
+<li>past <strong>Toffoli</strong>, assertions grow exponentially</li>
+<li><strong>one theorem per family</strong>, checked in
 milliseconds</li>
-<li>strangers’ code, <strong>safely composed</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Oct 20
@@ -985,13 +1003,13 @@ data-lesson="qoe-lesson-09" style="--accent: #966B55">
 <img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>every page is a <strong>classical</strong> drawing</li>
-<li>the animation is <strong>impossible</strong></li>
-<li>each step has a <strong>classical model</strong>; they refuse to
-glue</li>
-<li>one story per step, <strong>no story overall</strong></li>
-<li>where the quantum actually <strong>lives</strong></li>
-<li>and the gap has a price, in <strong>coherent memory</strong></li>
+<li>a process that runs <strong>step by step</strong></li>
+<li>between any two steps, <strong>classical bits</strong> would do</li>
+<li>no one classical carrier works for <strong>all steps at
+once</strong> (Bisio)</li>
+<li>the <strong>SHIFTS channel</strong>: one qubit in, two out, built to
+show it</li>
+<li>the quantum lives in the <strong>memory between steps</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Oct 27
@@ -1004,13 +1022,13 @@ style="--accent: #9598CA">
 <img src="img/myth12.png" alt="One oversized box balanced on a stack of small ones: each piece is cheap, the whole is not" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>buying in bulk should get cheaper</li>
-<li>it doesn’t: <strong>qubits of memory</strong>, zero or linear,
-nothing between</li>
-<li>no <strong>amortizing</strong>, no compressing, no caching</li>
-<li>copy 1,000,000 costs what copy 1 cost</li>
-<li>a <strong>theorem</strong>, not a hunch</li>
-<li>why the flipbook can’t be <strong>fixed</strong></li>
+<li>running n copies <strong>does not amortize</strong></li>
+<li>quantum memory: <strong>zero or linear</strong> in n, nothing
+between</li>
+<li><strong>log n and √n</strong> scalings ruled out</li>
+<li>the same law for <strong>preparing states</strong></li>
+<li>SHIFTS: at least <strong>0.03 qubits per copy</strong></li>
+<li>a <strong>theorem</strong>, with constants</li>
 </ul>
 <button class="coming" disabled>
 Coming Nov 3
@@ -1023,12 +1041,12 @@ style="--accent: #92BBA8">
 <img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>a <strong>tabletop test</strong> for quantum claims</li>
-<li>no lab, no tomography</li>
-<li>fakers pay the <strong>qubit memory bill</strong> or fold</li>
-<li>any implementation, <strong>no peeking inside</strong></li>
-<li>benchmarks that can’t be <strong>gamed</strong></li>
-<li>pretenders fail <strong>exponentially fast</strong></li>
+<li>a test with <strong>single-qubit measurements</strong> only</li>
+<li>a correct device passes <strong>every time</strong></li>
+<li>q qubits of memory pass with probability at most
+<strong>2<sup>q</sup>(1 − γ)<sup>n</sup></strong></li>
+<li>too little memory fails <strong>exponentially fast</strong></li>
+<li>the device stays a <strong>black box</strong></li>
 </ul>
 <button class="coming" disabled>
 Coming Nov 10
@@ -1041,12 +1059,16 @@ data-lesson="qoe-lesson-12" style="--accent: #9F4668">
 <img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can check them" width="600" height="600" loading="lazy">
 </figure>
 <ul>
-<li>the <strong>reigning faith</strong> of the AI era</li>
-<li>what the evidence says</li>
-<li>where quantum could fit in AI</li>
-<li><strong>lesson 1’s questions</strong>, aimed at the headlines</li>
-<li><strong>wall-clock math</strong>, not gut feel</li>
-<li>how to judge the <strong>next miracle</strong></li>
+<li>the AI era’s assumption: <strong>compute closes every
+gap</strong></li>
+<li>the <strong>1/g² wall</strong>: tiny gaps, irreducible
+randomness</li>
+<li><strong>weak baselines</strong>, query counts sold as runtimes</li>
+<li><strong>ignored parallelism</strong>, solver randomness as task
+randomness</li>
+<li>oracle cost hidden behind <strong>“assume oracle
+access”</strong></li>
+<li>the three questions on a <strong>headline claim</strong>, live</li>
 </ul>
 <button class="coming" disabled>
 Coming Nov 17

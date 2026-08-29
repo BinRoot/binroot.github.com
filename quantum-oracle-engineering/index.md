@@ -29,12 +29,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy"></figure>
 
-- most AI problems don't qualify
-- CPU, GPU, **QPU**: different jobs
-- for AI search, test one lever: **coherent precision**
-- **three questions** to ask first
-- famous overpromises, dissected
-- knowing when to walk away
+- **CPU, GPU, QPU**: three devices, three workloads
+- the QPU's job: **fewer samples** for an average
+- **Θ(1/ε)** queries in place of **Θ(1/ε²)** samples
+- **three questions**: task randomness, precision, oracle cost
+- Grover on a database loses to **data loading**
+- break-even: **t_oracle < t_roll / (C·P·g)**
 
 <button class="coming" disabled>Coming Sept 1</button>
 :::
@@ -44,12 +44,13 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy"></figure>
 
-- the folklore, with **fine print**
-- the trick: **precision on averages**
-- how the **square root** actually happens
-- a query-counting **proof**: classical can't keep up
-- **Go** flunks, a **sampled bandit** flunks
-- so we invented a game of **close calls**
+- a **query count** is not a runtime
+- the payoff qubit's angle **encodes the win probability**
+- **amplitude estimation** reads that angle to precision ε
+- best of k arms: **Ω(k/ε²)** samples vs **Õ(√k/ε)** queries
+- **Go** fails question 1, the **bandit** fails question 3
+- **Sway**: gaps of 10⁻⁴ on a 32×32 board
+- the same oracle shape fits an **epidemic model**
 
 <button class="coming" disabled>Coming Sept 8</button>
 :::
@@ -59,12 +60,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy"></figure>
 
-- "**assume the oracle exists**," says every paper
-- we stop assuming and build it, **gate by gate**
-- a game board made of qubits
-- all the randomness, **loaded up front**
-- picking moves without **skewing the odds**
-- the **scratch work** starts piling up
+- the contract: board, two moves, randomness tape, **payoff qubit**
+- one round: Black places, White places, **every stone rolls**
+- the **register layout** in Qiskit
+- a uniform move choice over the **legal cells**
+- the d20 as a **5-bit comparison** against a neighbour count
+- 3×3, two rounds: **169 qubits**
 
 <button class="coming" disabled>Coming Sept 15</button>
 :::
@@ -74,12 +75,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></figure>
 
-- the finished circuit must **run backward**
-- every cell updates **at once**, or bugs
-- the **self-flip trap**
-- **snapshot** the board, then swap
-- one qubit holds the score
-- the full bill, in qubits
+- amplitude estimation runs the rollout **forward and backward**
+- decide from the old board, write to a **shadow board**, swap
+- **in-place updates** read a neighbour that already flipped
+- erase **move-selection scratch** before the board changes
+- one **payoff qubit**, everything else inverted
+- the **qubit and gate bill** as the board grows
 
 <button class="coming" disabled>Coming Sept 22</button>
 :::
@@ -91,12 +92,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth05.png" alt="A trash can overflowing with bags that were never hauled away" width="600" height="600" loading="lazy"></figure>
 
-- there is **no delete**
-- leftover junk stays **tied to your answer**
-- and quietly poisons it
-- forgetting means **undoing history**
-- compute, use, **uncompute**
-- clean scratch still doesn't mean right answer
+- reversible circuits have **no delete**
+- entangled scratch **breaks interference**
+- **Bennett**: compute, copy out, uncompute
+- the inverse must see the **same inputs** as the forward pass
+- **peak scratch** sets the qubit bill
+- clean scratch is **necessary, not sufficient**
 
 <button class="coming" disabled>Coming Sept 29</button>
 :::
@@ -106,12 +107,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth06.png" alt="A cracked jar of water patched with bandages, still leaking" width="600" height="600" loading="lazy"></figure>
 
-- the rule every course teaches: **never peek**
-- production circuits **peek anyway**
-- **measure the garbage** on purpose
-- patch the damage with **phase fixes**
-- **cheapest eraser** there is
-- machine-checked rules for when it's safe
+- the textbook says **never measure** mid-circuit
+- compilers measure scratch to **reclaim qubits**
+- Gidney's **AND†**: an X-basis measurement instead of a Toffoli
+- a random sign, fixed by **one phase gate**
+- **half the T gates** of an adder
+- safe when scratch holds a **basis function** of the data
 
 <button class="coming" disabled>Coming Oct 6</button>
 :::
@@ -121,12 +122,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbour" width="600" height="600" loading="lazy"></figure>
 
-- scratch you can use but **never inspect**
-- **clean, borrowed, conditionally clean**
-- returning it as you found it **isn't enough**
-- promises checked **where blocks meet**
-- Rust's **borrow checker**, but for qubits
-- mismatched promises, **no deal**
+- three scratch classes: **clean, borrowed, conditionally clean**
+- Qiskit passes the reuse condition as **unchecked convention**
+- a block can **destroy its own condition**
+- two correct blocks, one **unguaranteed boundary**
+- **restoration types**: Hoare contracts over subspaces
+- a 12-bit oracle: **20 qubits to 13**
 
 <button class="coming" disabled>Coming Oct 13</button>
 :::
@@ -136,12 +137,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth11.png" alt="A sealed jar of identical blue pills with a single red one inside" width="600" height="600" loading="lazy"></figure>
 
-- circuits that **ace every test**, wrongly
-- **hidden phases**, invisible to truth tables
-- checking everything costs **2^n**
-- escape hatch: **one proof per circuit family**
-- every block ships with a **seal**, checked in milliseconds
-- strangers' code, **safely composed**
+- truth tables **cannot see a phase**
+- full-basis checking costs **2ⁿ**
+- certificates replayed by a **Lean kernel**
+- gate-by-gate checking needs **closure** under the gate set
+- past **Toffoli**, assertions grow exponentially
+- **one theorem per family**, checked in milliseconds
 
 <button class="coming" disabled>Coming Oct 20</button>
 :::
@@ -153,12 +154,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth09.png" alt="A hand pulling a book from a shelf, red light spilling from the gap" width="600" height="600" loading="lazy"></figure>
 
-- every page is a **classical** drawing
-- the animation is **impossible**
-- each step has a **classical model**; they refuse to glue
-- one story per step, **no story overall**
-- where the quantum actually **lives**
-- and the gap has a price, in **coherent memory**
+- a process that runs **step by step**
+- between any two steps, **classical bits** would do
+- no one classical carrier works for **all steps at once** (Bisio)
+- the **SHIFTS channel**: one qubit in, two out, built to show it
+- the quantum lives in the **memory between steps**
 
 <button class="coming" disabled>Coming Oct 27</button>
 :::
@@ -168,12 +168,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth12.png" alt="One oversized box balanced on a stack of small ones: each piece is cheap, the whole is not" width="600" height="600" loading="lazy"></figure>
 
-- buying in bulk should get cheaper
-- it doesn't: **qubits of memory**, zero or linear, nothing between
-- no **amortizing**, no compressing, no caching
-- copy 1,000,000 costs what copy 1 cost
-- a **theorem**, not a hunch
-- why the flipbook can't be **fixed**
+- running n copies **does not amortize**
+- quantum memory: **zero or linear** in n, nothing between
+- **log n and √n** scalings ruled out
+- the same law for **preparing states**
+- SHIFTS: at least **0.03 qubits per copy**
+- a **theorem**, with constants
 
 <button class="coming" disabled>Coming Nov 3</button>
 :::
@@ -183,12 +183,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth08.png" alt="A basket of red apples with one rotten apple hidden in the middle" width="600" height="600" loading="lazy"></figure>
 
-- a **tabletop test** for quantum claims
-- no lab, no tomography
-- fakers pay the **qubit memory bill** or fold
-- any implementation, **no peeking inside**
-- benchmarks that can't be **gamed**
-- pretenders fail **exponentially fast**
+- a test with **single-qubit measurements** only
+- a correct device passes **every time**
+- q qubits of memory pass with probability at most **2^q^(1 − γ)^n^**
+- too little memory fails **exponentially fast**
+- the device stays a **black box**
 
 <button class="coming" disabled>Coming Nov 10</button>
 :::
@@ -198,12 +197,12 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 <figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can check them" width="600" height="600" loading="lazy"></figure>
 
-- the **reigning faith** of the AI era
-- what the evidence says
-- where quantum could fit in AI
-- **lesson 1's questions**, aimed at the headlines
-- **wall-clock math**, not gut feel
-- how to judge the **next miracle**
+- the AI era's assumption: **compute closes every gap**
+- the **1/g² wall**: tiny gaps, irreducible randomness
+- **weak baselines**, query counts sold as runtimes
+- **ignored parallelism**, solver randomness as task randomness
+- oracle cost hidden behind **"assume oracle access"**
+- the three questions on a **headline claim**, live
 
 <button class="coming" disabled>Coming Nov 17</button>
 :::
