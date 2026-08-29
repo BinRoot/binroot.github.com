@@ -683,9 +683,11 @@
     gap: 0.5em;
   }
   .subscribe-form input[type="email"] {
+    box-sizing: border-box;
     padding: 0.85em 1.1em;
     border-radius: 999px;
-    font-size: 1em;
+    font-size: max(1em, 16px);   /* 16px or more, so iOS does not zoom the page on focus */
+    min-height: 3rem;            /* 48px tap target */
   }
   /* The one action on the page gets its own colour, a vermilion hotter than any
      card accent, and a resting glow so it reads as the action before anyone
@@ -706,9 +708,14 @@
     background: linear-gradient(135deg, #E8552A, #D63A1E);
     box-shadow: 0 8px 22px color-mix(in oklab, #D63A1E 48%, transparent);
   }
+  /* Phone: the field and the button stack as two equal full-width pills, each
+     a 48px target, the button directly under the field where the thumb lands. */
   @media (max-width: 480px) {
-    .subscribe-form { flex-direction: column; }
-    .subscribe-form input[type="email"], .subscribe-form button { width: 100%; flex: none; }
+    .subscribe-form { flex-direction: column; gap: 0.6em; }
+    .subscribe-form input[type="email"], .subscribe-form button {
+      box-sizing: border-box; width: 100%; flex: none; min-height: 3rem; text-align: center;
+    }
+    .subscribe-form input[type="email"]::placeholder { text-align: center; }
   }
 
   /* ── The grid: columns from the container, acts as row headers ── */
@@ -809,7 +816,7 @@ circuits from scratch.</p>
 </div>
 <div class="subscribe">
 <form class="subscribe-form">
-<input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+<input type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" placeholder="you@example.com" aria-label="Email address">
 <button type="submit">Notify me</button>
 </form>
 </div>

@@ -15,7 +15,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 ::: {.subscribe}
 <form class="subscribe-form">
-<input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+<input type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" placeholder="you@example.com" aria-label="Email address">
 <button type="submit">Notify me</button>
 </form>
 :::
