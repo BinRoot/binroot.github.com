@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Lesson 1: A different computer | Quantum Oracle Engineering</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="canonical" href="https://shukla.io/quantum-oracle-engineering/a-different-computer/">
+  <meta name="description" content="Why most AI problems don’t qualify for quantum speedups: the CPU/GPU/QPU stack, famous overpromises, and three screening questions to ask before building an oracle. Lesson 1 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta name="author" content="Nishant Shukla">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Nishant Shukla">
+  <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/a-different-computer/">
+  <meta property="og:title" content="Lesson 1: A different computer">
+  <meta name="twitter:title" content="Lesson 1: A different computer">
+  <meta property="og:description" content="Why most AI problems don’t qualify for quantum speedups: the CPU/GPU/QPU stack, famous overpromises, and three screening questions to ask before building an oracle. Lesson 1 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta name="twitter:description" content="Why most AI problems don’t qualify for quantum speedups: the CPU/GPU/QPU stack, famous overpromises, and three screening questions to ask before building an oracle. Lesson 1 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://shukla.io/quantum-oracle-engineering/img/myth01.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="600">
+  <meta name="twitter:image" content="https://shukla.io/quantum-oracle-engineering/img/myth01.png">
+  <meta name="twitter:image:alt" content="A robot scratching its head while holding a quantum processor chip">
+  <meta property="og:image:alt" content="A robot scratching its head while holding a quantum processor chip">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 1: A different computer","description":"Why most AI problems don’t qualify for quantum speedups: the CPU/GPU/QPU stack, famous overpromises, and three screening questions to ask before building an oracle. Lesson 1 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.","image":"https://shukla.io/quantum-oracle-engineering/img/myth01.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/a-different-computer/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quantum Oracle Engineering","item":"https://shukla.io/quantum-oracle-engineering/"},{"@type":"ListItem","position":2,"name":"Lesson 1: A different computer","item":"https://shukla.io/quantum-oracle-engineering/a-different-computer/"}]}</script>
+  <script>window.MathJax={options:{enableMenu:false}};</script>
+  <link rel="stylesheet" href="../slides.css?v=3374604614">
+  <script src="../slides.js?v=3374604614" defer></script>
+  <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
+</head>
+<body>
+<nav id="deck-crumb" class="chrome" aria-label="deck"><a href="https://shukla.io/quantum-oracle-engineering/">Quantum Oracle Engineering</a><span class="crumb-sep" aria-hidden="true">/</span>Lesson 1: A different computer</nav>
+<div id="deck">
+<section id="title" class="center slide" data-segment="Opening" data-segment-id="seg-opening">
+<h1>Quantum Oracle Engineering</h1>
+<h2>Lesson 1: A different computer</h2>
+<p><img src="../img/myth01.png" width="600" height="600" class="boil"
+     alt="A robot scratching its head while holding a quantum processor chip"
+     style="display:block; margin:0.6em auto 0; width:auto; max-height:44vh; max-width:100%;"></p>
+<!-- The landing page's boil filter, ported for deck use: noise displacing the
+     artwork a couple of pixels, reseeded four times a second, so the drawn
+     illustration wobbles the way hand-drawn animation does.  Copied from
+     index.md, which documents why every number is what it is (sRGB
+     interpolation, the grey no-displacement border mask, fractions rather
+     than percentages).  It must live in the body: an <svg> in <head> ends the
+     head element as far as the parser is concerned.  Deck art renders larger
+     than the landing card, so the boil grain is finer here; baseFrequency is
+     the knob if it ever reads as shimmer instead of boil. -->
+<svg class="filters" aria-hidden="true" focusable="false">
+  <filter id="boil" x="0" y="0" width="100%" height="100%"
+          color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="raw">
+      <animate attributeName="seed" values="1;2;3;4" dur="0.5s" calcMode="discrete" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix in="raw" type="matrix" result="noise"
+                   values="1 0 0 0 0
+                           0 1 0 0 0
+                           0 0 1 0 0
+                           0 0 0 0 1"/>
+    <feFlood flood-color="#808080" result="still"/>
+    <feFlood flood-color="#ffffff" x="0.08" y="0.08" width="0.84" height="0.84" result="inside"/>
+    <feGaussianBlur in="inside" stdDeviation="0.025" result="edge"/>
+    <feComposite in="noise" in2="edge" operator="in" result="inner"/>
+    <feComposite in="inner" in2="still" operator="over" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.007" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="notes">
+<p>Welcome. I’m <a href="https://shukla.io" target="_blank" rel="noopener">Nishant Shukla</a>, and this is Quantum Oracle Engineering.</p>
+<p>If you are following along live during <a href="https://qce.quantum.ieee.org/2026/" target="_blank" rel="noopener">IEEE Quantum Week 2026</a>, this is TUT-149, “Building the Oracle Step by Step for Monte Carlo Rollouts.”</p>
+<p>This first lesson builds intuition on <strong>when a Quantum Computer might help, and more importantly, when it won’t</strong>.</p>
+<p>We’ll focus on a small practical application with a modest speedup (something that we’ll likely run into in the next 10 years).</p>
+<p>Controls: Click the arrows to navigate. Or use arrow keys. Or scroll with your mouse.</p>
+</div>
+</section>
+<section id="assume-oracle-access" class="center slide" data-segment="Opening" data-segment-id="seg-opening">
+<h1>“Assume oracle access.”</h1>
+<!-- The oracle collage from the qoe post: paper cutouts, 2008-2025, each
+     red-inked where it grants itself an oracle.  collage.js mounts on the
+     div and loads its crops from ../assets/img/. -->
+<style>
+  /* Slide-scoped fit.  The blog lays the collage down a scrolling page
+     (wides full width, halves two per row, ~1.3x width in height); a slide
+     has one screen.  Densify to two wides or four halves per row and cap the
+     width so the whole board lands inside the viewport.  Scoped under .slide,
+     so the published post keeps its own layout, and higher specificity than
+     collage.js's injected rules. */
+  .slide .oracle-collage { margin: 0 auto; max-width: 72vw; }
+  .slide .oc-wide { flex: 1 1 46%; max-width: 48%; }
+  .slide .oc-half { flex: 1 1 21%; min-width: 0; max-width: 23%; }
+</style>
+<div class="oracle-collage"></div>
+<script src="../assets/collage.js?v=573295626-20677" defer></script>
+
+<div class="notes">
+<p>When you read research papers, the fun part is often left out!</p>
+<p><strong>Here is a sentence you will find in many query-model speedup papers: “Assume oracle access.”</strong></p>
+<p>For those unfamiliar, the “oracle” is the quantum circuit black box that we hand-wave away.</p>
+<p>It’s like a startup saying “we’re raising Series D, but assume the product exists.”</p>
+<p><strong>Somebody still has to build it!</strong></p>
+<p>And there aren’t a lot of resources out there on practical oracles.</p>
+</div>
+</section>
+<section id="two-acts" class="slide" data-segment="Opening" data-segment-id="seg-opening">
+<h1>Choose, then build</h1>
+<!-- Slide 3's ambient loop: the three named contenders drift through a
+     screening lens on the left; Go and the bandit deflect to the stop sign,
+     and the close-calls game that passes glides
+     across the seam and snaps a gate onto the growing circuit on the right.
+     The finished circuit appears, the payoff qubit glows, and the loop
+     resets.  Deterministic timing, no randomness.  Reduced motion gets a
+     static mid-cycle frame, which doubles as the print fallback. -->
+<div id="choose-build-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="choose-build" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/choose-build.js?v=2877656543-9869" defer></script>
+
+<div class="notes">
+<p>Have you ever played the board game Go? It’s like chess but the rules are more simple, in my opinion.</p>
+<p>Have you heard of the two-arm bandit problem? It’s like a simplified slot machine with two arms you can pull, and your job is to guess which one will maximize profit.</p>
+<p>They’re both VERY different games. In this lesson, we’ll get comfortable talking about games and thinking of them as abstract concepts so we can build the AI player in a quantum computer.</p>
+<p><strong>Although a quantum computer <em>can</em> play these games, you’ll see that it won’t be worth it.</strong></p>
+<p>And, in the next lesson we’ll introduce a game where a quantum computer <em>likely</em> beats a classical one.</p>
+</div>
+</section>
+<section id="cpu" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>CPU</h1>
+<!-- Slide 4's CPU: die shot of an AMD Ryzen 5 9600X Zen 5 CCD in polarized
+     light, by Fritzchens Fritz.  License: CC0 1.0 public domain.  Source:
+     https://commons.wikimedia.org/wiki/File:AMD_Ryzen_5_9600X_DSCx16_CCD_poly@20xPol_FullHQ.jpg
+     (original is 31493x27018; this is a 1600px webp render). -->
+<div id="cs-cpu-viz" style="display:flex; justify-content:center; margin:12px 0;">
+  <img src="../assets/img/cpu-die-9600x.webp" width="1600" height="1373"
+       alt="Die shot of an AMD Ryzen 5 9600X core complex die in polarized light"
+       style="max-width:100%; max-height:62vh; width:auto; height:auto; border-radius:6px;">
+</div>
+
+<div class="notes">
+<p>This is a CPU die, photographed in polarized light.</p>
+<p><strong>CPUs are built for minimizing latency.</strong> They get tasks done one at a time, rapidly!</p>
+<ul>
+<li>Logic: branches, flow-charts, pipelines</li>
+<li>Operating System: quickly completing one thing after another</li>
+<li>UI: render ASAP</li>
+</ul>
+</div>
+</section>
+<section id="gpu" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>GPU</h1>
+<!-- Slide 5's GPU: an Nvidia AD102 (GeForce RTX 4090, Ada Lovelace, 5nm)
+     in infrared, by Fritzchens Fritz.  License: CC0 1.0 public domain.
+     NOT a die shot, despite the source filename and the outline's wording:
+     the frame is the packaged part on the board, lid marking legible
+     (AD102-301-A1), ringed by its GDDR6X packages.  Slide 4 IS a die shot,
+     so the two slides are not the same treatment and the script must not
+     claim they are.  Swapping in a genuine AD102 die shot would restore the
+     outline's intent; until then the speaker note makes the sealed lid the
+     point rather than pretending it is silicon.  Source:
+     https://commons.wikimedia.org/wiki/File:Nvidia@5nm@AdaLovelace@AD102@GeForce_RTX_4090@S_TW_2324A1_U2F028.MOW_AD102-301-A1_DSCx5@IR.jpg
+     (original is 4912x3264; this is a 1600px webp render). -->
+<div id="cs-gpu-viz" style="display:flex; justify-content:center; margin:12px 0;">
+  <img src="../assets/img/gpu-die-ad102.webp" width="1600" height="1063"
+       alt="An Nvidia AD102 processor package on a GeForce RTX 4090 board, photographed in infrared"
+       style="max-width:100%; max-height:62vh; width:auto; height:auto; border-radius:6px;">
+</div>
+
+<div class="notes">
+<p><strong>A GPU uses broad parallel execution to trade latency for throughput.</strong></p>
+<p>A very simple, slightly faulty, analogy: a CPU draws one pixel at a time quickly but it takes forever to render the full scene, whereas the GPU renders the full scene all at once, without pixel-by-pixel progress.</p>
+<ul>
+<li>matrix multiplication</li>
+<li>graphics</li>
+<li>neural network training</li>
+</ul>
+</div>
+</section>
+<section id="qpu" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>QPU</h1>
+<div id="compute-stack-viz" style="display:flex; justify-content:center; margin:4px 0;">
+<svg id="compute-stack-svg" viewBox="0 0 520 140" width="820" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs><marker id="cs-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker></defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#cs-arrow)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- GPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">GPU</text>
+  <!-- Grid of small cores -->
+  <g id="cs-cores" transform="translate(220,40)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">many parallel arithmetic lanes</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('cs-cores');
+  const cols = 14, rows = 3, size = 16, gap = 4;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', c * (size + gap));
+      rect.setAttribute('y', r * (size + gap));
+      rect.setAttribute('width', size);
+      rect.setAttribute('height', size);
+      rect.setAttribute('rx', 2);
+      rect.setAttribute('fill', '#d4e6dc');
+      rect.setAttribute('stroke', '#8cbfa3');
+      rect.setAttribute('stroke-width', '0.8');
+      g.appendChild(rect);
+    }
+  }
+})();
+</script>
+
+<div id="qpu-viz" style="display:flex; justify-content:center; margin:4px 0;">
+<svg id="qpu-svg" viewBox="0 0 520 140" width="820" aria-label="A CPU offloads coherent expectation estimation to a QPU" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs>
+    <marker id="qpu-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker>
+  </defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#qpu-arr)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- QPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">QPU</text>
+  <!-- Coherent state visual: overlapping translucent grids -->
+  <g id="qpu-superposition" transform="translate(280,38)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">coherent expectation estimation</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('qpu-superposition');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Draw several overlapping mini-grids offset from each other.  The caption
+  // names the useful operation rather than implying that superposition alone
+  // evaluates and reveals every board.
+  const gridSize = 4;
+  const cellPx = 10;
+  const copies = 5;
+  const offsetX = 12;
+  const offsetY = 3;
+  const colors = ['#9b8ec4', '#b8aed6', '#7a6bab', '#c4b8e0', '#6b5a9e'];
+
+  // Random-ish board patterns for each copy
+  const patterns = [
+    [1,0,1,0, 0,1,0,1, 1,0,1,0, 0,1,0,1],
+    [0,1,0,1, 1,0,1,0, 0,0,1,1, 1,1,0,0],
+    [1,1,0,0, 0,0,1,1, 1,0,0,1, 0,1,1,0],
+    [0,0,1,1, 1,1,0,0, 0,1,0,1, 1,0,1,0],
+    [1,0,0,1, 0,1,1,0, 1,1,0,0, 0,0,1,1],
+  ];
+
+  for (let i = copies - 1; i >= 0; i--) {
+    const group = document.createElementNS(ns, 'g');
+    const tx = i * offsetX;
+    const ty = i * offsetY;
+    group.setAttribute('transform', `translate(${tx},${ty})`);
+    group.setAttribute('opacity', i === 0 ? '0.9' : (0.2 + 0.1 * (copies - i)).toFixed(2));
+
+    // Grid background
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', gridSize * cellPx + 2);
+    bg.setAttribute('height', gridSize * cellPx + 2);
+    bg.setAttribute('rx', 2);
+    bg.setAttribute('fill', '#ece8f6');
+    bg.setAttribute('stroke', '#b8aed6');
+    bg.setAttribute('stroke-width', '0.8');
+    group.appendChild(bg);
+
+    // Cells
+    const pat = patterns[i];
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        if (pat[r * gridSize + c]) {
+          const cell = document.createElementNS(ns, 'rect');
+          cell.setAttribute('x', 1 + c * cellPx + 1);
+          cell.setAttribute('y', 1 + r * cellPx + 1);
+          cell.setAttribute('width', cellPx - 2);
+          cell.setAttribute('height', cellPx - 2);
+          cell.setAttribute('rx', 1.5);
+          cell.setAttribute('fill', colors[i]);
+          group.appendChild(cell);
+        }
+      }
+    }
+    g.appendChild(group);
+  }
+
+  // Curly brace / ket label to the right
+  const label = document.createElementNS(ns, 'text');
+  label.setAttribute('x', copies * offsetX + gridSize * cellPx + 18);
+  label.setAttribute('y', gridSize * cellPx / 2 + 10);
+  label.setAttribute('text-anchor', 'start');
+  label.setAttribute('font-size', '10');
+  label.setAttribute('fill', '#9b8ec4');
+  label.setAttribute('font-style', 'italic');
+  label.textContent = '|ψ⟩';
+  g.appendChild(label);
+})();
+</script>
+
+<div class="notes">
+<p>Fault-tolerant QPUs are coming soon (as you can see, I couldn’t find a nice photograph for this slide).</p>
+<p>The pattern is the same as the GPU: the processor offloads to something with a different cost model.</p>
+<p>Common misunderstanding: “it tries every answer and reads them all.” That’s people misunderstanding superposition.</p>
+<p><strong>The QPU leverage comes from preparing outcomes coherently, reusing a reversible program and its inverse, letting amplitudes interfere, and only then measuring.</strong></p>
+<p>For this course, that changes the query cost of estimating an expectation.</p>
+</div>
+</section>
+<section id="stack" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>The stack</h1>
+<!-- Slide 7's anchor: the compute stack as a living table.  Three rows (CPU,
+     GPU, QPU), each a framework step so they reveal one per press.  Device
+     thumbnails reuse segment B's die shots; the QPU row draws the
+     overlapping-boards motif, since no die shot exists for it.  Strength
+     cells are small CSS-animated glyphs (stopwatch, lanes, converging dots);
+     the QPU strength cell carries grayed simulation and factoring marks per
+     the scoping rule.  All motion is CSS keyframes, so reduced-motion
+     freezes to sensible static states. -->
+<style>
+  #stack-table { max-width: 920px; margin: 6px auto; font-family: 'Ubuntu', sans-serif; }
+  #stack-table .st-row {
+    display: grid; grid-template-columns: 170px 1.1fr 1.5fr;
+    gap: 0 34px; align-items: center; padding: 10px 0; border-top: 1px solid #e8e8e8;
+  }
+  #stack-table .st-row.st-head { border-top: 0; padding: 0 0 2px; }
+  #stack-table .st-hdr {
+    font-size: 11px; color: #999; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  #stack-table .st-dev {
+    display: flex; align-items: center; gap: 14px;
+    font-weight: 700; color: #2d3140; font-size: 19px;
+  }
+  #stack-table .st-dev img { width: 86px; height: auto; border-radius: 5px; }
+  #stack-table .st-cell { display: flex; align-items: flex-end; gap: 22px; }
+  #stack-table .st-glyph { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  #stack-table .st-cap { font-size: 12px; color: #888; }
+  #stack-table .st-ghost { opacity: 0.32; }
+
+  /* CPU strength: one hand sweeping a stopwatch. */
+  #stack-table .st-hand {
+    transform-box: view-box; transform-origin: 50% 50%;
+    animation: st-spin 2.4s linear infinite;
+  }
+  @keyframes st-spin { to { transform: rotate(360deg); } }
+
+  /* GPU strength: blocks streaming down parallel lanes, staggered. */
+  #stack-table .st-lane {
+    animation: st-flow 1.6s linear infinite;
+  }
+  @keyframes st-flow { from { transform: translateX(0); } to { transform: translateX(44px); } }
+
+  /* QPU strength: a scattered sample cloud converging on one precise estimate.
+     The scatter is the base state, so reduced motion shows the cloud. */
+  #stack-table .st-dot {
+    transform: translate(var(--dx), var(--dy)); opacity: 0.65;
+    animation: st-converge 3s ease-in infinite;
+  }
+  @keyframes st-converge {
+    0% { transform: translate(var(--dx), var(--dy)); opacity: 0.65; }
+    70% { transform: translate(0, 0); opacity: 0.9; }
+    82%, 100% { transform: translate(0, 0); opacity: 0; }
+  }
+  #stack-table .st-mean { animation: st-beat 3s ease-in infinite; }
+  @keyframes st-beat { 0%, 65% { r: 3; } 75% { r: 5; } 100% { r: 3; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    #stack-table * { animation: none !important; }
+  }
+  @media (max-width: 700px) {
+    #stack-table .st-row { grid-template-columns: 110px 1fr 1.2fr; gap: 0 16px; }
+    #stack-table .st-dev img { width: 62px; }
+    #stack-table .st-dev { font-size: 15px; }
+  }
+</style>
+<div id="stack-table">
+  <div class="st-row st-head">
+    <div class="st-hdr">device</div>
+    <div class="st-hdr">strength</div>
+    <div class="st-hdr">workloads</div>
+  </div>
+
+  <div class="st-row step">
+    <div class="st-dev"><img src="../assets/img/cpu-die-9600x.webp" alt="CPU die shot">CPU</div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="17" fill="#fff" stroke="#4a4a4a" stroke-width="2"/>
+          <rect x="21" y="2" width="6" height="4" rx="1" fill="#4a4a4a"/>
+          <g class="st-hand"><line x1="24" y1="24" x2="24" y2="11" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round"/></g>
+          <circle cx="24" cy="24" r="2" fill="#4a4a4a"/>
+        </svg>
+        <div class="st-cap">latency</div>
+      </div>
+    </div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <path d="M20 4 L34 20 L20 36 L6 20 Z" fill="#fff" stroke="#4a4a4a" stroke-width="1.8"/>
+          <path d="M20 20 L30 10 M20 20 L30 30" stroke="#8a90a0" stroke-width="1.8" fill="none"/>
+        </svg>
+        <div class="st-cap">branching</div>
+      </div>
+      <div class="st-glyph">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <ellipse cx="20" cy="10" rx="12" ry="5" fill="#fff" stroke="#4a4a4a" stroke-width="1.8"/>
+          <path d="M8 10 V30 C8 33 32 33 32 30 V10" fill="#fff" stroke="#4a4a4a" stroke-width="1.8"/>
+          <path d="M8 20 C8 23 32 23 32 20" fill="none" stroke="#8a90a0" stroke-width="1.5"/>
+        </svg>
+        <div class="st-cap">queries</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="st-row step">
+    <div class="st-dev"><img src="../assets/img/gpu-die-ad102.webp" alt="Nvidia AD102 GPU package">GPU</div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="64" height="48" viewBox="0 0 64 48">
+          <g stroke="#ddd" stroke-width="1.5">
+            <line x1="4" y1="10" x2="60" y2="10"/><line x1="4" y1="21" x2="60" y2="21"/>
+            <line x1="4" y1="32" x2="60" y2="32"/><line x1="4" y1="43" x2="60" y2="43"/>
+          </g>
+          <g fill="#4D8C55">
+            <rect class="st-lane" x="4" y="7" width="9" height="6" rx="1.5"/>
+            <rect class="st-lane" x="4" y="18" width="9" height="6" rx="1.5" style="animation-delay:-0.5s"/>
+            <rect class="st-lane" x="4" y="29" width="9" height="6" rx="1.5" style="animation-delay:-1.1s"/>
+            <rect class="st-lane" x="4" y="40" width="9" height="6" rx="1.5" style="animation-delay:-0.8s"/>
+          </g>
+        </svg>
+        <div class="st-cap">throughput</div>
+      </div>
+    </div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <g stroke="#bbb" stroke-width="1.2">
+            <path d="M8 8 L20 14 M8 20 L20 14 M8 32 L20 14 M8 8 L20 26 M8 20 L20 26 M8 32 L20 26 M20 14 L32 20 M20 26 L32 20"/>
+          </g>
+          <g fill="#4a4a4a">
+            <circle cx="8" cy="8" r="3"/><circle cx="8" cy="20" r="3"/><circle cx="8" cy="32" r="3"/>
+            <circle cx="20" cy="14" r="3"/><circle cx="20" cy="26" r="3"/><circle cx="32" cy="20" r="3"/>
+          </g>
+        </svg>
+        <div class="st-cap">training</div>
+      </div>
+      <div class="st-glyph">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <path d="M6 34 L18 10 L24 22 L30 14 L36 34 Z" fill="#fff" stroke="#4a4a4a" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M18 10 L24 22 L12 22 Z" fill="#e8e8e8" stroke="#8a90a0" stroke-width="1.2"/>
+        </svg>
+        <div class="st-cap">graphics</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="st-row step">
+    <div class="st-dev">
+      <svg width="86" height="70" viewBox="0 0 86 70">
+        <g stroke="#456AAD" fill="none">
+          <g opacity="0.9" stroke-width="1.6"><rect x="6" y="6" width="40" height="40" rx="3"/><path d="M6 19 H46 M6 32 H46 M19 6 V46 M32 6 V46"/></g>
+          <g opacity="0.45" stroke-width="1.4" transform="translate(14,9)"><rect x="6" y="6" width="40" height="40" rx="3"/><path d="M6 19 H46 M6 32 H46 M19 6 V46 M32 6 V46"/></g>
+          <g opacity="0.2" stroke-width="1.2" transform="translate(28,18)"><rect x="6" y="6" width="40" height="40" rx="3"/><path d="M6 19 H46 M6 32 H46 M19 6 V46 M32 6 V46"/></g>
+        </g>
+      </svg>
+      QPU
+    </div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="56" height="48" viewBox="0 0 56 48">
+          <g fill="#456AAD">
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:18px; --dy:-11px"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:-17px; --dy:-14px; animation-delay:-0.4s"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:11px; --dy:14px; animation-delay:-0.9s"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:-13px; --dy:10px; animation-delay:-1.3s"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:22px; --dy:5px; animation-delay:-1.8s"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:-22px; --dy:-2px; animation-delay:-2.2s"/>
+            <circle class="st-dot" cx="28" cy="24" r="2.4" style="--dx:4px; --dy:-17px; animation-delay:-2.6s"/>
+            <circle class="st-mean" cx="28" cy="24" r="3" fill="#2d3140"/>
+          </g>
+        </svg>
+        <div class="st-cap">precision</div>
+      </div>
+      <div class="st-glyph st-ghost">
+        <svg width="30" height="40" viewBox="0 0 30 40">
+          <polygon points="15,14 21.9,18 21.9,26 15,30 8.1,26 8.1,18"
+                   fill="none" stroke="#4a4a4a" stroke-width="1.6"/>
+          <circle cx="15" cy="22" r="4" fill="none" stroke="#4a4a4a" stroke-width="1.4"/>
+          <title>simulation</title>
+        </svg>
+        <div class="st-cap">simulation</div>
+      </div>
+      <div class="st-glyph st-ghost">
+        <svg width="30" height="40" viewBox="0 0 30 40">
+          <rect x="6" y="17" width="18" height="14" rx="2.5" fill="none" stroke="#4a4a4a" stroke-width="1.6"/>
+          <path d="M10 17 V12 a5 5 0 0 1 10 0 V17" fill="none" stroke="#4a4a4a" stroke-width="1.6"/>
+          <title>factoring</title>
+        </svg>
+        <div class="st-cap">factoring</div>
+      </div>
+    </div>
+    <div class="st-cell">
+      <div class="st-glyph">
+        <svg width="44" height="40" viewBox="0 0 44 40">
+          <circle cx="22" cy="7" r="3" fill="#2d3140"/>
+          <path d="M22 10 L8 24 M22 10 L22 24 M22 10 L36 24" stroke="#8a90a0" stroke-width="1.6" fill="none"/>
+          <circle cx="8" cy="27" r="3" fill="#fff" stroke="#2d3140" stroke-width="1.4"/>
+          <circle cx="22" cy="27" r="3" fill="#fff" stroke="#2d3140" stroke-width="1.4"/>
+          <circle cx="36" cy="27" r="3" fill="#fff" stroke="#2d3140" stroke-width="1.4"/>
+        </svg>
+        <div class="st-cap">rollouts</div>
+      </div>
+      <div class="st-glyph">
+        <svg width="44" height="40" viewBox="0 0 44 40">
+          <path d="M4 33 C 14 33, 15 8, 22 8 C 29 8, 30 33, 40 33" fill="none" stroke="#4a4a4a" stroke-width="1.8"/>
+          <line x1="22" y1="8" x2="22" y2="36" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="3,3"/>
+        </svg>
+        <div class="st-cap">expectations</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+<p>Every device has its pros and cons.</p>
+<p><strong>The CPU is all about minimizing latency.</strong></p>
+<p><strong>The GPU accomplishes massive throughput.</strong></p>
+<p>For our use-case, <strong>the QPU grants precision</strong>. Under coherent oracle access, the same number of calls to the program buys a smaller error on an expectation.</p>
+<p>Simulation and factoring are QPU strengths too. But, in our lessons, they are not our focus.</p>
+</div>
+</section>
+<section id="mismatch" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>Mismatch costs</h1>
+<!-- Slide 8's ambient loop: the wrong-lane race.  The same dependent chain of
+     blocks runs twice.  Top lane: the CPU processes it in place, one block
+     after another, and finishes.  Bottom lane: the chain pays the bus ride to
+     the GPU, where one lane works while the rest sit dark (a dependent chain
+     cannot parallelize), pays the ride back, and finishes later.  The clock
+     bars under each lane make the loss legible: the offloaded run's bar is
+     simply longer.  Deterministic loop; reduced motion shows the finished
+     outcome frame. -->
+<div id="mismatch-race-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="mismatch-race" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/mismatch-race.js?v=703795269-6790" defer></script>
+
+<div class="notes">
+<p>Top: <strong>the CPU executes the tasks one at a time, quickly</strong>.</p>
+<p>Bottom: the tasks are loaded onto the GPU. <strong>The GPU processes with high throughput</strong>, and then the result travels back.</p>
+<p>This is just a simple demo to dismiss the myth that “GPUs are just faster CPUs.”</p>
+</div>
+</section>
+<section id="lever" class="slide" data-segment="The compute stack" data-segment-id="seg-compute-stack">
+<h1>The precision lever</h1>
+<!-- Slide 9's ambient loop: the lever board.  Three levers tagged with the
+     icons from the stack table: molecule (simulation) and padlock (factoring)
+     sit grayed and untouched; the die lever (precision) pulls itself, and the
+     sample cloud above collapses into one glowing estimate, then everything
+     resets.  The die still identifies an expectation over random outcomes;
+     the label names what coherent queries buy.  Reduced motion shows the
+     pulled-lever, collapsed-cloud frame. -->
+<div id="sampling-lever-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="sampling-lever" viewBox="0 0 760 324" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/sampling-lever.js?v=2538580070-7797" defer></script>
+
+<div class="notes">
+<p>Where is a QPU useful? We have several levers.</p>
+<p>Two famous ones stand out of reach: simulating quantum systems and Shor-style algebra.</p>
+<p><strong>This course studies the lever for AI search: precision on an expectation.</strong></p>
+</div>
+</section>
+<section id="q1" class="slide" data-segment="The three questions" data-segment-id="seg-three-questions">
+<h1>Does the best classical method still sample?</h1>
+<!-- Slides 10-13: the screening line, with 1 gate position live.  See
+     assets/gates.js; the questions live in the slide titles, and there are
+     no words in the figure. -->
+<div class="gates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="gates-fig" data-gates="1" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/gates.js?v=3402356024-18099" defer></script>
+
+<div class="notes">
+<p>The first gate asks whether sampling is necessary.</p>
+<p><strong>Does a classical algorithm <em>require</em> sampling?</strong></p>
+<p>If yes, then this task randomness is a great reason to consider a QPU.</p>
+<p>If no, then enumeration, dynamic programming, quadrature, variance reduction or a trustworthy surrogate may still remove or shrink the need for a QPU. And guess what? <strong>Most tasks get caught here.</strong></p>
+</div>
+</section>
+<section id="q2" class="slide" data-segment="The three questions" data-segment-id="seg-three-questions">
+<h1>Is precision the bottleneck?</h1>
+<!-- Slides 10-13: the screening line, with 2 gate positions live.  See
+     assets/gates.js; the questions live in the slide titles, and there are
+     no words in the figure. -->
+<div class="gates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="gates-fig" data-gates="2" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/gates.js?v=3402356024-18099" defer></script>
+
+<div class="notes">
+<p>Next, <strong>the second gate asks whether precision is the bottleneck</strong>.</p>
+<p>The first gate (randomness) on its own is not enough.</p>
+<p>The task has to force differences so small that telling them apart is the hard part.</p>
+</div>
+</section>
+<section id="q3" class="slide" data-segment="The three questions" data-segment-id="seg-three-questions">
+<h1>Is the oracle worth building?</h1>
+<!-- Slides 10-13: the screening line, with 3 gate positions live.  See
+     assets/gates.js; the questions live in the slide titles, and there are
+     no words in the figure. -->
+<div class="gates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="gates-fig" data-gates="3" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/gates.js?v=3402356024-18099" defer></script>
+
+<div class="notes">
+<p>Lastly, the third gate is about the cost (in terms of time) of executing the oracle on a quantum machine.</p>
+<p><strong>Every quantum query has to be cheap enough to pay for itself.</strong></p>
+</div>
+</section>
+<section id="three-questions" class="slide" data-segment="The three questions" data-segment-id="seg-three-questions">
+<h1>The assembled test</h1>
+<!-- Slides 10-13: the screening line, with all 3 gates live.  See
+     assets/gates.js; the questions live in the slide titles, and there are
+     no words in the figure. -->
+<div class="gates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="gates-fig" data-gates="4" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/gates.js?v=3402356024-18099" defer></script>
+
+<div class="notes">
+<p>The gates help organize our thoughts, so we know when to apply quantum computing.</p>
+</div>
+</section>
+<section id="estimating" class="slide" data-segment="The mechanism" data-segment-id="seg-mechanism">
+<h1>Two kinds of access</h1>
+<!-- Slide 14's two access models and classical sampling demonstration.  The
+     equation distinguishes a disposable draw from coherent A/A-dagger
+     access.  A black box (the title slide's motif) emits one outcome at a time
+     down its output
+     wire; dots stack into two bins; an estimate bar tracks the running
+     fraction with an error band that shrinks as draws accumulate.  After
+     thirty draws the hidden truth tick fades in level with the estimate:
+     the sequence is fixed at 21 of 30 against a true 0.7, so the point
+     estimate is exact.  What the slide argues from is the width of the
+     band still sitting around it, not a miss.
+     Reduced motion shows the completed frame with the truth revealed. -->
+<style>
+  #estimate-box-viz .access-equation img { max-height: 12vh; width: min(88%, 920px); }
+  #estimate-box .eb-play circle:first-child { transition: opacity 0.15s; }
+  #estimate-box .eb-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation access-equation">
+  <img src="../assets/access-models-eq.svg"
+       alt="A classical call returns one draw X from p, while coherent access prepares good and bad outcomes with a unitary A and also provides its inverse">
+</div>
+<div id="estimate-box-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="estimate-box" viewBox="0 0 760 300" width="800" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/estimate-box.js?v=2597691801-11295" defer></script>
+
+<div class="notes">
+<p>Hit play to run the simulation. Each ball that shoots out of the box represents an outcome of a rollout.</p>
+<p>There’s also a quantum way of thinking about a rollout.</p>
+<p>Let’s look at the two different access models.</p>
+<p><strong>A classical sampling call returns one draw X from p.</strong></p>
+<p><strong>A coherent oracle A prepares the good and bad outcomes as amplitudes</strong>, and amplitude estimation must be able to reuse A and its inverse without measuring between calls.</p>
+<p>If the quantum equation is scary, think of A |0&gt; as “A is the program circuit” we run, in this case, the rollout itself. Think: “A acts on |0&gt; to produce an output”. The output holds both |0&gt; and |1&gt; at once, weighted by probability, until you measure it.</p>
+</div>
+</section>
+<section id="classical-rate" class="slide" data-segment="The mechanism" data-segment-id="seg-mechanism">
+<h1>The classical rate</h1>
+<!-- Slide 15's anchor: the dartboard rounds.  Darts thwack into a board in
+     three rounds (100, 400, 1,600 total), fire rate ramping; the scatter
+     never changes, but the centroid crosshair steadies and its grouping
+     circle halves per round while the dart count quadruples.  Presenter
+     controlled from the console panel, which is also the launcher; opens
+     paused with an empty board.  Reduced motion shows the final frame. -->
+<style>
+  #classical-rate-fig .cr-play circle:first-child { transition: opacity 0.15s; }
+  #classical-rate-fig .cr-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation">
+  <img src="../assets/classical-rate-eq.svg"
+       alt="Classical error after M samples scales as one over square root M, so resolving a gap g takes order one over g squared samples">
+</div>
+<div id="classical-rate-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="classical-rate-fig" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/classical-rate.js?v=797334464-11449" defer></script>
+
+<div class="notes">
+<p>Now, hit play on this demo.</p>
+<p>The dart shoots with some variance. The spread is constant, though we eventually get a clear answer.</p>
+<ul>
+<li>Round 1: we shoot 100 darts</li>
+<li>Round 2: we shoot 400 darts (notice the circle halves)</li>
+<li>Round 3: we shoot 1,600 darts (and the circle only halves again)</li>
+</ul>
+<p>The pattern? <strong>You’ll need four times the samples to halve its error.</strong></p>
+<p>As you x4 the number of rollouts (M), you x0.5 the error (e).</p>
+<p><strong>The “gap” is how far apart two candidate moves are in win rate.</strong> You can distinguish the candidate moves once your error is smaller than it.</p>
+</div>
+</section>
+<section id="quantum-rate" class="slide" data-segment="The mechanism" data-segment-id="seg-mechanism">
+<h1>The quantum rate</h1>
+<!-- Slide 16's anchor: the rematch.  Slide 15's final board stands ghosted on
+     the left as the receipt (1,600 darts for a 9px grouping).  On the right,
+     the quantum round: no darts land during querying; the board shimmers in
+     superposition while the counter ticks 40 queries, then the shimmer
+     collapses and ONE dart lands with the same 9px circle.  Faithful to what
+     amplitude estimation does: query coherently M times, measure once.  The
+     payoff rows then fade in.  Presenter controlled; opens paused.  Reduced
+     motion shows the final frame. -->
+<style>
+  #quantum-rate-fig .qr-play circle:first-child { transition: opacity 0.15s; }
+  #quantum-rate-fig .qr-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation compact">
+  <img src="../assets/quantum-rate-eq.svg"
+       alt="Quantum error after M coherent queries scales as one over M, so resolving a gap g takes order one over g queries">
+</div>
+<div id="quantum-rate-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="quantum-rate-fig" viewBox="0 0 760 344" width="800" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/quantum-rate.js?v=487720379-11198" defer></script>
+
+<div class="notes">
+<p>Hit run to see a representation of how a quantum computer performs rollouts.</p>
+<p>On the right, the quantum computer does the same job coherently.</p>
+<p>Watch the board, because nothing lands during the coherent calls.</p>
+<p>Then the estimate is measured.</p>
+<p>For bounded outcomes at fixed confidence, amplitude estimation achieves additive error of order one over M, so <strong>resolving a gap g takes order one over g coherent queries rather than order one over g squared samples</strong>.</p>
+</div>
+</section>
+<section id="qualifiers" class="slide" data-segment="The mechanism" data-segment-id="seg-mechanism">
+<h1>The fine print</h1>
+<!-- Slide 17's ambient loop: the beam balance, count against count.  1,600
+     sample grains pour into the left pan; 40 circuit chips stack into the
+     right; the beam rocks on damped springs and settles hovering near level
+     under a "?", because the per-chip weight is unknown until the wall-clock
+     test.  Between the count captions, the relation in symbols:
+     40 = sqrt(1,600).  "* fault-tolerant era" is a static footnote under the
+     query count.  Reduced motion shows the settled frame. -->
+<div id="qualifiers-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="qualifiers-fig" viewBox="0 0 760 320" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/qualifiers-scale.js?v=2197336459-8285" defer></script>
+
+<div class="notes">
+<p><strong>The quantum algorithm clearly has fewer operations, but each operation is far heavier.</strong></p>
+<p>So which algorithm do we go with? Hard to say. We’ll have more to say on this soon.</p>
+<p>Btw, <strong>everything today assumes fault tolerance</strong>: no variational circuits, no NISQ demonstration, no hardware claims.</p>
+</div>
+</section>
+<section id="deterministic" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>A deterministic world</h1>
+<!-- Slide 18: a deterministic world.  A crisp game tree snaps outward from
+     the root, then backward induction climbs it: leaves settle, each parent
+     takes the best or the worst of its children (chevrons say which), and
+     the root locks on a definite value.  Faint stubs leave the frame on
+     three sides, because this is a crop of something vastly larger: the
+     value being well defined is not the same as being affordable to
+     compute, which is what slides 23 and 24 are for.  No words.  Slides 19
+     to 24 reuse this same tree. -->
+<div id="tree-crisp-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="tree-crisp-fig" viewBox="0 0 760 350" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/tree-crisp.js?v=3373129764-12775" defer></script>
+
+<div class="notes">
+<p><strong>Tic-tac-toe is a game with no innate randomness.</strong></p>
+<p>When X reaches for the best available move, then O reaches for the worst available for X.</p>
+<p>The rules and state are deterministic and known.</p>
+<p>On the other hand, Go is also deterministic but since it is a 19x19 board, the number of legal positions blows up. The game tree is HUGE. <strong>It’s tempting to reach out for a QPU, but that’s a trap!</strong></p>
+</div>
+</section>
+<section id="toolbox-1" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>The classical toolbox, part one</h1>
+<p><img class="photo" src="../assets/img/maze-hedge.webp" width="1024" height="683"
+     alt="A hedge maze seen from above, most of its corridors unwalked"></p>
+<div class="notes">
+<p><strong>Classical solvers are very good at deterministic games.</strong></p>
+<p>Minimax is an algorithm that walks the tree, for example. Alpha-beta pruning throws away entire branches the moment it knows they cannot matter, without looking inside them.</p>
+<p>Are you sure a clever classical machine can’t beat your quantum one?</p>
+</div>
+</section>
+<section id="toolbox-2" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>The classical toolbox, part two</h1>
+<p><img class="photo" src="../assets/img/card-catalog.webp" width="1500" height="1125"
+     alt="A wall of wooden card-catalog drawers"></p>
+<div class="notes">
+<p>Another classical solver trick is to use transposition tables, which memorize different move orders that reach the same position. The learned value functions score a position without much effort.</p>
+<p>For example, checkers was weakly solved with enormous search and endgame databases.</p>
+<p>Nim has a closed form.</p>
+<p>Connect Four is solved.</p>
+<p>AlphaZero learned its own priors and values without solving Go.</p>
+<p><strong>Classical structure has eliminated sampling or reduced search in one domain after another.</strong></p>
+</div>
+</section>
+<section id="stochastic" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>A stochastic world</h1>
+<!-- The fan-out tree from the Sway post's sampling visual, tree half only:
+     one move fans into candidate placements, then into a binary outcome
+     tree.  The board half stays in lesson 2. -->
+<style>
+  #fanout-pair {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: min(6vw, 100px);
+    margin: 0;
+  }
+  #fanout-pair .slide-equation {
+    flex: 0 1 620px;
+    width: auto;
+    margin: 0;
+  }
+  #fanout-pair .slide-equation img {
+    width: 100%;
+    max-height: 18vh;
+  }
+  #fanout-pair #fanout-tree {
+    flex: 0 0 auto;
+    width: min(28vw, 260px);
+  }
+</style>
+<div id="fanout-pair">
+  <div class="slide-equation">
+    <img src="../assets/value-eq.svg"
+         alt="V of a equals the expected reward conditioned on action a, with fixed policies; one rollout is one sample">
+  </div>
+  <svg id="fanout-tree" viewBox="0 0 200 370"></svg>
+</div>
+<script src="../assets/fanout-tree.js?v=420991313-6549" defer></script>
+
+<div class="notes">
+<p>By putting randomness in the environment, we make the game more challenging.</p>
+<p>One future turns into a distribution of futures.</p>
+<p>It is still a game tree, and actually a finite one could be summed exactly.</p>
+<p>The problem is that its branching makes enumeration unaffordable.</p>
+<p>Under fixed policies, a practical access model is to play to the end and record the outcome.</p>
+<p>That is a rollout, and <strong>one rollout is one classical sample of the expectation</strong> shown here.</p>
+</div>
+</section>
+<section id="whose-dice" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>Whose dice?</h1>
+<!-- Slide 22's anchor: whose dice?  Two panels, same size and same framing.
+     Left, "in the task": Hurricane Katrina from MODIS, drifting slowly the
+     whole time the slide is up, because that randomness does not stop when
+     you stop computing.  Right, "in the solver": a dozen dice frozen in
+     mid-air, an instrument someone chose to throw.  Label colours carry the
+     deck's convention (accent for task randomness, grey for solver
+     randomness).  Photographs are public domain and Unsplash-licensed, so
+     nothing needs crediting on the canvas; see img/CREDITS.md. -->
+<div id="whose-dice-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="whose-dice-fig" viewBox="0 0 760 320" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/whose-dice.js?v=3091639179-5357" defer></script>
+
+<div class="notes">
+<p>On the left, randomness belongs to the task.</p>
+<p>On the right, randomness belongs only to the chosen solver.</p>
+<p><strong>Solver dice are a warning that another classical algorithm may remove the sampling.</strong></p>
+<p><strong>Task dice make the problem a better quantum candidate.</strong></p>
+</div>
+</section>
+<section id="escape-hatches" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>Escape hatches</h1>
+<p><img class="photo" src="../assets/img/tunnel-lit.webp" width="1024" height="682"
+     alt="A lit pedestrian tunnel with someone walking through it"></p>
+<div class="notes">
+<p><strong>Even when the randomness belongs to the task, sampling is not automatic.</strong></p>
+<p>If the state space is small enough to enumerate, dynamic programming computes the expectation outright.</p>
+<p>In low dimensions, quadrature solves it without any need for a QPU.</p>
+<p>Also, a learned approximator can skip the expectation altogether.</p>
+</div>
+</section>
+<section id="hatches-fail" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>Where the hatches fail</h1>
+<p><img class="photo" src="../assets/img/wall-cracked.webp" width="1024" height="768"
+     alt="A plastered wall with its surface cracked and broken away"></p>
+<div class="notes">
+<p>Depth!</p>
+<p>When the state space explodes, enumeration is hard!</p>
+<p>Quadrature dies in high dimensions.</p>
+<p>Approximator bias is hard to bound over a long horizon.</p>
+<p><strong>That is the regime where sampling is the last resort standing</strong>, and that regime is the opening.</p>
+</div>
+</section>
+<section id="diagnostic" class="slide" data-segment="Question 1 · Sampling" data-segment-id="seg-question-1">
+<h1>The diagnostic</h1>
+<!-- Slide 25: the diagnostic.  The one-line test, written as a test.
+     See assets/diagnostic.js.
+
+     This slide is the deck's second deliberate break of the seven-word rule
+     (the closing card is the other).  It earns it: the outline calls this
+     "the one-line test you take home" and runs a participation beat on it,
+     asking the room for two domains and applying the rule out loud to each.
+     The rule has to be on screen for that to work, and five wordless designs
+     The strengthened wording asks what remains after the best classical
+     reformulation, so task randomness is a candidate condition rather than
+     an automatic pass. -->
+<div id="diagnostic-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="diagnostic-fig" viewBox="0 0 760 290" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/diagnostic.js?v=4012465762-6812" defer></script>
+
+<div class="notes">
+<p>In summary, the first gate was all about “<strong>does sampling still dominate after considering the strongest classical reformulation</strong>.”</p>
+</div>
+</section>
+<section id="easy-comparison" class="slide" data-segment="Question 2 · Precision" data-segment-id="seg-question-2">
+<h1>An easy comparison</h1>
+<!-- Slides 29-32: two candidate actions, state "apart".  See assets/candidates.js. -->
+<div class="candidates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="candidates-fig" data-state="apart" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/candidates.js?v=1455164660-5672" defer></script>
+
+<div class="notes">
+<p>Next, let’s talk about precision.</p>
+<p>What do we mean by precision?</p>
+<p>Here are two candidate actions, and the distribution of outcomes for each.</p>
+<p>If each rollout leads to one of two outcomes here, then how many rollouts do we need? Ten, a hundred, a thousand?</p>
+<p>The bracket underneath is the gap. When it is this wide, <strong>a few hundred rollouts settle the matter and no quantum computer is necessary</strong>.</p>
+</div>
+</section>
+<section id="hard-comparison" class="slide" data-segment="Question 2 · Precision" data-segment-id="seg-question-2">
+<h1>A hard comparison</h1>
+<!-- Slides 29-32: two candidate actions, state "close".  See assets/candidates.js. -->
+<div class="candidates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="candidates-fig" data-state="close" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/candidates.js?v=1455164660-5672" defer></script>
+
+<div class="notes">
+<p>Take a look at how close these two are.</p>
+<p>How many rollouts would you need now?</p>
+<p>Notice the narrow gap. <strong>Each action’s spread stayed fixed; only the means moved close enough to make precision expensive.</strong></p>
+</div>
+</section>
+<section id="the-bill" class="slide" data-segment="Question 2 · Precision" data-segment-id="seg-question-2">
+<h1>The cost, itemized</h1>
+<!-- Slide 28: the bill, itemized.  Log-scaled bars per gap regime; the
+     numerals are the slide.  See assets/the-cost.js. -->
+<div id="the-cost-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="the-cost-fig" viewBox="0 0 760 360" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/the-cost.js?v=881205920-8768" defer></script>
+
+<div class="notes">
+<p>Compare the 3 gaps (g).</p>
+<p>Gray = classical. Blue = quantum.</p>
+<p><strong>If your task requires distinguishing a small gap, quantum may help.</strong></p>
+</div>
+</section>
+<section id="counterpunch" class="slide" data-segment="Question 2 · Precision" data-segment-id="seg-question-2">
+<h1>The classical counterpunch</h1>
+<!-- Slide 30: the classical counterpunch.  One axis, one bar, one shrinking
+     region.  The bar is where the classical side finishes; the room to its
+     left is what the QPU has to land in; adding cores steps the bar left and
+     the room closes.  See assets/cores.js. -->
+<div id="cores-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="cores-fig" viewBox="0 0 760 280" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/cores.js?v=160481385-8581" defer></script>
+
+<div class="notes">
+<p>One more thing before we move on.</p>
+<p>Independent rollouts parallelize beautifully.</p>
+<p>In an optimistic baseline with perfect scaling, a thousand cores divide the sampling time by a thousand.</p>
+<p>Sure, there’s overhead in scheduling, communication and management, but using the optimistic classical baseline makes the quantum comparison harder to game.</p>
+<p><strong>Every classical worker raises the bar for the QPU to clear.</strong></p>
+</div>
+</section>
+<section id="query" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>The rollout query</h1>
+<!-- Slide: one coherent rollout call.  The full register architecture is
+     deferred to Lesson 3; here the reader needs the three stages and the fact
+     that amplitude estimation also spends the inverse.
+
+     Drawn as ONE bar in three segments rather than three boxes, because the
+     claim is that a single query carries the whole rollout: three separate
+     boxes say "three things" and argue against the slide.
+
+     A and A-dagger are two arrows spanning the same bar, one each way, and
+     they are deliberately identical in weight and colour.  An arc curving from
+     the end back to the start is the universal notation for iteration, and it
+     got read as "run it again", which is the classical move this slide argues
+     against.  Two opposed arrows over one object say "this runs both ways",
+     and matching their styling says the inverse IS the same circuit, which is
+     also why it costs the same by gate reversal.
+
+     Palette is the deck's own: ink on paper, the one accent spent on the
+     payoff.  Everything the old version said in small print is in the note. -->
+<div id="oracle-diagram-viz" style="display:flex; justify-content:center; margin:8px 0;">
+<svg id="oracle-diagram" viewBox="0 0 900 230" width="980"
+     role="img" aria-labelledby="od-title od-desc"
+     style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <title id="od-title">One coherent rollout oracle call, forwards and backwards</title>
+  <desc id="od-desc">A single unitary A runs left to right in three stages: it
+    prepares the stochastic choices, runs the rollout reversibly, and encodes
+    the payoff in an amplitude. Beneath it, an arrow running right to left
+    shows A dagger, the same circuit reversed, which amplitude estimation also
+    spends.</desc>
+  <defs>
+    <marker id="od-tip" markerUnits="userSpaceOnUse"
+            markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+      <path d="M0,0 L12,5 L0,10 Z" fill="#2d3140"/>
+    </marker>
+  </defs>
+
+  <!-- forward: A, left to right across the whole call -->
+  <line x1="90" y1="46" x2="432" y2="46" stroke="#2d3140" stroke-width="1.5"/>
+  <text x="450" y="53" text-anchor="middle" font-size="22" font-weight="700" fill="#2d3140">A</text>
+  <line x1="468" y1="46" x2="810" y2="46" stroke="#2d3140" stroke-width="1.5"
+        marker-end="url(#od-tip)"/>
+
+  <!-- the call: one bar, three segments -->
+  <rect x="90" y="76" width="720" height="86" rx="7" fill="#faf8f4" stroke="#2d3140" stroke-width="1.6"/>
+  <rect x="570" y="76.8" width="239.2" height="84.4" rx="7" fill="#456AAD" fill-opacity="0.10"/>
+  <line x1="330" y1="76" x2="330" y2="162" stroke="#d8d5cd" stroke-width="1"/>
+  <line x1="570" y1="76" x2="570" y2="162" stroke="#d8d5cd" stroke-width="1"/>
+
+  <text x="210" y="126" text-anchor="middle" font-size="19" fill="#2d3140">prepare choices</text>
+  <text x="450" y="126" text-anchor="middle" font-size="19" fill="#2d3140">reversible rollout</text>
+  <text x="690" y="126" text-anchor="middle" font-size="19" font-weight="700" fill="#456AAD">encode payoff</text>
+
+  <!-- backward: the same circuit reversed, right to left -->
+  <line x1="810" y1="192" x2="476" y2="192" stroke="#2d3140" stroke-width="1.5"/>
+  <text x="450" y="199" text-anchor="middle" font-size="19" font-weight="700" fill="#2d3140">A†</text>
+  <line x1="424" y1="192" x2="90" y2="192" stroke="#2d3140" stroke-width="1.5"
+        marker-end="url(#od-tip)"/>
+</svg>
+</div>
+
+<div class="notes">
+<p><strong>This is the unitary behind one coherent oracle call.</strong></p>
+<p>It prepares the stochastic choices, runs the full rollout reversibly, and encodes the payoff in an amplitude.</p>
+<p>Amplitude estimation reuses this operation and its inverse; different query conventions count those calls slightly differently, and the overhead in our wall-clock model absorbs that constant bookkeeping.</p>
+</div>
+</section>
+<section id="data-loading" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>An oracle can be heavy</h1>
+<!-- Slide 32's ambient loop: the one-off loading bill.  Two identical
+     machines, differing only in what is inside.  Left, "one-off stored data": a
+     phone book feeds down a fat arrow, the box fills with a million loaded
+     records, and a stop sign marks that loading has already matched a
+     classical scan.  Right, "computed predicate": nothing enters, the box holds one
+     small circuit, and the search runs by pushing a pulse through that rule
+     1,000 times, then a green check.  No looping: it runs once when the
+     slide becomes current, holds the final frame, and the replay button
+     restarts it.  Reduced motion shows the final frame. -->
+<div id="loading-cost-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="loading-cost-fig" viewBox="0 0 760 340" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/loading-cost.js?v=598964885-13456" defer></script>
+
+<div class="notes">
+<p>Left: the data has to be loaded first. <strong>A million records in is already a classical scan, so the square root buys nothing.</strong></p>
+<p>Right: nothing is loaded. <strong>The rule is computed, and a thousand calls to it is practically nothing.</strong></p>
+</div>
+</section>
+<section id="cost-sources" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>Three cost sources</h1>
+<p><img class="photo" src="../assets/img/scaffolding.webp" width="1024" height="754"
+     alt="Scaffolding covering the face of a building"></p>
+<div class="notes">
+<p>Three things make that circuit expensive.</p>
+<ol type="1">
+<li><strong>The dynamics have to become reversible.</strong></li>
+<li><strong>The scratch work has to be uncomputed.</strong></li>
+<li>And <strong>the randomness has to live inside the circuit</strong>, in qubits you prepared yourself.</li>
+</ol>
+</div>
+</section>
+<section id="rules-compile" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>Rules that compile</h1>
+<!-- Slide 34: rules that compile.  Board on the left says what the rule
+     reads; circuit on the right says what that costs.  See assets/rules.js. -->
+<div id="rules-compile-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="rules-compile-fig" viewBox="0 0 760 300" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/rules.js?v=1707956531-9133" defer></script>
+
+<div class="notes">
+<p><strong>Simple rules yield simple circuits.</strong> That’s why Go is so relevant for quantum, and chess is less so.</p>
+<p>In this diagram, the cell updates by reading its four orthogonal neighbors.</p>
+<p>Local rules like that compile to a circuit that stays regular and shallow.</p>
+</div>
+</section>
+<section id="rules-tangle" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>Rules that tangle</h1>
+<!-- Slide 35: rules that tangle.  The same board, but the reads cross it and
+     run back into earlier positions, and the circuit pays for it.
+     See assets/rules.js. -->
+<div id="rules-tangle-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="rules-tangle-fig" viewBox="0 0 760 396" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/rules.js?v=1707956531-9133" defer></script>
+
+<div class="notes">
+<p>In this example, the game rules reach across the whole board (and that dashed line going backwards is a read into earlier positions, which is what history-dependent legality means).</p>
+<p>Look at what happened to the circuit. It did not just get a little worse, <strong>it got wider <em>and</em> deeper at the same time</strong>, and this is one step of one rollout.</p>
+<p><strong>This is where oracle cost eats the speedup you came for.</strong></p>
+</div>
+</section>
+<section id="balance" class="slide" data-segment="Question 3 · The oracle" data-segment-id="seg-question-3">
+<h1>The balance</h1>
+<p><img class="photo" src="../assets/img/balance-bronze.webp" width="1400" height="1615"
+     alt="A bronze two-pan balance with its weights"></p>
+<div class="notes">
+<p>So the balance is an optimization problem.</p>
+<p>On one side, a QPU saves you time by requiring fewer samples.</p>
+<p>On the other, executing the coherent query could itself be costly.</p>
+<p>When a classical sample costs nanoseconds, realistic quantum overhead is unlikely to pay at practical gaps.</p>
+<p>But no fixed overhead defeats a quadratic query advantage at every scale: <strong>when rollouts are expensive and the required gap is tiny enough, the balance can tip</strong>.</p>
+</div>
+</section>
+<section id="failures-1" class="slide" data-segment="Failure modes" data-segment-id="seg-failure-modes">
+<h1>Many ways claims fail</h1>
+<p><img class="photo" src="../assets/img/ruin-columns.webp" width="1023" height="681"
+     alt="The standing columns of a ruined temple"></p>
+<div class="notes">
+<p>Five ways these arguments go wrong, and I have made some of them myself.</p>
+<ol type="1">
+<li>A weak classical baseline.</li>
+<li>Query counts quoted as though they were runtimes.</li>
+<li>Oracle cost swept under the rug by three words.</li>
+<li>Solver randomness dressed up as an inherent sampling bottleneck.</li>
+<li>And parallel resources ignored on either side.</li>
+</ol>
+<p>Tang’s result is the canonical warning about the first: <strong>match the input model before celebrating the algorithm</strong>. The three questions and the wall-clock model catch all five.</p>
+</div>
+</section>
+<section id="dominoes" class="slide" data-segment="Failure modes" data-segment-id="seg-failure-modes">
+<h1>The dominoes</h1>
+<!-- Slide 38: the cracked foundation.  Four low-rank QML claims stand on one
+     shared strong input model; Tang's 2018 classical analogue
+     cracks that slab and they go down together, struck through, because they
+     shared an assumption rather than tipping each other.  Beside them, a
+     second slab, "proven in the query model", takes the same shove: its
+     tiles rock and hold, the tutorial's own 1/eps among them.  Runs once on
+     arrival with a replay button; reduced motion shows the final frame. -->
+<div id="dominoes-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="dominoes-fig" viewBox="0 0 760 345" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/dominoes.js?v=2055996150-13468" defer></script>
+
+<div class="notes">
+<p>In 2016 there was a celebrated quantum algorithm for recommendation systems.</p>
+<p><strong>In 2018 Ewin Tang, then an undergraduate, gave a classical analogue that was only polynomially slower</strong> under comparable strong length-square sampling access.</p>
+<p>That removed the claimed exponential separation, and related dequantization work spread to neighboring low-rank linear-algebra claims.</p>
+<p>It was a domino effect of many results tipping each other over.</p>
+<p>In this diagram, the slab on the right takes the same shock and holds because those query separations are proved inside their stated oracle models. Though, <strong>end-to-end advantage still has to pay for implementing the model</strong>.</p>
+</div>
+</section>
+<section id="queries-vs-clock" class="slide" data-segment="The wall-clock test" data-segment-id="seg-wall-clock">
+<h1>Winning queries, losing the clock</h1>
+<!-- Slide 39: two hourglasses.  Left, the classical one: countless fine
+     grains through a wide neck, draining in a torrent.  Right, the baseline
+     quantum architecture used in this lesson: six boulders through one
+     coherent query lane, still going when the left glass is empty.  Fewer
+     items, each costlier: it wins the count and loses the clock at this
+     operating point.  This is not a claim that amplitude estimation cannot
+     trade coherent width for depth.  The 2:1 finishing ratio is the chapter's
+     8.3 vs 17 minutes.  Runs once on arrival with a replay button; reduced
+     motion shows the final frame. -->
+<div id="scoreboard-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="scoreboard-fig" viewBox="0 0 760 340" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/scoreboard.js?v=1675035010-12525" defer></script>
+
+<div class="notes">
+<p>On the left, a mountain of cheap samples through a wide throat.</p>
+<p>On the right, <strong>fewer, heavier queries through one coherent query lane</strong>.</p>
+<p>Parallel amplitude estimation can trade coherent depth for entangled width, connectivity, and memory.</p>
+<p>Oshio, Wada, and Yamamoto made that trade explicit in 2026.</p>
+</div>
+</section>
+<section id="race" class="slide" data-segment="The wall-clock test" data-segment-id="seg-wall-clock">
+<h1>The race</h1>
+<!-- Slide 40: the race.  The two runtime models make the argument explicit;
+     the two lanes beneath them show why the models have different shapes.
+     Classical rollouts spread across P cores; the displayed quantum model is
+     the lesson's one-coherent-query-lane baseline.  Parallel amplitude
+     estimation needs a separate width-depth resource model.  The next slide
+     solves these baseline expressions for the break-even oracle time. -->
+<div class="slide-equation">
+  <img src="../assets/race-eq.svg"
+       alt="CPU runtime scales as rollout time divided by the number of cores, times one over the gap squared. For the one-query-lane baseline, QPU runtime scales as amplitude-estimation overhead times oracle time, times one over the gap">
+</div>
+<div id="race-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="race-fig" viewBox="0 0 760 258" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/race.js?v=1591087232-5464" defer></script>
+
+<div class="notes">
+<p>Predicting speed of computation is a valuable skill.</p>
+<p>Classically, one rollout costs t roll and an optimistic perfectly parallel baseline lets P cores divide the sampling time; resolving the gap costs one over g squared samples.</p>
+<p>On the one-lane quantum side, one coherent query costs t oracle, amplitude estimation adds the overhead C, and resolving the same gap costs one over g queries.</p>
+<p>The picture underneath is why these baseline expressions have different shapes: <strong>classical work goes wide across ordinary cores; this coherent query chain goes long</strong>. A parallel quantum architecture replaces the second line with a width-depth tradeoff and must count its entangled qubits and communication too.</p>
+<p>Neither lane finishes because the resource choices decide the winner.</p>
+</div>
+</section>
+<section id="break-even" class="slide" data-segment="The wall-clock test" data-segment-id="seg-wall-clock">
+<h1>Break-even</h1>
+<!-- Slide 41: break-even.  The inequality the whole lesson builds toward for
+     the one-coherent-query-lane baseline.
+
+     Set in real LaTeX (assets/break-even-eq.tex) and rendered to
+     assets/break-even-eq.svg by the Makefile, because Computer Modern sets a
+     fraction, a relation and five braces better than hand-placed SVG <text>
+     ever will.  The braces are part of the equation rather than captions
+     placed beside it, so TeX keeps every name centred under the symbol it
+     names even if the equation is edited.
+
+     Rendered at build time, not by MathJax in the browser: the tutorial runs
+     with networking disabled and the Makefile's MathJax is a CDN URL (which
+     pandoc's blanked template variable drops anyway, so no MathJax actually
+     reaches the page).  dvisvgm --no-fonts turns the glyphs into paths, so
+     the file needs no webfont either.
+
+     To change the inequality, edit the .tex and rebuild; do not hand-edit the
+     generated SVG.
+
+     This slide used to be assets/img/cairn-balanced.webp alone, which left
+     the script's "read it aloud twice" pointing at a photograph of stones.
+     The cairn stays in assets/img/ and is no longer referenced. -->
+<div id="break-even-viz" style="display:flex; justify-content:center; margin:12px 0;">
+  <img src="../assets/break-even-eq.svg"
+       alt="t sub oracle is less than t sub roll divided by C times P times g: the time for one oracle query must be less than the time for one classical rollout divided by the amplitude-estimation overhead, the classical core count, and the gap"
+       style="width:86%; max-width:1000px; height:auto;">
+</div>
+
+<div class="notes">
+<p><strong>The QPU wins when the time for one oracle call is less than the time for one rollout, divided by the overhead, by the number of classical cores, and by the gap.</strong></p>
+<p>Smaller gaps grow the right-hand side, so the QPU can afford slower queries.</p>
+<p>More classical cores shrink it, so the bar rises.</p>
+<p>Btw, if you choose a parallel amplitude-estimation architecture, there’s a little tweak you may need to make: add its coherent width, communication, and depth tradeoff.</p>
+<p>For those curious, <strong>these equations remain true regardless of the outcome of BQP versus BPP</strong>.</p>
+</div>
+</section>
+<section id="toolkit" class="slide" data-segment="The wall-clock test" data-segment-id="seg-wall-clock">
+<h1>The toolkit, and three contenders</h1>
+<p><img class="photo" src="../assets/img/toolbox-wooden.webp" width="1024" height="860"
+     alt="A wooden tool tote with a chisel and a spokeshave lying beside it"></p>
+<div class="notes">
+<p><strong>You have a solid toolkit: the three questions and one inequality.</strong></p>
+<p>Not too exotic, eh?</p>
+</div>
+</section>
+<section id="series-bridge" class="slide" data-segment="The rest of the course" data-segment-id="seg-series">
+<h1>A different computer</h1>
+<!-- The closing bridge from Lesson 1 to the complete twelve-lesson series.
+     Six compact stations show the work changing character: choose, prove,
+     build, trust, locate, judge.  It is a curriculum promise rather than a
+     second flowchart for the three-question screening test. -->
+<style>
+  #series-bridge-viz {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+  }
+  #series-bridge-viz .sb-route {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+  }
+  #series-bridge-viz .sb-stop {
+    min-width: 0;
+    padding: 18px 12px 20px;
+    text-align: center;
+    border-top: 4px solid #9aa0a8;
+    background: rgba(45, 49, 64, 0.035);
+    border-radius: 0 0 6px 6px;
+  }
+  #series-bridge-viz .sb-stop:first-child {
+    border-color: #456AAD;
+    background: rgba(69, 106, 173, 0.09);
+  }
+  #series-bridge-viz .sb-num {
+    color: #456AAD;
+    font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, monospace;
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  #series-bridge-viz .sb-verb {
+    margin-top: 0.35em;
+    color: #2d3140;
+    font-size: 1.05em;
+    font-weight: 700;
+  }
+  #series-bridge-viz .sb-object {
+    margin-top: 0.15em;
+    color: #7a7f88;
+    font-size: 0.62em;
+    line-height: 1.35;
+  }
+  #series-bridge-viz .sb-payoff {
+    margin: 1.7em auto 0;
+    text-align: center;
+    color: #456AAD;
+    font-size: 0.9em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  #series-bridge-viz .sb-next {
+    margin: 0.65em auto 0;
+    text-align: center;
+    color: #2d3140;
+    font-size: 0.74em;
+    font-weight: 700;
+  }
+  @media (max-width: 900px) {
+    #series-bridge-viz .sb-route { gap: 7px; }
+    #series-bridge-viz .sb-stop { padding: 14px 6px 16px; }
+  }
+</style>
+<div id="series-bridge-viz">
+  <div class="sb-route" role="list" aria-label="The twelve-lesson course arc">
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">1</div>
+      <div class="sb-verb">choose</div>
+      <div class="sb-object">the problem</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">2</div>
+      <div class="sb-verb">prove</div>
+      <div class="sb-object">the opening</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">3–7</div>
+      <div class="sb-verb">build</div>
+      <div class="sb-object">the oracle</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">8</div>
+      <div class="sb-verb">trust</div>
+      <div class="sb-object">the pieces</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">9–11</div>
+      <div class="sb-verb">locate</div>
+      <div class="sb-object">the quantum</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">12</div>
+      <div class="sb-verb">judge</div>
+      <div class="sb-object">the next claim</div>
+    </div>
+  </div>
+  <div class="sb-payoff">The next eleven lessons price the difference.</div>
+  <div class="sb-next">Next: Go fails · the ordinary bandit fails · one invented game survives</div>
+</div>
+
+<div class="notes">
+<p>Today’s lesson ends here.</p>
+<p><strong>Next, lesson 2 identifies a problem worth solving.</strong></p>
+<p>Lessons 3 through 7 build the oracle, make it reversible, clean its garbage, measure safely, and borrow memory without breaking promises.</p>
+<p>Lesson 8 makes separately written blocks trustworthy together.</p>
+<p>Lessons 9 through 11 locate where the quantum advantage lives, account for its coherent memory, and turn that cost into a test.</p>
+<p>Lesson 12 brings the three questions and the wall-clock math back to the next AI miracle.</p>
+</div>
+</section>
+<section id="qr" class="bare slide" data-segment="The rest of the course" data-segment-id="seg-series">
+<h1>The address</h1>
+<!-- Slide 44: the address.  A Lesson 2 cliffhanger, QR, URL and subscription
+     prompt, all sharing the same destination.
+     See assets/qr.js.
+
+     The slide's title is hidden by the `.bare` class in slides.css rather
+     than omitted, so the outline overlay and the permalink still have
+     something to name it by while the canvas stays empty.
+
+     The QR is generated offline with qrencode (ECC level M, 33 modules) and
+     inlined as a single path, so the deck still loads with networking
+     disabled.  Its matrix was cross-checked against qrencode's own SVG output
+     and the rendered pixels verified against that matrix.  To point it
+     somewhere else, regenerate rather than hand-editing:
+       qrencode -t ASCII -m 0 --level=M "<url>" -->
+<style>
+  /* slides.css already underlines `.slide a`, and that underline is painted
+     by the anchor, so the text inherits it and the link reads as a link with
+     no hover needed.  All this adds is the cursor. */
+  #qr-fig a { cursor: pointer; }
+</style>
+<div id="qr-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="qr-fig" viewBox="0 0 760 400" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script>window.qr_data = { n: 33, d: "M0 0h7v1h-7zM8 0h5v1h-5zM16 0h1v1h-1zM18 0h3v1h-3zM23 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM16 1h2v1h-2zM21 1h3v1h-3zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM10 2h2v1h-2zM13 2h2v1h-2zM16 2h1v1h-1zM18 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM18 3h1v1h-1zM21 3h1v1h-1zM23 3h2v1h-2zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM9 4h3v1h-3zM16 4h1v1h-1zM18 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM11 5h2v1h-2zM15 5h4v1h-4zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h3v1h-3zM12 7h1v1h-1zM15 7h3v1h-3zM19 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h3v1h-3zM9 8h1v1h-1zM14 8h5v1h-5zM21 8h2v1h-2zM26 8h1v1h-1zM29 8h1v1h-1zM31 8h2v1h-2zM0 9h1v1h-1zM2 9h1v1h-1zM7 9h2v1h-2zM10 9h2v1h-2zM13 9h1v1h-1zM16 9h2v1h-2zM19 9h2v1h-2zM23 9h1v1h-1zM26 9h2v1h-2zM29 9h2v1h-2zM32 9h1v1h-1zM1 10h6v1h-6zM9 10h2v1h-2zM12 10h2v1h-2zM18 10h1v1h-1zM21 10h9v1h-9zM31 10h2v1h-2zM0 11h1v1h-1zM5 11h1v1h-1zM8 11h1v1h-1zM11 11h2v1h-2zM15 11h3v1h-3zM19 11h5v1h-5zM27 11h1v1h-1zM29 11h1v1h-1zM1 12h1v1h-1zM4 12h3v1h-3zM8 12h2v1h-2zM14 12h3v1h-3zM20 12h6v1h-6zM27 12h3v1h-3zM31 12h2v1h-2zM0 13h1v1h-1zM2 13h1v1h-1zM5 13h1v1h-1zM11 13h4v1h-4zM17 13h1v1h-1zM20 13h2v1h-2zM24 13h1v1h-1zM27 13h1v1h-1zM31 13h1v1h-1zM0 14h1v1h-1zM3 14h5v1h-5zM9 14h3v1h-3zM14 14h1v1h-1zM18 14h4v1h-4zM26 14h1v1h-1zM29 14h1v1h-1zM2 15h1v1h-1zM4 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h2v1h-2zM28 15h3v1h-3zM1 16h1v1h-1zM4 16h1v1h-1zM6 16h3v1h-3zM11 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM21 16h2v1h-2zM25 16h2v1h-2zM28 16h3v1h-3zM1 17h1v1h-1zM3 17h2v1h-2zM9 17h1v1h-1zM14 17h2v1h-2zM18 17h1v1h-1zM20 17h1v1h-1zM22 17h3v1h-3zM26 17h1v1h-1zM28 17h2v1h-2zM31 17h2v1h-2zM5 18h2v1h-2zM8 18h2v1h-2zM11 18h1v1h-1zM15 18h2v1h-2zM18 18h1v1h-1zM20 18h2v1h-2zM25 18h1v1h-1zM27 18h2v1h-2zM30 18h1v1h-1zM0 19h2v1h-2zM3 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h5v1h-5zM20 19h1v1h-1zM22 19h5v1h-5zM28 19h1v1h-1zM31 19h2v1h-2zM0 20h1v1h-1zM2 20h1v1h-1zM6 20h5v1h-5zM14 20h3v1h-3zM19 20h1v1h-1zM22 20h1v1h-1zM29 20h2v1h-2zM0 21h1v1h-1zM2 21h2v1h-2zM7 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM15 21h2v1h-2zM20 21h1v1h-1zM22 21h2v1h-2zM25 21h2v1h-2zM29 21h1v1h-1zM32 21h1v1h-1zM4 22h3v1h-3zM10 22h1v1h-1zM12 22h4v1h-4zM17 22h4v1h-4zM23 22h2v1h-2zM26 22h2v1h-2zM29 22h4v1h-4zM1 23h2v1h-2zM7 23h1v1h-1zM10 23h1v1h-1zM13 23h3v1h-3zM18 23h1v1h-1zM20 23h1v1h-1zM26 23h1v1h-1zM29 23h1v1h-1zM0 24h1v1h-1zM5 24h2v1h-2zM12 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM19 24h2v1h-2zM22 24h7v1h-7zM31 24h2v1h-2zM8 25h2v1h-2zM11 25h1v1h-1zM14 25h3v1h-3zM19 25h1v1h-1zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h2v1h-2zM0 26h7v1h-7zM8 26h2v1h-2zM13 26h2v1h-2zM17 26h5v1h-5zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM11 27h2v1h-2zM14 27h7v1h-7zM23 27h2v1h-2zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM9 28h1v1h-1zM12 28h1v1h-1zM15 28h5v1h-5zM22 28h7v1h-7zM30 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM11 29h4v1h-4zM16 29h2v1h-2zM19 29h1v1h-1zM21 29h2v1h-2zM27 29h1v1h-1zM29 29h1v1h-1zM31 29h2v1h-2zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h2v1h-2zM15 30h2v1h-2zM20 30h1v1h-1zM22 30h1v1h-1zM26 30h2v1h-2zM29 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM13 31h2v1h-2zM17 31h2v1h-2zM20 31h1v1h-1zM22 31h3v1h-3zM26 31h3v1h-3zM32 31h1v1h-1zM0 32h7v1h-7zM8 32h5v1h-5zM14 32h1v1h-1zM16 32h2v1h-2zM19 32h1v1h-1zM21 32h3v1h-3zM25 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1z" };</script>
+<script src="../assets/qr.js?v=1282329972-3265" defer></script>
+
+<div class="notes">
+<p>Click the link to open Lesson 2.</p>
+</div>
+</section>
+</div>
+</body>
+</html>

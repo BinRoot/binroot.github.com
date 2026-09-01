@@ -1,0 +1,21 @@
+% race-eq.tex -- the two wall-clock models immediately before break-even.
+\documentclass[border=2pt]{standalone}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{456AAD}
+\definecolor{ink}{HTML}{2D3140}
+\definecolor{dim}{HTML}{7A7F88}
+\begin{document}
+\color{ink}
+$\displaystyle
+  \underbrace{
+    T_{\mathrm{CPU}}
+      \sim \frac{t_{\mathrm{roll}}}{P}\,\frac{1}{g^2}}
+    _{\textcolor{dim}{\text{ideal }P\text{-way classical baseline}}}
+  \qquad
+  \underbrace{
+    \textcolor{accent}{T_{\mathrm{QPU}}
+      \sim C\,t_{\mathrm{oracle}}\,\frac{1}{g}}}
+    _{\textcolor{dim}{\text{one coherent query lane}}}
+$
+\end{document}

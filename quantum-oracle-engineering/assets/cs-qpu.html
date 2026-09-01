@@ -1,0 +1,93 @@
+<div id="qpu-viz" style="display:flex; justify-content:center; margin:4px 0;">
+<svg id="qpu-svg" viewBox="0 0 520 140" width="820" aria-label="A CPU offloads coherent expectation estimation to a QPU" style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <!-- CPU box -->
+  <rect x="10" y="30" width="120" height="80" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">CPU</text>
+  <text x="70" y="82" text-anchor="middle" font-size="9" fill="#888">sequential</text>
+  <text x="70" y="94" text-anchor="middle" font-size="9" fill="#888">branching, I/O</text>
+  <!-- Arrow -->
+  <defs>
+    <marker id="qpu-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bbb"/></marker>
+  </defs>
+  <line x1="138" y1="70" x2="195" y2="70" stroke="#bbb" stroke-width="1.5" marker-end="url(#qpu-arr)"/>
+  <text x="167" y="60" text-anchor="middle" font-size="8" fill="#999">offload</text>
+  <!-- QPU box -->
+  <rect x="200" y="10" width="310" height="120" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="1.5"/>
+  <text x="355" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#4a4a4a">QPU</text>
+  <!-- Coherent state visual: overlapping translucent grids -->
+  <g id="qpu-superposition" transform="translate(280,38)"></g>
+  <text x="355" y="120" text-anchor="middle" font-size="9" fill="#888">coherent expectation estimation</text>
+</svg>
+</div>
+<script>
+(function() {
+  const g = document.getElementById('qpu-superposition');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Draw several overlapping mini-grids offset from each other.  The caption
+  // names the useful operation rather than implying that superposition alone
+  // evaluates and reveals every board.
+  const gridSize = 4;
+  const cellPx = 10;
+  const copies = 5;
+  const offsetX = 12;
+  const offsetY = 3;
+  const colors = ['#9b8ec4', '#b8aed6', '#7a6bab', '#c4b8e0', '#6b5a9e'];
+
+  // Random-ish board patterns for each copy
+  const patterns = [
+    [1,0,1,0, 0,1,0,1, 1,0,1,0, 0,1,0,1],
+    [0,1,0,1, 1,0,1,0, 0,0,1,1, 1,1,0,0],
+    [1,1,0,0, 0,0,1,1, 1,0,0,1, 0,1,1,0],
+    [0,0,1,1, 1,1,0,0, 0,1,0,1, 1,0,1,0],
+    [1,0,0,1, 0,1,1,0, 1,1,0,0, 0,0,1,1],
+  ];
+
+  for (let i = copies - 1; i >= 0; i--) {
+    const group = document.createElementNS(ns, 'g');
+    const tx = i * offsetX;
+    const ty = i * offsetY;
+    group.setAttribute('transform', `translate(${tx},${ty})`);
+    group.setAttribute('opacity', i === 0 ? '0.9' : (0.2 + 0.1 * (copies - i)).toFixed(2));
+
+    // Grid background
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', gridSize * cellPx + 2);
+    bg.setAttribute('height', gridSize * cellPx + 2);
+    bg.setAttribute('rx', 2);
+    bg.setAttribute('fill', '#ece8f6');
+    bg.setAttribute('stroke', '#b8aed6');
+    bg.setAttribute('stroke-width', '0.8');
+    group.appendChild(bg);
+
+    // Cells
+    const pat = patterns[i];
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        if (pat[r * gridSize + c]) {
+          const cell = document.createElementNS(ns, 'rect');
+          cell.setAttribute('x', 1 + c * cellPx + 1);
+          cell.setAttribute('y', 1 + r * cellPx + 1);
+          cell.setAttribute('width', cellPx - 2);
+          cell.setAttribute('height', cellPx - 2);
+          cell.setAttribute('rx', 1.5);
+          cell.setAttribute('fill', colors[i]);
+          group.appendChild(cell);
+        }
+      }
+    }
+    g.appendChild(group);
+  }
+
+  // Curly brace / ket label to the right
+  const label = document.createElementNS(ns, 'text');
+  label.setAttribute('x', copies * offsetX + gridSize * cellPx + 18);
+  label.setAttribute('y', gridSize * cellPx / 2 + 10);
+  label.setAttribute('text-anchor', 'start');
+  label.setAttribute('font-size', '10');
+  label.setAttribute('fill', '#9b8ec4');
+  label.setAttribute('font-style', 'italic');
+  label.textContent = '|ψ⟩';
+  g.appendChild(label);
+})();
+</script>

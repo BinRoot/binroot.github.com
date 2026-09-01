@@ -1,0 +1,16 @@
+<!-- The oracle collage from the qoe post: paper cutouts, 2008-2025, each
+     red-inked where it grants itself an oracle.  collage.js mounts on the
+     div and loads its crops from ../assets/img/. -->
+<style>
+  /* Slide-scoped fit.  The blog lays the collage down a scrolling page
+     (wides full width, halves two per row, ~1.3x width in height); a slide
+     has one screen.  Densify to two wides or four halves per row and cap the
+     width so the whole board lands inside the viewport.  Scoped under .slide,
+     so the published post keeps its own layout, and higher specificity than
+     collage.js's injected rules. */
+  .slide .oracle-collage { margin: 0 auto; max-width: 72vw; }
+  .slide .oc-wide { flex: 1 1 46%; max-width: 48%; }
+  .slide .oc-half { flex: 1 1 21%; min-width: 0; max-width: 23%; }
+</style>
+<div class="oracle-collage"></div>
+<script src="../assets/collage.js" defer></script>

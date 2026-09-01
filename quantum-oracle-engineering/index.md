@@ -20,9 +20,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 </form>
 :::
 
-:::: {.lessons}
+::::: {.lessons}
 
 <p class="act">Choose the problem, build the oracle</p>
+
+:::: {.act-group}
 
 ::: {.lesson data-lesson="qoe-lesson-01" style="--accent: #456AAD"}
 ### 1. A different computer
@@ -36,7 +38,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - Grover on a database loses to **data loading**
 - break-even: **t_oracle < t_roll / (C·P·g)**
 
-<button class="coming" disabled>Coming Sept 1</button>
+<div class="act"><a class="deck" href="a-different-computer/">View slides</a></div>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-02" style="--accent: #4D8C55"}
@@ -64,7 +66,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - one round: Black places, White places, **every stone rolls**
 - the **register layout** in Qiskit
 - a uniform move choice over the **legal cells**
-- the d20 as a **5-bit comparison** against a neighbour count
+- the d20 as a **5-bit comparison** against a neighbor count
 - 3×3, two rounds: **169 qubits**
 
 <button class="coming" disabled>Coming Sept 15</button>
@@ -77,7 +79,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - amplitude estimation runs the rollout **forward and backward**
 - decide from the old board, write to a **shadow board**, swap
-- **in-place updates** read a neighbour that already flipped
+- **in-place updates** read a neighbor that already flipped
 - erase **move-selection scratch** before the board changes
 - one **payoff qubit**, everything else inverted
 - the **qubit and gate bill** as the board grows
@@ -85,7 +87,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 <button class="coming" disabled>Coming Sept 22</button>
 :::
 
+::::
+
 <p class="act">Make it correct</p>
+
+:::: {.act-group}
 
 ::: {.lesson data-lesson="qoe-lesson-05" style="--accent: #7E874C"}
 ### 5. Garbage collection
@@ -120,7 +126,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 ::: {.lesson data-lesson="qoe-lesson-07" style="--accent: #761D01"}
 ### 7. Calling conventions
 
-<figure class="art"><img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbour" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbor" width="600" height="600" loading="lazy"></figure>
 
 - three scratch classes: **clean, borrowed, conditionally clean**
 - Qiskit passes the reuse condition as **unchecked convention**
@@ -147,7 +153,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 <button class="coming" disabled>Coming Oct 20</button>
 :::
 
+::::
+
 <p class="act">Price it, test it, judge it</p>
+
+:::: {.act-group}
 
 ::: {.lesson data-lesson="qoe-lesson-09" style="--accent: #966B55"}
 ### 9. Where the quantum lives
@@ -208,6 +218,8 @@ This course teaches the craft of building practical quantum circuits from scratc
 :::
 
 ::::
+
+:::::
 
 ::: {.agenda}
 ### Live Tutorial Agenda

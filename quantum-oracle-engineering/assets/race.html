@@ -1,0 +1,14 @@
+<!-- Slide 40: the race.  The two runtime models make the argument explicit;
+     the two lanes beneath them show why the models have different shapes.
+     Classical rollouts spread across P cores; the displayed quantum model is
+     the lesson's one-coherent-query-lane baseline.  Parallel amplitude
+     estimation needs a separate width-depth resource model.  The next slide
+     solves these baseline expressions for the break-even oracle time. -->
+<div class="slide-equation">
+  <img src="../assets/race-eq.svg"
+       alt="CPU runtime scales as rollout time divided by the number of cores, times one over the gap squared. For the one-query-lane baseline, QPU runtime scales as amplitude-estimation overhead times oracle time, times one over the gap">
+</div>
+<div id="race-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="race-fig" viewBox="0 0 760 258" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/race.js" defer></script>

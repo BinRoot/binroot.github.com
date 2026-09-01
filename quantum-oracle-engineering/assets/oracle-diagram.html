@@ -1,0 +1,58 @@
+<!-- Slide: one coherent rollout call.  The full register architecture is
+     deferred to Lesson 3; here the reader needs the three stages and the fact
+     that amplitude estimation also spends the inverse.
+
+     Drawn as ONE bar in three segments rather than three boxes, because the
+     claim is that a single query carries the whole rollout: three separate
+     boxes say "three things" and argue against the slide.
+
+     A and A-dagger are two arrows spanning the same bar, one each way, and
+     they are deliberately identical in weight and colour.  An arc curving from
+     the end back to the start is the universal notation for iteration, and it
+     got read as "run it again", which is the classical move this slide argues
+     against.  Two opposed arrows over one object say "this runs both ways",
+     and matching their styling says the inverse IS the same circuit, which is
+     also why it costs the same by gate reversal.
+
+     Palette is the deck's own: ink on paper, the one accent spent on the
+     payoff.  Everything the old version said in small print is in the note. -->
+<div id="oracle-diagram-viz" style="display:flex; justify-content:center; margin:8px 0;">
+<svg id="oracle-diagram" viewBox="0 0 900 230" width="980"
+     role="img" aria-labelledby="od-title od-desc"
+     style="max-width:100%; font-family:'Ubuntu',sans-serif;">
+  <title id="od-title">One coherent rollout oracle call, forwards and backwards</title>
+  <desc id="od-desc">A single unitary A runs left to right in three stages: it
+    prepares the stochastic choices, runs the rollout reversibly, and encodes
+    the payoff in an amplitude. Beneath it, an arrow running right to left
+    shows A dagger, the same circuit reversed, which amplitude estimation also
+    spends.</desc>
+  <defs>
+    <marker id="od-tip" markerUnits="userSpaceOnUse"
+            markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+      <path d="M0,0 L12,5 L0,10 Z" fill="#2d3140"/>
+    </marker>
+  </defs>
+
+  <!-- forward: A, left to right across the whole call -->
+  <line x1="90" y1="46" x2="432" y2="46" stroke="#2d3140" stroke-width="1.5"/>
+  <text x="450" y="53" text-anchor="middle" font-size="22" font-weight="700" fill="#2d3140">A</text>
+  <line x1="468" y1="46" x2="810" y2="46" stroke="#2d3140" stroke-width="1.5"
+        marker-end="url(#od-tip)"/>
+
+  <!-- the call: one bar, three segments -->
+  <rect x="90" y="76" width="720" height="86" rx="7" fill="#faf8f4" stroke="#2d3140" stroke-width="1.6"/>
+  <rect x="570" y="76.8" width="239.2" height="84.4" rx="7" fill="#456AAD" fill-opacity="0.10"/>
+  <line x1="330" y1="76" x2="330" y2="162" stroke="#d8d5cd" stroke-width="1"/>
+  <line x1="570" y1="76" x2="570" y2="162" stroke="#d8d5cd" stroke-width="1"/>
+
+  <text x="210" y="126" text-anchor="middle" font-size="19" fill="#2d3140">prepare choices</text>
+  <text x="450" y="126" text-anchor="middle" font-size="19" fill="#2d3140">reversible rollout</text>
+  <text x="690" y="126" text-anchor="middle" font-size="19" font-weight="700" fill="#456AAD">encode payoff</text>
+
+  <!-- backward: the same circuit reversed, right to left -->
+  <line x1="810" y1="192" x2="476" y2="192" stroke="#2d3140" stroke-width="1.5"/>
+  <text x="450" y="199" text-anchor="middle" font-size="19" font-weight="700" fill="#2d3140">A†</text>
+  <line x1="424" y1="192" x2="90" y2="192" stroke="#2d3140" stroke-width="1.5"
+        marker-end="url(#od-tip)"/>
+</svg>
+</div>

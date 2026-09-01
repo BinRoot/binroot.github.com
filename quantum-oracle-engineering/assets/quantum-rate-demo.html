@@ -1,0 +1,20 @@
+<!-- Slide 16's anchor: the rematch.  Slide 15's final board stands ghosted on
+     the left as the receipt (1,600 darts for a 9px grouping).  On the right,
+     the quantum round: no darts land during querying; the board shimmers in
+     superposition while the counter ticks 40 queries, then the shimmer
+     collapses and ONE dart lands with the same 9px circle.  Faithful to what
+     amplitude estimation does: query coherently M times, measure once.  The
+     payoff rows then fade in.  Presenter controlled; opens paused.  Reduced
+     motion shows the final frame. -->
+<style>
+  #quantum-rate-fig .qr-play circle:first-child { transition: opacity 0.15s; }
+  #quantum-rate-fig .qr-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation compact">
+  <img src="../assets/quantum-rate-eq.svg"
+       alt="Quantum error after M coherent queries scales as one over M, so resolving a gap g takes order one over g queries">
+</div>
+<div id="quantum-rate-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="quantum-rate-fig" viewBox="0 0 760 344" width="800" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/quantum-rate.js" defer></script>

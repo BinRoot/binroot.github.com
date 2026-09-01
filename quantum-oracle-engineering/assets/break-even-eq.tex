@@ -1,0 +1,38 @@
+% break-even-eq.tex -- slide 41's one-query-lane break-even inequality.
+%
+% Rendered to assets/break-even-eq.svg at build time by the Makefile:
+%
+%   latex -> DVI -> dvisvgm --no-fonts (glyphs become paths)
+%
+% Set in real LaTeX rather than drawn in SVG by hand, because this is the
+% deck's final piece of mathematics and Computer Modern sets a fraction, a
+% relation and five braces better than hand-placed <text> elements do.
+% Rendered at BUILD time rather than by MathJax in the browser, because the
+% tutorial commits to running with networking disabled and the Makefile's
+% MathJax comes from a CDN; --no-fonts turns every glyph into a path, so the
+% finished SVG carries no font dependency either.
+%
+% The braces are part of the equation rather than labels positioned beside
+% it, so TeX does the alignment: each name sits centred under the symbol it
+% names, and stays there if the equation is ever edited.
+%
+% The accent matches --accent in slides.css and the deck's blue elsewhere.
+\documentclass[border=2pt]{standalone}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{456AAD}
+\definecolor{ink}{HTML}{2D3140}
+\definecolor{dim}{HTML}{7A7F88}
+\begin{document}
+\color{ink}
+$\displaystyle
+  \underbrace{\textcolor{accent}{t_{\mathrm{oracle}}}}
+             _{\textcolor{dim}{\text{one query}}}
+  \;<\;
+  \frac{\overbrace{t_{\mathrm{roll}}}
+                  ^{\textcolor{dim}{\text{one rollout}}}}
+       {\underbrace{C}_{\textcolor{dim}{\text{overhead}}}
+        \cdot\underbrace{P}_{\textcolor{dim}{\text{cores}}}
+        \cdot\underbrace{g}_{\textcolor{dim}{\text{gap}}}}
+$
+\end{document}

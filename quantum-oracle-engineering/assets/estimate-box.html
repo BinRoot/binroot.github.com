@@ -1,0 +1,24 @@
+<!-- Slide 14's two access models and classical sampling demonstration.  The
+     equation distinguishes a disposable draw from coherent A/A-dagger
+     access.  A black box (the title slide's motif) emits one outcome at a time
+     down its output
+     wire; dots stack into two bins; an estimate bar tracks the running
+     fraction with an error band that shrinks as draws accumulate.  After
+     thirty draws the hidden truth tick fades in level with the estimate:
+     the sequence is fixed at 21 of 30 against a true 0.7, so the point
+     estimate is exact.  What the slide argues from is the width of the
+     band still sitting around it, not a miss.
+     Reduced motion shows the completed frame with the truth revealed. -->
+<style>
+  #estimate-box-viz .access-equation img { max-height: 12vh; width: min(88%, 920px); }
+  #estimate-box .eb-play circle:first-child { transition: opacity 0.15s; }
+  #estimate-box .eb-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation access-equation">
+  <img src="../assets/access-models-eq.svg"
+       alt="A classical call returns one draw X from p, while coherent access prepares good and bad outcomes with a unitary A and also provides its inverse">
+</div>
+<div id="estimate-box-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="estimate-box" viewBox="0 0 760 300" width="800" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/estimate-box.js" defer></script>

@@ -1,0 +1,20 @@
+% access-models-eq.tex -- the two access models amplitude estimation separates.
+\documentclass[border=2pt]{standalone}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{456AAD}
+\definecolor{ink}{HTML}{2D3140}
+\definecolor{dim}{HTML}{7A7F88}
+\begin{document}
+\color{ink}
+$\displaystyle
+  \underbrace{X\sim p}
+             _{\textcolor{dim}{\text{one classical draw per call}}}
+  \qquad\textcolor{dim}{\text{versus}}\qquad
+  \underbrace{
+    \textcolor{accent}{A|0\rangle
+      =\sqrt{1-a}\,|\psi_0\rangle|0\rangle
+       +\sqrt{a}\,|\psi_1\rangle|1\rangle}}
+    _{\textcolor{dim}{\text{coherent access to }A\text{ and }A^\dagger}}
+$
+\end{document}

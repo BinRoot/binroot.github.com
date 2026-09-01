@@ -170,6 +170,20 @@
   <meta property="og:title" content="Quantum Oracle Engineering">
   <meta property="og:description" content="A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.">
   <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/">
+  <!-- The course itself, as structured data.  Lesson pages already declare
+       isPartOf this course; this is the other half of that pair, so a crawler
+       can walk course -> lesson and back.  hasPart lists only what is actually
+       published: the remaining lessons join it as they ship. -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Course",
+  "name":"Quantum Oracle Engineering",
+  "description":"A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.",
+  "url":"https://shukla.io/quantum-oracle-engineering/",
+  "inLanguage":"en",
+  "provider":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},
+  "author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},
+  "hasPart":[{"@type":"LearningResource","name":"Lesson 1: A different computer",
+  "url":"https://shukla.io/quantum-oracle-engineering/a-different-computer/",
+  "learningResourceType":"Slide deck"}]}</script>
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Quantum Oracle Engineering">
   <meta name="twitter:description" content="A twelve-chapter course on quantum oracle engineering: screening problems for quantum advantage, compiling Monte Carlo rollouts into reversible circuits, and certifying quantum building blocks beyond the reach of any test.">
@@ -380,7 +394,7 @@
   .pagefoot p {
     margin: 0;
   }
-  .lessons {
+  .act-group {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5em 2em;
@@ -388,6 +402,9 @@
   .lesson {
     position: relative;
     isolation: isolate;
+    /* A card reached by its hash would otherwise land flush against the top of
+       the window, with the wash that marks it cropped by the edge. */
+    scroll-margin-top: 2rem;
     border-top: 1px solid #d8d5cd;
     padding-top: 1.2em;
     display: flex;
@@ -430,11 +447,16 @@
     font-weight: 600;
     color: #1a1a1a;
   }
-  .lesson button {
+  .lesson button,
+  .lesson a.deck {
     margin-top: auto;
     align-self: flex-start;
     padding: 0.45em 1.1em;
     font-family: inherit;
+    /* Both of these are here for the same reason, from opposite directions: a
+       button inherits neither the page's family nor its line height, an anchor
+       inherits both.  Stating them holds the two chips to one shape. */
+    line-height: normal;
     font-size: 0.72em;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -447,6 +469,53 @@
     border-color: #8a877f;
     color: #3d3b36;
   }
+  /* A published lesson swaps the status chip for the one action its card has,
+     so it stops reading as another greyed-out date: filled, weighted, and
+     carrying a resting glow the way the page's other real button does.  The
+     fill is the lesson's own accent, not the subscribe vermilion, which stays
+     the single page-level action.
+     It is not the accent flat, though.  Seven of the twelve are pale enough
+     that white on them fails 4.5:1, and two fail against dark ink as well, so
+     no one text colour serves the set.  Holding the accent to a maximum
+     lightness does: same hue, same chroma, dark enough that white clears the
+     bar on every one of the twelve, 7.1:1 at the worst of them.  The flat
+     colour below it is the fallback where relative colour syntax is missing,
+     and the accent still reaches that case through the glow. */
+  .lesson a.deck {
+    padding: 0.9em 1.7em;
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #fff;
+    background: #3d3b36;
+    background: oklch(from var(--accent) min(l, 0.45) c h);
+    border-color: transparent;
+    box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 32%, transparent);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* The arrow is the part that says the button leaves the page. */
+  .lesson a.deck::after {
+    content: "\2192";
+    display: inline-block;
+    margin-left: 0.5em;
+  }
+  .lesson a.deck:hover,
+  .lesson a.deck:focus-visible {
+    background: oklch(from var(--accent) min(l, 0.52) c h);
+    box-shadow: 0 8px 22px color-mix(in oklab, var(--accent) 48%, transparent);
+  }
+  /* Motion, so it sits behind the same guard as the card's lift and the boil. */
+  @media (prefers-reduced-motion: no-preference) {
+    .lesson a.deck,
+    .lesson a.deck::after {
+      transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+    .lesson a.deck:hover::after,
+    .lesson a.deck:focus-visible::after {
+      transform: translateX(3px);
+    }
+  }
 
   /* signup.js builds this row and everything below it.  The row inherits the
      auto top margin that used to pin the lone chip to the bottom of the card. */
@@ -457,7 +526,8 @@
     flex-wrap: wrap;
     gap: 0.5em;
   }
-  .lesson .act button {
+  .lesson .act button,
+  .lesson .act a.deck {
     margin-top: 0;
   }
   .lesson .notify,
@@ -534,7 +604,7 @@
      scrolls.  Everything the state does is nested here, so the wash, the rule,
      the buttons and the boil cannot drift apart the way they do when each lives
      in its own rule with the selector copied across all of them. */
-  .lesson:is(:hover, :focus-within, .lit) {
+  .lesson:is(:hover, :focus-within, .lit, :target) {
     &::before {
       background: color-mix(in oklab, var(--accent) 9%, #fcfcfa);
       box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 22%, transparent);
@@ -544,6 +614,11 @@
     }
     & button.coming {
       color: var(--accent);
+    }
+    /* The deck button is already wearing the accent, so it opens its glow to
+       the spread it shows under its own pointer instead. */
+    & a.deck {
+      box-shadow: 0 8px 22px color-mix(in oklab, var(--accent) 48%, transparent);
     }
 
     /* Both of these are motion, so both sit behind the same guard: the card
@@ -567,6 +642,55 @@
   .lesson::before {
     transition: background-color 160ms ease, border-color 160ms ease,
                 box-shadow 160ms ease;
+  }
+
+  /* ── The lesson a hash names, run full bleed ──────────────────────────
+     Reached by its own URL, a lesson stops being one card among twelve: it
+     takes the whole row and its wash runs past the grid to both page edges,
+     so the band reads as a chapter opener while the eleven around it stay a
+     grid.  Only the colour bleeds.  The card keeps the grid's width, and that
+     is what holds the text to a measure while the band goes edge to edge. */
+  .lesson:target {
+    grid-column: 1 / -1;
+    /* The band's own top edge separates it from what is above, so the card's
+       hairline would only draw a rule across the middle of a coloured field. */
+    border-top-color: transparent;
+  }
+  /* 100vw counts the vertical scrollbar, so the band overruns the page by a
+     scrollbar's width.  Clip it at the root: body is narrower than the window
+     and centred, so clipping there would crop the bleed itself.  `clip` rather
+     than `hidden`, which would turn the root into a scroll container. */
+  html { overflow-x: clip; }
+  .lesson:target::before {
+    left: 50%;
+    right: auto;
+    width: 100vw;
+    margin-left: -50vw;
+    border-radius: 0;
+    border-top: 1px solid color-mix(in oklab, var(--accent) 30%, #d8d5cd);
+  }
+  /* The width the band buys is spent on two columns rather than on a longer
+     line: the art holds one, the heading, the bullets and the button stack in
+     the other, and the bullets themselves split in two.  Below the grid's own
+     single-column breakpoint the card is already the full width of the page
+     and the stacked layout it already has is the right one. */
+  @media (min-width: 701px) {
+    .lesson:target {
+      display: grid;
+      grid-template-columns: min(17em, 26%) minmax(0, 1fr);
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        "art title"
+        "art list"
+        "art cta";
+      column-gap: 2.6em;
+      padding-top: 1.8em;
+    }
+    .lesson:target > .art  { grid-area: art; margin-bottom: 0; }
+    .lesson:target > h2    { grid-area: title; }
+    .lesson:target > ul    { grid-area: list; columns: 2; column-gap: 2.6em; }
+    .lesson:target > ul li { break-inside: avoid; }
+    .lesson:target > .act  { grid-area: cta; align-self: start; margin-top: 0; }
   }
   .filters {
     position: absolute;
@@ -724,22 +848,45 @@
      rows.  Narrower screens fall to three, two, then one column on their own. */
   .lessons {
     container-type: inline-size;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2.2em 2.2em;
     margin-top: 1em;
     /* cqw against the root, not vw: vw counts the vertical scrollbar and
        would leave the grid a scrollbar's width too wide. */
     margin-inline: calc(50% - min(38em, 50cqw - 1.25em));
   }
   html { container-type: inline-size; }
+  .act-group {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.2em 2.2em;
+  }
+  /* An act holding the lesson a hash names lays out in three, not four: the
+     band takes a row of its own, and three cards is exactly a full row after
+     it.  Left at four, the act's remaining three would leave a hole beside
+     them, and the row would read as ragged against the full acts around it.
+     The other two acts never hear about it, which is why each act owns its
+     own grid.  Guarded above the single-column breakpoint, where the cards
+     stack and no row can be short. */
+  @media (min-width: 701px) {
+    .act-group:has(.lesson:target) { grid-template-columns: repeat(3, 1fr); }
+    /* Three columns only pays off if the three are contiguous.  A target in the
+       middle of its act would otherwise split it into two part-rows, so the band
+       moves to the head of its own act and the other three close up behind it in
+       one full row.  Scoped to the act, so this is a reshuffle of four siblings
+       rather than of the whole course: the eight cards in the other two acts do
+       not move, and neither does the reading order the markup sets. */
+    .act-group .lesson:target { order: -1; }
+    /* The heading's negative bottom margin is there to tuck it under a card's
+       top padding.  A band has an edge of its own, and the tuck lands the
+       heading on top of it, so it comes off for the act that holds one. */
+    .lessons > .act:has(+ .act-group .lesson:target) { margin-bottom: 0.9em; }
+  }
   /* Four across, two across, one across: every act stays a whole block, never
      three cards and an orphan. */
-  @media (min-width: 1280px) { .lessons { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1280px) { .act-group { grid-template-columns: repeat(4, 1fr); } }
   /* In the two-across range the cards get wide; the art stays a picture, not a poster. */
   .lesson img { max-width: min(100%, 22em); margin-inline: auto; display: block; }
-  @media (max-width: 700px)  { .lessons { grid-template-columns: 1fr; margin-inline: 0; } }
+  @media (max-width: 700px)  { .lessons { margin-inline: 0; }
+                               .act-group { grid-template-columns: 1fr; } }
   .lessons > .act {
-    grid-column: 1 / -1;
     margin: 1.6em 0 -0.6em;
     font-size: 0.78em;
     letter-spacing: 0.16em;
@@ -764,7 +911,7 @@
   }
   .lesson ul { line-height: 1.5; }
   /* Chips as pills; the date is the status, "notify me" the action. */
-  .lesson button, .signup button, .signup input[type="email"] {
+  .lesson button, .lesson a.deck, .signup button, .signup input[type="email"] {
     border-radius: 999px;
   }
   .lesson button { padding: 0.5em 1.1em; }
@@ -824,6 +971,7 @@ circuits from scratch.</p>
 <p class="act">
 Choose the problem, build the oracle
 </p>
+<div class="act-group">
 <section id="a-different-computer" class="lesson"
 data-lesson="qoe-lesson-01" style="--accent: #456AAD">
 <h2>1. A different computer</h2>
@@ -840,9 +988,9 @@ cost</li>
 <li>Grover on a database loses to <strong>data loading</strong></li>
 <li>break-even: <strong>t_oracle &lt; t_roll / (C·P·g)</strong></li>
 </ul>
-<button class="coming" disabled>
-Coming Sept 1
-</button>
+<div class="act">
+<a class="deck" href="a-different-computer/">View slides</a>
+</div>
 </section>
 <section id="the-monte-carlo-speedup" class="lesson"
 data-lesson="qoe-lesson-02" style="--accent: #4D8C55">
@@ -880,7 +1028,7 @@ qubit</strong></li>
 rolls</strong></li>
 <li>the <strong>register layout</strong> in Qiskit</li>
 <li>a uniform move choice over the <strong>legal cells</strong></li>
-<li>the d20 as a <strong>5-bit comparison</strong> against a neighbour
+<li>the d20 as a <strong>5-bit comparison</strong> against a neighbor
 count</li>
 <li>3×3, two rounds: <strong>169 qubits</strong></li>
 </ul>
@@ -899,7 +1047,7 @@ data-lesson="qoe-lesson-04" style="--accent: #F03836">
 backward</strong></li>
 <li>decide from the old board, write to a <strong>shadow board</strong>,
 swap</li>
-<li><strong>in-place updates</strong> read a neighbour that already
+<li><strong>in-place updates</strong> read a neighbor that already
 flipped</li>
 <li>erase <strong>move-selection scratch</strong> before the board
 changes</li>
@@ -910,9 +1058,11 @@ changes</li>
 Coming Sept 22
 </button>
 </section>
+</div>
 <p class="act">
 Make it correct
 </p>
+<div class="act-group">
 <section id="garbage-collection" class="lesson"
 data-lesson="qoe-lesson-05" style="--accent: #7E874C">
 <h2>5. Garbage collection</h2>
@@ -956,7 +1106,7 @@ Coming Oct 6
 data-lesson="qoe-lesson-07" style="--accent: #761D01">
 <h2>7. Calling conventions</h2>
 <figure class="art">
-<img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbour" width="600" height="600" loading="lazy">
+<img src="img/myth07.png" alt="Interlocking gears meshing edge to edge, every tooth having to fit its neighbor" width="600" height="600" loading="lazy">
 </figure>
 <ul>
 <li>three scratch classes: <strong>clean, borrowed, conditionally
@@ -993,9 +1143,11 @@ milliseconds</li>
 Coming Oct 20
 </button>
 </section>
+</div>
 <p class="act">
 Price it, test it, judge it
 </p>
+<div class="act-group">
 <section id="where-the-quantum-lives" class="lesson"
 data-lesson="qoe-lesson-09" style="--accent: #966B55">
 <h2>9. Where the quantum lives</h2>
@@ -1074,6 +1226,7 @@ access”</strong></li>
 Coming Nov 17
 </button>
 </section>
+</div>
 </div>
 <section id="live-tutorial-agenda" class="agenda">
 <h2>Live Tutorial Agenda</h2>

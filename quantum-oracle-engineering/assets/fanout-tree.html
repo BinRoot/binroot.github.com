@@ -1,0 +1,33 @@
+<!-- The fan-out tree from the Sway post's sampling visual, tree half only:
+     one move fans into candidate placements, then into a binary outcome
+     tree.  The board half stays in lesson 2. -->
+<style>
+  #fanout-pair {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: min(6vw, 100px);
+    margin: 0;
+  }
+  #fanout-pair .slide-equation {
+    flex: 0 1 620px;
+    width: auto;
+    margin: 0;
+  }
+  #fanout-pair .slide-equation img {
+    width: 100%;
+    max-height: 18vh;
+  }
+  #fanout-pair #fanout-tree {
+    flex: 0 0 auto;
+    width: min(28vw, 260px);
+  }
+</style>
+<div id="fanout-pair">
+  <div class="slide-equation">
+    <img src="../assets/value-eq.svg"
+         alt="V of a equals the expected reward conditioned on action a, with fixed policies; one rollout is one sample">
+  </div>
+  <svg id="fanout-tree" viewBox="0 0 200 370"></svg>
+</div>
+<script src="../assets/fanout-tree.js" defer></script>

@@ -2,7 +2,7 @@
    Shares the palette and typography of the course index page. */
 
 :root {
-  --bg: #fcfcfa;
+  --bg: #faf8f4;   /* warm paper rather than screen white, as the gym post */
   --ink: #1a1a1a;
   --dim: #55534e;
   --faint: #6b6b66;
@@ -56,6 +56,18 @@ html, body {
   position: relative;
   height: 100vh;
   overflow: hidden;
+  /* A size container, so slide type and spacing follow the deck's own width.
+     That is what lets the notes column take a third of the screen and leave
+     the slide intact, only smaller. */
+  container-type: inline-size;
+  /* Nothing in a deck scrolls, so BOTH swipe axes belong to the pointer
+     handlers.  This was `pan-y pinch-zoom`, which hands vertical drags to the
+     browser: it claims the gesture for scrolling and fires pointercancel
+     part-way through, so an up or down swipe could never be read, and on a
+     page with nothing to scroll it only bought overscroll and pull-to-
+     refresh.  pinch-zoom stays, which is how phones read small type, and
+     `pan-y` returns under .grid-on below, where the deck really does scroll. */
+  touch-action: pinch-zoom;
 }
 
 /* Slides stack in one box and cut instantly.  They stay laid out rather than
@@ -68,10 +80,13 @@ html, body {
   flex-direction: column;
   justify-content: center;
   padding: 8vh 10vw 12vh;
+  padding: 8vh 10cqw 12vh;
   /* Nothing in a deck scrolls.  A slide too tall for the viewport clips, which
      is an authoring signal, not something to hand the audience a scrollbar for. */
   overflow: hidden;
+  /* vw first as the fallback; cqw wins where container units are supported. */
   font-size: clamp(1.05rem, 1.9vw, 1.9rem);
+  font-size: clamp(1.05rem, 1.9cqw, 1.9rem);
   line-height: 1.6;
   visibility: hidden;
   opacity: 0;
@@ -94,6 +109,9 @@ html, body {
   letter-spacing: 0.01em;
   margin: 0 0 1em;
 }
+/* `## Title {.bare}` keeps its title for the outline overlay and the permalink
+   but does not draw it, for a slide whose figure is the entire message. */
+.slide.bare h1 { display: none; }
 /* Every deck spends its one h2 on the myth it is about to take apart, so this
    is the same quoted claim the index page sets, and it keeps the same serif
    italic voice there. */
@@ -151,6 +169,32 @@ html, body {
   font-style: italic;
 }
 .slide img, .slide svg { max-width: 100%; height: auto; }
+.slide img.photo { display: block; margin: 0 auto; max-height: 60vh; width: auto;
+  border-radius: 6px; }
+/* Equations are rendered to SVG paths at build time: crisp on a projector,
+   font-independent, and available when the tutorial is offline.  A strip is
+   deliberately compact so the equation explains the figure without turning
+   the slide into a page of mathematics. */
+.slide-equation {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto 0.35em;
+}
+.slide-equation img {
+  display: block;
+  width: min(80%, 820px);
+  max-height: 16vh;
+  object-fit: contain;
+}
+.slide-equation.compact {
+  margin-top: 0.8em;
+}
+.slide-equation.compact img {
+  max-height: 14vh;
+}
 .slide table { border-collapse: collapse; font-size: 0.8em; }
 .slide th, .slide td {
   padding: 0.35em 0.9em 0.35em 0;
@@ -158,28 +202,253 @@ html, body {
   border-bottom: 1px solid var(--rule);
 }
 
+/* The boil: hand-drawn wobble for the lesson art, using the filter injected
+   by assets/boil-filter.html.  Unlike the landing page's hover-gated version,
+   a deck applies it continuously (a projector has no hover), behind the same
+   reduced-motion guard. */
+.filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .slide img.boil { filter: url(#boil); }
+}
+
 /* Incremental reveal.  Opacity rather than display, so the layout never
    shifts as steps appear.  No transition: steps snap on. */
 .step { opacity: 0; }
 .step.shown { opacity: 1; }
 
-/* Speaker notes, off until `n`. */
+/* Speaker notes live in a bottom drawer, closed by default on every load so
+   the presentation view is always clean.  The notes tab (hidden while
+   fullscreen) or `n` opens it; while open it tracks the current slide. */
 .notes { display: none; }
-body.notes-on .notes {
-  display: block;
-  max-width: 34em;
-  margin-top: 1.4em;
-  padding: 0.7em 1em;
-  border: 1px dashed var(--rule);
-  background: var(--note-bg);
-  color: var(--dim);
-  font-size: 0.6em;
-  line-height: 1.55;
-  text-align: left;
+#notes-tab {
+  right: 6.2rem;
+  bottom: 0.78rem;
+  padding: 0.15rem 0.7rem;
+  font: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  color: var(--faint);
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  cursor: pointer;
 }
-body.notes-on .notes > :last-child { margin-bottom: 0; }
+#notes-tab:hover { color: var(--dim); border-color: var(--dim); }
+body.is-fullscreen #notes-tab { display: none; }
 
-/* Fixed chrome, all of it built by slides.js. */
+/* The arrow that points a reader at that tab, standing in for the line of
+   small print it replaces.  Fixed like the rest of the chrome, sized so its
+   tip lands just above the tab, and drawn a shade darker than the tab's own
+   label: the point of it is to be noticed. */
+#notes-arrow {
+  position: fixed;
+  z-index: 10;
+  /* left and top are set by slides.js, which measures the tab to put the tip
+     over its centre.  These are only where it sits until that runs. */
+  right: 6rem;
+  bottom: 1.75rem;
+  width: 10.5rem;
+  height: 8.4rem;
+  color: var(--dim);
+  pointer-events: none;
+  display: none;
+}
+#notes-arrow svg { width: 100%; height: 100%; }
+body.at-start #notes-arrow { display: block; }
+/* Everything that hides the tab hides the arrow, plus the overlays that cover
+   the deck and the open drawer, whose presence answers the question it asks. */
+body.is-fullscreen #notes-arrow,
+body.grid-on #notes-arrow,
+body.drawer-on #notes-arrow,
+body.outline-on #notes-arrow,
+body.help-on #notes-arrow { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Both paths carry pathLength="100", so one pair of keyframes draws either
+     of them without anyone measuring the real geometry: the shaft sweeps in,
+     the head lands on the end of it. */
+  /* Dash 100, gap 200, against a pathLength of 100.  A bare `100` would mean
+     dash 100 gap 100, and at offset 100 the path's last point lands exactly
+     where the next dash starts: a zero-length dash on the final point, which
+     a round cap paints as a full circle.  That put a dot on the arrow's tip
+     for the whole delay, before anything had been drawn.  A gap longer than
+     the path leaves no second dash to land on either end. */
+  #notes-arrow path { stroke-dasharray: 100 200; stroke-dashoffset: 100; }
+  body.at-start #notes-arrow .shaft {
+    animation: notes-arrow-draw 0.9s ease-out 0.45s forwards;
+  }
+  body.at-start #notes-arrow .head {
+    animation: notes-arrow-draw 0.3s ease-out 1.3s forwards;
+  }
+  /* Once drawn it nudges along its own direction, so the eye is led down to
+     the tab rather than handed a picture of an arrow. */
+  body.at-start #notes-arrow svg {
+    animation: notes-arrow-nudge 2.6s ease-in-out 1.75s infinite;
+  }
+  /* The tab answers, so the eye has somewhere to land: a ring opening out of
+     its edge as the head arrives, three times and then done.  No fill mode, so
+     the tab is left exactly as it was found. */
+  body.at-start #notes-tab {
+    animation: notes-tab-pulse 1.15s ease-out 1.55s 3;
+  }
+  /* The same boil the lesson art wears, so the line reads as drawn rather
+     than plotted.  Guarded on the filter existing: a deck that does not
+     inject it still gets the arrow, just a steady one. */
+  body:has(#boil) #notes-arrow svg { filter: url(#boil); }
+}
+/* The stroke fades up over the first tenth rather than being there from the
+   off.  A round cap on a dash that has barely any length yet paints a full
+   circle of the stroke width, so frame one of a plain dashoffset draw is a
+   blob sitting at the start of the path; by the time this is opaque there is
+   a line under the cap.  It reads as the pen touching down. */
+@keyframes notes-arrow-draw {
+  from { stroke-dashoffset: 100; stroke-opacity: 0; }
+  10%  { stroke-opacity: 1; }
+  to   { stroke-dashoffset: 0; stroke-opacity: 1; }
+}
+@keyframes notes-tab-pulse {
+  from { box-shadow: 0 0 0 0 rgba(85, 83, 78, 0.45); }
+  to   { box-shadow: 0 0 0 0.62rem rgba(85, 83, 78, 0); }
+}
+@keyframes notes-arrow-nudge {
+  0%, 100% { transform: none; }
+  50%      { transform: translate(2px, 5px); }
+}
+
+/* The grid tab sits beside the notes tab and matches it exactly; the two are
+   the deck's only reader-facing controls. */
+#grid-tab {
+  right: 10.4rem;
+  bottom: 0.78rem;
+  padding: 0.15rem 0.7rem;
+  font: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  color: var(--faint);
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  cursor: pointer;
+}
+#grid-tab:hover { color: var(--dim); border-color: var(--dim); }
+body.is-fullscreen #grid-tab { display: none; }
+body.grid-on #grid-tab { color: var(--ink); border-color: var(--dim); }
+
+/* Grid mode: the deck becomes a scroll container and every slide becomes a
+   live thumbnail of itself, placed and scaled by slides.js.  Nothing here
+   changes a slide's internal layout, so a tile is exactly what the slide
+   looks like, only smaller. */
+body.grid-on #deck {
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+body.grid-on .slide {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform-origin: top left;
+  cursor: pointer;
+  outline-style: solid;
+  outline-color: var(--rule);
+  background: var(--bg);
+}
+/* A tile is a target, not a page: swallow clicks on links and controls
+   inside it so the whole thumbnail behaves as one button. */
+body.grid-on .slide > * { pointer-events: none; }
+body.grid-on .slide:hover { outline-color: var(--dim); }
+body.grid-on .slide.tile-current { outline-color: var(--ink); }
+body.grid-on .arrow { display: none; }
+#grid-spacer { width: 1px; height: 0; pointer-events: none; }
+#notes-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  display: none;
+  max-height: 42vh;
+  overflow-y: auto;
+  padding: 1rem 3.2rem 1.2rem 1.6rem;
+  background: var(--note-bg);
+  border-top: 1px solid var(--rule);
+  color: var(--dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+body.drawer-on #notes-drawer { display: block; }
+#notes-drawer > :last-child { margin-bottom: 0; }
+/* Notes are short paragraphs and the occasional list, set as a column of
+   text: a comfortable measure, air between paragraphs, hanging bullets. */
+#notes-drawer .drawer-body { max-width: 36em; }
+#notes-drawer p { margin: 0 0 0.95em; }
+#notes-drawer p:last-child { margin-bottom: 0; }
+#notes-drawer ul, #notes-drawer ol { margin: 0 0 0.95em; padding-left: 1.25em; }
+#notes-drawer li { margin: 0.3em 0; }
+#notes-drawer li::marker { color: var(--faint); }
+/* Same as the deck's own links: the ink is inherited and the underline does
+   the work, so a link in the notes does not arrive as browser blue. */
+#notes-drawer a { color: inherit; text-decoration: underline; }
+#notes-drawer code { font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, monospace; font-size: 0.92em; }
+#notes-drawer .drawer-title {
+  margin: 0 0 1.1em;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+#notes-drawer .drawer-title b { color: var(--dim); font-weight: 600; }
+
+/* On a landscape screen with room for it, the notes stand beside the deck as
+   a column: a narrow measure reads faster than a wide strip, and the slide
+   stays whole, only smaller, because the deck is a size container.  The fixed
+   chrome on the right edge moves in with the deck.  Portrait and narrow
+   screens keep the strip under the slide. */
+@media (orientation: landscape) and (min-width: 900px) {
+  :root { --notes-w: min(34vw, 480px); }
+  body.drawer-on #deck { width: calc(100% - var(--notes-w)); }
+  body.drawer-on #notes-drawer {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    width: var(--notes-w);
+    max-height: none;
+    padding: 2.4rem 2rem 2.4rem 1.8rem;
+    border-top: 0;
+    border-left: 1px solid var(--rule);
+    font-size: 1.04rem;
+    line-height: 1.7;
+  }
+  body.drawer-on #notes-close { top: 1rem; right: 1.1rem; }
+  body.drawer-on #chapters { right: var(--notes-w); }
+  body.drawer-on #seglabel { left: calc((100% - var(--notes-w)) / 2); }
+  body.drawer-on #counter { right: calc(var(--notes-w) + 1.4rem); }
+  body.drawer-on #notes-tab { right: calc(var(--notes-w) + 6.2rem); }
+  body.drawer-on #grid-tab { right: calc(var(--notes-w) + 10.4rem); }
+  body.drawer-on #nav-next { right: calc(var(--notes-w) + 0.5rem); }
+}
+#notes-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 1rem;
+  padding: 0.1rem 0.45rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--faint);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+#notes-close:hover { color: var(--dim); }
+
+/* Fixed chrome.  Built by slides.js, except the crumb below, which slides.lua
+   emits so the way back survives scripting being off. */
 .chrome {
   position: fixed;
   z-index: 10;
@@ -195,6 +464,82 @@ body.notes-on .notes > :last-child { margin-bottom: 0; }
   background: var(--ink);
 }
 #counter { right: 1.4rem; bottom: 1rem; }
+
+/* The crumb: the course, then the deck.  Same corner vocabulary as the counter
+   and the tabs, so it reads as chrome rather than as slide content, and it
+   sits above the slides' 8vh top padding rather than pushing it down.  Long
+   lesson titles ellipsis the way the segment label does instead of wrapping
+   into the canvas. */
+#deck-crumb {
+  top: 1rem;
+  left: 1.4rem;
+  max-width: 46vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#deck-crumb a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+#deck-crumb a:hover,
+#deck-crumb a:focus-visible { color: var(--dim); border-bottom-color: var(--dim); }
+#deck-crumb .crumb-sep { margin: 0 0.5em; color: var(--rule); }
+/* The projector never shows it, and neither do the overlays it would sit on. */
+body.is-fullscreen #deck-crumb,
+body.outline-on #deck-crumb,
+body.help-on #deck-crumb { display: none; }
+
+/* Segment chrome, present only when the deck's markdown declares segments
+   (level-1 headers).  The label names the current segment; the chaptered bar
+   replaces #progress, one zone per segment sized by its slide count, each
+   filling as its slides go by.  Tapping or clicking a zone jumps to that
+   segment's first slide. */
+#seglabel {
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  max-width: 40vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#chapters {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 3px;
+  height: 4px;
+}
+#chapters .zone {
+  flex-grow: 1;
+  flex-basis: 0;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: var(--rule);
+  cursor: pointer;
+}
+/* An invisible extension of each zone upward, so the 4px bar is tappable on a
+   phone without being 4px. */
+#chapters .zone::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.3rem;
+}
+#chapters .fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background: var(--ink);
+}
 #timer {
   left: 1.4rem;
   bottom: 1rem;
@@ -202,6 +547,30 @@ body.notes-on .notes > :last-child { margin-bottom: 0; }
   font-variant-numeric: tabular-nums;
 }
 body.timer-on #timer { display: block; }
+
+/* Edge arrows, the mouse's click affordance.  Hidden until slides.js sets
+   `arrows-on` (mouse movement, plus one hint on load), absent on touch
+   devices, and hidden with the rest of the chrome in print. */
+.arrow {
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.35em 0.45em;
+  border: 0;
+  background: none;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--faint);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#nav-prev { left: 0.5rem; }
+#nav-next { right: 0.5rem; }
+body.arrows-on .arrow { opacity: 1; pointer-events: auto; }
+.arrow:hover { color: var(--ink); }
+.arrow:disabled { visibility: hidden; }
+@media (pointer: coarse) { .arrow { display: none; } }
 
 #outline, #help {
   position: fixed;
@@ -223,6 +592,14 @@ body.outline-on #outline, body.help-on #help { display: block; }
   margin: 0 0 1.4em;
 }
 #outline ol { margin: 0; padding-left: 2.2em; }
+#outline .seg {
+  margin: 1.5em 0 0.6em;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+#outline .lists > ol:first-child, #outline .seg:first-child { margin-top: 0; }
 #outline li { margin: 0.5em 0; }
 #outline button {
   padding: 0;
@@ -253,6 +630,13 @@ body.outline-on #outline, body.help-on #help { display: block; }
 
 @media (max-width: 700px) {
   .slide { padding: 6vh 7vw 12vh; }
+  /* The reader tabs take their own row on a narrow screen.  #seglabel is
+     centred with a 40vw allowance, which at phone widths runs straight under
+     both of them; lifting the tabs clear keeps the segment name readable
+     rather than trading it away. */
+  #grid-tab, #notes-tab { bottom: 2.7rem; }
+  #notes-tab { right: 1.4rem; }
+  #grid-tab { right: 7.2rem; }
 }
 
 /* Print to PDF as a conference backup: one slide per page, all steps shown. */
@@ -270,5 +654,7 @@ body.outline-on #outline, body.help-on #help { display: block; }
     break-after: page;
   }
   .step { opacity: 1 !important; }
-  .chrome, #outline, #help, .notes { display: none !important; }
+  .chrome, #outline, #help, .notes, #notes-drawer, #notes-tab {
+    display: none !important;
+  }
 }

@@ -1,0 +1,12 @@
+<!-- Slide 8's ambient loop: the wrong-lane race.  The same dependent chain of
+     blocks runs twice.  Top lane: the CPU processes it in place, one block
+     after another, and finishes.  Bottom lane: the chain pays the bus ride to
+     the GPU, where one lane works while the rest sit dark (a dependent chain
+     cannot parallelize), pays the ride back, and finishes later.  The clock
+     bars under each lane make the loss legible: the offloaded run's bar is
+     simply longer.  Deterministic loop; reduced motion shows the finished
+     outcome frame. -->
+<div id="mismatch-race-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg id="mismatch-race" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/mismatch-race.js" defer></script>

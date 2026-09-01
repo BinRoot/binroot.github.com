@@ -1,0 +1,18 @@
+<!-- Slide 15's anchor: the dartboard rounds.  Darts thwack into a board in
+     three rounds (100, 400, 1,600 total), fire rate ramping; the scatter
+     never changes, but the centroid crosshair steadies and its grouping
+     circle halves per round while the dart count quadruples.  Presenter
+     controlled from the console panel, which is also the launcher; opens
+     paused with an empty board.  Reduced motion shows the final frame. -->
+<style>
+  #classical-rate-fig .cr-play circle:first-child { transition: opacity 0.15s; }
+  #classical-rate-fig .cr-play:hover circle:first-child { opacity: 0.24; }
+</style>
+<div class="slide-equation">
+  <img src="../assets/classical-rate-eq.svg"
+       alt="Classical error after M samples scales as one over square root M, so resolving a gap g takes order one over g squared samples">
+</div>
+<div id="classical-rate-viz" style="display:flex; justify-content:center; margin:4px 0 12px;">
+<svg id="classical-rate-fig" viewBox="0 0 760 300" width="980" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/classical-rate.js" defer></script>

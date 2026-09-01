@@ -1,0 +1,102 @@
+<!-- The closing bridge from Lesson 1 to the complete twelve-lesson series.
+     Six compact stations show the work changing character: choose, prove,
+     build, trust, locate, judge.  It is a curriculum promise rather than a
+     second flowchart for the three-question screening test. -->
+<style>
+  #series-bridge-viz {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+  }
+  #series-bridge-viz .sb-route {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+  }
+  #series-bridge-viz .sb-stop {
+    min-width: 0;
+    padding: 18px 12px 20px;
+    text-align: center;
+    border-top: 4px solid #9aa0a8;
+    background: rgba(45, 49, 64, 0.035);
+    border-radius: 0 0 6px 6px;
+  }
+  #series-bridge-viz .sb-stop:first-child {
+    border-color: #456AAD;
+    background: rgba(69, 106, 173, 0.09);
+  }
+  #series-bridge-viz .sb-num {
+    color: #456AAD;
+    font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, monospace;
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  #series-bridge-viz .sb-verb {
+    margin-top: 0.35em;
+    color: #2d3140;
+    font-size: 1.05em;
+    font-weight: 700;
+  }
+  #series-bridge-viz .sb-object {
+    margin-top: 0.15em;
+    color: #7a7f88;
+    font-size: 0.62em;
+    line-height: 1.35;
+  }
+  #series-bridge-viz .sb-payoff {
+    margin: 1.7em auto 0;
+    text-align: center;
+    color: #456AAD;
+    font-size: 0.9em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  #series-bridge-viz .sb-next {
+    margin: 0.65em auto 0;
+    text-align: center;
+    color: #2d3140;
+    font-size: 0.74em;
+    font-weight: 700;
+  }
+  @media (max-width: 900px) {
+    #series-bridge-viz .sb-route { gap: 7px; }
+    #series-bridge-viz .sb-stop { padding: 14px 6px 16px; }
+  }
+</style>
+<div id="series-bridge-viz">
+  <div class="sb-route" role="list" aria-label="The twelve-lesson course arc">
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">1</div>
+      <div class="sb-verb">choose</div>
+      <div class="sb-object">the problem</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">2</div>
+      <div class="sb-verb">prove</div>
+      <div class="sb-object">the opening</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">3–7</div>
+      <div class="sb-verb">build</div>
+      <div class="sb-object">the oracle</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">8</div>
+      <div class="sb-verb">trust</div>
+      <div class="sb-object">the pieces</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">9–11</div>
+      <div class="sb-verb">locate</div>
+      <div class="sb-object">the quantum</div>
+    </div>
+    <div class="sb-stop" role="listitem">
+      <div class="sb-num">12</div>
+      <div class="sb-verb">judge</div>
+      <div class="sb-object">the next claim</div>
+    </div>
+  </div>
+  <div class="sb-payoff">The next eleven lessons price the difference.</div>
+  <div class="sb-next">Next: Go fails · the ordinary bandit fails · one invented game survives</div>
+</div>
