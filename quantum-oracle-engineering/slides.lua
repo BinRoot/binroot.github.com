@@ -111,6 +111,12 @@ local function head_tags(meta)
         and ('"image":"' .. jesc(BASE .. pandoc.utils.stringify(meta.image)) .. '",')
         or '')
     .. '"learningResourceType":"Slide deck","inLanguage":"en",'
+    .. (meta.date
+        and ('"datePublished":"' .. jesc(pandoc.utils.stringify(meta.date)) .. '",')
+        or '')
+    .. (meta.modified
+        and ('"dateModified":"' .. jesc(pandoc.utils.stringify(meta.modified)) .. '",')
+        or '')
     .. '"author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},'
     .. '"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering",'
     .. '"url":"' .. jesc(BASE) .. '"},'

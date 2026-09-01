@@ -433,6 +433,40 @@ body.drawer-on #notes-drawer { display: block; }
   body.drawer-on #grid-tab { right: calc(var(--notes-w) + 10.4rem); }
   body.drawer-on #nav-next { right: calc(var(--notes-w) + 0.5rem); }
 }
+
+/* Portrait and narrow screens keep the strip under the slide, and it pushes
+   rather than covers.  The deck gives up exactly the drawer's height and every
+   piece of chrome pinned to the window's bottom is re-pinned to the deck's,
+   so the slide and its note are both readable at once.  This is the landscape
+   rule above, turned through ninety degrees.
+   The drawer takes a fixed height rather than sizing to its text, because the
+   deck has to know in advance how much room to give up; a note shorter than
+   the strip simply leaves white space under itself.
+   The media query is the exact complement of the landscape one: not (landscape
+   and wide) is (portrait or narrow). */
+@media (orientation: portrait), (max-width: 899px) {
+  :root { --notes-h: 40vh; }
+  body.drawer-on #deck { height: calc(100vh - var(--notes-h)); }
+  body.drawer-on #notes-drawer { height: var(--notes-h); max-height: var(--notes-h); }
+  /* Less room means less of it can go on margin, or the slide clips. */
+  body.drawer-on .slide { padding-top: 4vh; padding-bottom: 5vh; }
+  /* Shift the chrome rather than re-pin it.  Narrow screens already give the
+     reader tabs a row of their own above the counter, and rewriting each
+     element's `bottom` here flattened the two rows back into one.  A translate
+     moves everything up by the drawer's height and leaves those relationships
+     alone.  #seglabel keeps its own centring translate. */
+  body.drawer-on #progress,
+  body.drawer-on #chapters,
+  body.drawer-on #counter,
+  body.drawer-on #timer,
+  body.drawer-on #notes-tab,
+  body.drawer-on #grid-tab { transform: translateY(calc(-1 * var(--notes-h))); }
+  body.drawer-on #seglabel {
+    transform: translateX(-50%) translateY(calc(-1 * var(--notes-h)));
+  }
+  /* The edge arrows centre on the deck, not on the window. */
+  body.drawer-on .arrow { top: calc((100vh - var(--notes-h)) / 2); }
+}
 #notes-close {
   position: absolute;
   top: 0.6rem;
