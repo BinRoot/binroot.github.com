@@ -1,0 +1,24 @@
+% break-even-numbers-eq.tex -- the break-even inequality with one row of
+% numbers in it: a one-percent gap, a thousand cores, overhead ten.  Same
+% pipeline and palette as break-even-eq.tex; rendered to .svg by the Makefile.
+% The constants match lesson 2's far-line slide (C = 10, P = 1000).
+\documentclass[border=2pt]{standalone}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{456AAD}
+\definecolor{ink}{HTML}{2D3140}
+\definecolor{dim}{HTML}{7A7F88}
+\begin{document}
+\color{ink}
+$\displaystyle
+  \underbrace{g = 0.01}_{\textcolor{dim}{\text{gap}}}
+  \qquad
+  \underbrace{P = 1000}_{\textcolor{dim}{\text{cores}}}
+  \qquad
+  \underbrace{C = 10}_{\textcolor{dim}{\text{overhead}}}
+  \qquad\Longrightarrow\qquad
+  \textcolor{accent}{t_{\mathrm{oracle}}}
+  \;<\;
+  \frac{t_{\mathrm{roll}}}{100}
+$
+\end{document}

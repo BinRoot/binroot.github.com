@@ -1,15 +1,20 @@
-<!-- Slide 25: the diagnostic.  The one-line test, written as a test.
-     See assets/diagnostic.js.
+<!-- Question 1's closing card: the one-line test, written as a test.  See
+     assets/diagnostic.js, which draws every svg.diagnostic-fig from its data
+     attributes; Questions 2 and 3 close on the same card (diagnostic-2.html,
+     diagnostic-3.html).
 
-     This slide is the deck's second deliberate break of the seven-word rule
-     (the closing card is the other).  It earns it: the outline calls this
-     "the one-line test you take home" and runs a participation beat on it,
-     asking the room for two domains and applying the rule out loud to each.
-     The rule has to be on screen for that to work, and five wordless designs
-     The strengthened wording asks what remains after the best classical
-     reformulation, so task randomness is a candidate condition rather than
-     an automatic pass. -->
-<div id="diagnostic-viz" style="display:flex; justify-content:center; margin:12px 0;">
-<svg id="diagnostic-fig" viewBox="0 0 760 290" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+     This slide is one of the deck's deliberate breaks of the seven-word rule
+     (the closing card is another).  It earns it: the outline calls this "the
+     one-line test you take home" and runs a participation beat on it, asking
+     the room for two domains and applying the rule to each.  The rule has to
+     be on screen for that to work.  The strengthened wording asks what remains
+     after the best classical reformulation, so task randomness is a candidate
+     condition rather than an automatic pass. -->
+<div class="diagnostic-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="diagnostic-fig" viewBox="0 0 760 290" width="1000" style="max-width:100%; font-family:'Ubuntu',sans-serif;"
+     data-premise="after the strongest classical reformulation"
+     data-question="does sampling still dominate?"
+     data-yes="remaining expectation"
+     data-no="classical structure removes it"></svg>
 </div>
 <script src="../assets/diagnostic.js" defer></script>

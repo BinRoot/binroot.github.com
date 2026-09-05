@@ -61,7 +61,7 @@ Have you heard of the two-arm bandit problem? It's like a simplified slot machin
 
 They're both VERY different games. In this lesson, we'll get comfortable talking about games and thinking of them as abstract concepts so we can build the AI player in a quantum computer.
 
-**Although a quantum computer _can_ play these games, you'll see that it won't be worth it.** 
+**Although a quantum computer _can_ play these games, you'll see next lesson that it won't be worth it.** 
 
 And, in the next lesson we'll introduce a game where a quantum computer _likely_ beats a classical one.
  -->
@@ -153,49 +153,6 @@ Two famous ones stand out of reach: simulating quantum systems and Shor-style al
 
 -->
 
-# The three questions {#seg-three-questions}
-
-## Does the best classical method still sample? {#q1}
-
-::: {#gates-1}
-:::
-
-<!-- The first gate asks whether sampling is necessary. 
-
-**Does a classical algorithm _require_ sampling?** 
-
-If yes, then this task randomness is a great reason to consider a QPU. 
-
-If no, then enumeration, dynamic programming, quadrature, variance reduction or a trustworthy surrogate may still remove or shrink the need for a QPU. And guess what? **Most tasks get caught here.** -->
-
-## Is precision the bottleneck? {#q2}
-
-::: {#gates-2}
-:::
-
-<!-- Next, **the second gate asks whether precision is the bottleneck**. 
-
-The first gate (randomness) on its own is not enough. 
-
-The task has to force differences so small that telling them apart is the hard part. -->
-
-## Is the oracle worth building? {#q3}
-
-::: {#gates-3}
-:::
-
-<!-- Lastly, the third gate is about the cost (in terms of time) of executing the oracle on a quantum machine. 
-
-**Every quantum query has to be cheap enough to pay for itself.** 
--->
-
-## The assembled test {#three-questions}
-
-::: {#gates-4}
-:::
-
-<!-- The gates help organize our thoughts, so we know when to apply quantum computing.  -->
-
 # The mechanism {#seg-mechanism}
 
 ## Two kinds of access {#estimating}
@@ -207,7 +164,7 @@ The task has to force differences so small that telling them apart is the hard p
 
 There's also a quantum way of thinking about a rollout.
 
-Let's look at the two different access models. 
+Here are the two access models. 
 
 **A classical sampling call returns one draw X from p.** 
 
@@ -247,7 +204,7 @@ As you x4 the number of rollouts (M), you x0.5 the error (e).
 
 On the right, the quantum computer does the same job coherently. 
 
-Watch the board, because nothing lands during the coherent calls. 
+Keep an eye on the board: nothing lands during the coherent calls. 
 
 Then the estimate is measured. 
 
@@ -261,10 +218,53 @@ For bounded outcomes at fixed confidence, amplitude estimation achieves additive
 
 <!-- **The quantum algorithm clearly has fewer operations, but each operation is far heavier.** 
 
-So which algorithm do we go with? Hard to say. We'll have more to say on this soon.
+So which algorithm do we go with? That takes three questions.
 
 Btw, **everything today assumes fault tolerance**: no variational circuits, no NISQ demonstration, no hardware claims. 
 -->
+
+# The three questions {#seg-three-questions}
+
+## Does the best classical method still sample? {#q1}
+
+::: {#gates-1}
+:::
+
+<!-- The first gate asks whether sampling is necessary. 
+
+**Does a classical algorithm _require_ sampling?** 
+
+If yes, then this task randomness is a great reason to consider a QPU. 
+
+If no, then enumeration, dynamic programming, quadrature, variance reduction or a trustworthy surrogate may still remove or shrink the need for a QPU. And guess what? **Most tasks get caught here.** -->
+
+## Is precision the bottleneck? {#q2}
+
+::: {#gates-2}
+:::
+
+<!-- Next, **the second gate asks whether precision is the bottleneck**. 
+
+The first gate (randomness) on its own is not enough. 
+
+The task has to force differences so small that telling them apart is the hard part. -->
+
+## Is the oracle worth building? {#q3}
+
+::: {#gates-3}
+:::
+
+<!-- Lastly, the third gate is about the cost (in terms of time) of executing the oracle on a quantum machine. 
+
+**Every quantum query has to be cheap enough to cover its own cost.** 
+-->
+
+## The assembled test {#three-questions}
+
+::: {#gates-4}
+:::
+
+<!-- The gates help organize our thoughts, so we know when to apply quantum computing.  -->
 
 # Question 1 · Sampling {#seg-question-1}
 
@@ -321,7 +321,7 @@ By putting randomness in the environment, we make the game more challenging.
 
 One future turns into a distribution of futures. 
 
-It is still a game tree, and actually a finite one could be summed exactly.
+It is still a game tree, and a finite one could be summed in full.
 
 The problem is that its branching makes enumeration unaffordable. 
 
@@ -399,7 +399,7 @@ The bracket underneath is the gap. When it is this wide, **a few hundred rollout
 ::: {#candidates-close}
 :::
 
-<!-- Take a look at how close these two are. 
+<!-- See how close these two are. 
 
 How many rollouts would you need now? 
 
@@ -431,6 +431,17 @@ In an optimistic baseline with perfect scaling, a thousand cores divide the samp
 Sure, there's overhead in scheduling, communication and management, but using the optimistic classical baseline makes the quantum comparison harder to game. 
 
 **Every classical worker raises the bar for the QPU to clear.** -->
+
+## The second diagnostic {#diagnostic-2}
+
+::: {#diagnostic-2}
+:::
+
+<!-- **Does the gap drive the cost?**
+
+A wide gap: a few hundred rollouts settle it, so stop, no quantum computer needed.
+
+A tiny gap: the samples pile up, so keep going. -->
 
 # Question 3 · The oracle {#seg-question-3}
 
@@ -488,7 +499,7 @@ Local rules like that compile to a circuit that stays regular and shallow.
 
 <!-- In this example, the game rules reach across the whole board (and that dashed line going backwards is a read into earlier positions, which is what history-dependent legality means). 
 
-Look at what happened to the circuit. It did not just get a little worse, **it got wider _and_ deeper at the same time**, and this is one step of one rollout. 
+See what happened to the circuit. It did not just get a little worse, **it got wider _and_ deeper at the same time**, and this is one step of one rollout. 
 
 **This is where oracle cost eats the speedup you came for.** -->
 
@@ -503,42 +514,21 @@ On one side, a QPU saves you time by requiring fewer samples.
 
 On the other, executing the coherent query could itself be costly. 
 
-When a classical sample costs nanoseconds, realistic quantum overhead is unlikely to pay at practical gaps. 
+When a classical sample costs nanoseconds, realistic quantum overhead is unlikely to win at practical gaps. 
 
 But no fixed overhead defeats a quadratic query advantage at every scale: **when rollouts are expensive and the required gap is tiny enough, the balance can tip**. 
 -->
 
-# Failure modes {#seg-failure-modes}
+## The third diagnostic {#diagnostic-3}
 
-## Many ways claims fail {#failures-1}
-
-<img class="photo" src="../assets/img/ruin-columns.webp" width="1023" height="681"
-     alt="The standing columns of a ruined temple">
-
-<!-- Five ways these arguments go wrong, and I have made some of them myself. 
-
-1. A weak classical baseline. 
-2. Query counts quoted as though they were runtimes. 
-3. Oracle cost swept under the rug by three words. 
-4. Solver randomness dressed up as an inherent sampling bottleneck. 
-5. And parallel resources ignored on either side. 
-
-Tang's result is the canonical warning about the first: **match the input model before celebrating the algorithm**. The three questions and the wall-clock model catch all five. -->
-
-## The dominoes {#dominoes}
-
-::: {#dominoes}
+::: {#diagnostic-3}
 :::
 
-<!-- In 2016 there was a celebrated quantum algorithm for recommendation systems. 
+<!-- **Is one coherent query cheap?**
 
-**In 2018 Ewin Tang, then an undergraduate, gave a classical analogue that was only polynomially slower** under comparable strong length-square sampling access. 
+Local rules that compile and nothing loaded from a database: build it.
 
-That removed the claimed exponential separation, and related dequantization work spread to neighboring low-rank linear-algebra claims. 
-
-It was a domino effect of many results tipping each other over. 
-
-In this diagram, the slab on the right takes the same shock and holds because those query separations are proved inside their stated oracle models. Though, **end-to-end advantage still has to pay for implementing the model**. -->
+Tangled rules or a data load: stop, the oracle eats the speedup. -->
 
 # The wall-clock test {#seg-wall-clock}
 
@@ -587,6 +577,20 @@ Btw, if you choose a parallel amplitude-estimation architecture, there's a littl
 For those curious, **these equations remain true regardless of the outcome of BQP versus BPP**. 
  -->
 
+## A hundred times faster {#break-even-numbers}
+
+::: {#break-even-numbers}
+:::
+
+<!-- Plug in a one-percent gap, a thousand classical cores, and an overhead of ten.
+
+**One coherent rollout must finish a hundred times faster than a classical rollout on a single core.**
+
+Fault-tolerant gates run far slower than CPU cycles, so for ordinary AI search the answer is no.
+
+Lesson 2 moves the knobs until it isn't.
+-->
+
 ## The toolkit, and three contenders {#toolkit}
 
 <img class="photo" src="../assets/img/toolbox-wooden.webp" width="1024" height="860"
@@ -596,6 +600,38 @@ For those curious, **these equations remain true regardless of the outcome of BQ
 
 Not too exotic, eh?
  -->
+
+# Failure modes {#seg-failure-modes}
+
+## Many ways claims fail {#failures-1}
+
+<img class="photo" src="../assets/img/ruin-columns.webp" width="1023" height="681"
+     alt="The standing columns of a ruined temple">
+
+<!-- Five ways these arguments go wrong, and I have made some of them myself. 
+
+1. A weak classical baseline. 
+2. Query counts quoted as though they were runtimes. 
+3. Oracle cost swept under the rug by three words. 
+4. Solver randomness dressed up as an inherent sampling bottleneck. 
+5. And parallel resources ignored on either side. 
+
+Tang's result is the canonical warning about the first: **match the input model before celebrating the algorithm**. The three questions and the wall-clock model catch all five. -->
+
+## The dominoes {#dominoes}
+
+::: {#dominoes}
+:::
+
+<!-- In 2016 there was a celebrated quantum algorithm for recommendation systems. 
+
+**In 2018 Ewin Tang, then an undergraduate, gave a classical analogue that was only polynomially slower** under comparable strong length-square sampling access. 
+
+That removed the claimed exponential separation, and related dequantization work spread to neighboring low-rank linear-algebra claims. 
+
+It was a domino effect of many results tipping each other over. 
+
+In this diagram, the slab on the right takes the same shock and holds because those query separations are proved inside their stated oracle models. Though, **advantage on the wall clock still has to cover the cost of implementing the model**. -->
 
 # The rest of the course {#seg-series}
 
