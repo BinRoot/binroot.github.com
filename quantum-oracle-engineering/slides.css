@@ -54,7 +54,11 @@ html, body {
 
 #deck {
   position: relative;
+  /* 100vh on iOS Safari is the toolbar-hidden height, so the deck's bottom
+     sat under the toolbar.  dvh tracks the visible area; vh stays as the
+     fallback for browsers without it. */
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   /* A size container, so slide type and spacing follow the deck's own width.
      That is what lets the notes column take a third of the screen and leave
@@ -212,8 +216,12 @@ html, body {
   height: 0;
   overflow: hidden;
 }
-@media (prefers-reduced-motion: no-preference) {
+/* Mouse-driven browsers only: iOS Safari renders an SVG filter referenced
+   from CSS unreliably on images, and a blank title card reads as a broken
+   page.  Touch devices get the still artwork. */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .slide img.boil { filter: url(#boil); }
+  body:has(#boil) #notes-arrow svg { filter: url(#boil); }
 }
 
 /* Incremental reveal.  Opacity rather than display, so the layout never
@@ -298,8 +306,8 @@ body.help-on #notes-arrow { display: none; }
   }
   /* The same boil the lesson art wears, so the line reads as drawn rather
      than plotted.  Guarded on the filter existing: a deck that does not
-     inject it still gets the arrow, just a steady one. */
-  body:has(#boil) #notes-arrow svg { filter: url(#boil); }
+     inject it still gets the arrow, just a steady one; the boil itself is
+     applied below, under the same mouse-only guard as the artwork. */
 }
 /* The stroke fades up over the first tenth rather than being there from the
    off.  A round cap on a dash that has barely any length yet paints a full
@@ -446,7 +454,7 @@ body.drawer-on #notes-drawer { display: block; }
    and wide) is (portrait or narrow). */
 @media (orientation: portrait), (max-width: 899px) {
   :root { --notes-h: 40vh; }
-  body.drawer-on #deck { height: calc(100vh - var(--notes-h)); }
+  body.drawer-on #deck { height: calc(100vh - var(--notes-h)); height: calc(100dvh - var(--notes-h)); }
   body.drawer-on #notes-drawer { height: var(--notes-h); max-height: var(--notes-h); }
   /* Less room means less of it can go on margin, or the slide clips. */
   body.drawer-on .slide { padding-top: 4vh; padding-bottom: 5vh; }
@@ -465,7 +473,7 @@ body.drawer-on #notes-drawer { display: block; }
     transform: translateX(-50%) translateY(calc(-1 * var(--notes-h)));
   }
   /* The edge arrows centre on the deck, not on the window. */
-  body.drawer-on .arrow { top: calc((100vh - var(--notes-h)) / 2); }
+  body.drawer-on .arrow { top: calc((100vh - var(--notes-h)) / 2); top: calc((100dvh - var(--notes-h)) / 2); }
 }
 #notes-close {
   position: absolute;
@@ -662,6 +670,28 @@ body.outline-on #outline, body.help-on #help { display: block; }
 #help dt { color: var(--faint); }
 #help dd { margin: 0; }
 
+/* A phone held sideways: little height, so the title shrinks and the slide
+   gives up most of its vertical padding rather than clipping its top.
+   Centring moves from justify-content to a pair of flexible spacers: a slide
+   that fits is still centred, and one that does not starts under the crumb
+   and clips at the bottom, instead of spilling its title over the crumb. */
+@media (max-height: 520px) {
+  .slide { justify-content: flex-start; padding: 2.4rem 6vw 2.6rem; }
+  .slide::before, .slide::after { content: ''; flex: 1 0 0; }
+  .slide h1 { font-size: 1.45em; margin: 0 0 0.3em; }
+  .slide-equation.compact { margin-top: 0.2em; }
+  .slide-equation img, .slide-equation.compact img { max-height: 10vh; }
+  /* Figures scale to the height left over, so the title stays on screen. */
+  .slide svg { max-height: 52vh; width: auto; }
+  /* With the notes open the deck is only 60vh tall, so the crumb goes and
+     the title and figure shrink again to fit above the strip. */
+  body.drawer-on #deck-crumb { display: none; }
+  body.drawer-on .slide { padding-top: 0.5rem; padding-bottom: 2.4rem; }
+  body.drawer-on .slide h1 { font-size: 1.2em; margin-bottom: 0.2em; }
+  body.drawer-on .slide-equation img,
+  body.drawer-on .slide-equation.compact img { max-height: 6vh; }
+  body.drawer-on .slide svg { max-height: 28vh; }
+}
 @media (max-width: 700px) {
   .slide { padding: 6vh 7vw 12vh; }
   /* The reader tabs take their own row on a narrow screen.  #seglabel is

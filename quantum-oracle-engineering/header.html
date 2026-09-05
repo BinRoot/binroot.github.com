@@ -466,8 +466,10 @@ button.busy::after {
   }
 
   /* Both of these are motion, so both sit behind the same guard: the card
-     lifts, and the artwork boils inside its frame. */
-  @media (prefers-reduced-motion: no-preference) {
+     lifts, and the artwork boils inside its frame.  Mouse-driven browsers
+     only: iOS Safari renders an SVG filter referenced from CSS unreliably on
+     images, and a blank card reads as a broken page. */
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
     transform: translateY(-2px);
 
     & .art img {
