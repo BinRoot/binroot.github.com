@@ -902,6 +902,9 @@
   @media (min-width: 1280px) { .act-group { grid-template-columns: repeat(4, 1fr); } }
   /* In the two-across range the cards get wide; the art stays a picture, not a poster. */
   .lesson img { max-width: min(100%, 22em); margin-inline: auto; display: block; }
+  /* Inline equations in the bullets: LaTeX rendered to SVG at build time, sized
+     in em from the SVG's own height so the mathematics sits at text size. */
+  .lesson img.eq { display: inline-block; width: auto; max-width: none; margin: 0 -0.1em; vertical-align: -0.52em; }
   @media (max-width: 700px)  { .lessons { margin-inline: 0; }
                                .act-group { grid-template-columns: 1fr; } }
   .lessons > .act {
@@ -994,12 +997,15 @@ data-lesson="qoe-lesson-01" style="--accent: #456AAD">
 <ul>
 <li><strong>CPU, GPU, QPU</strong>: three devices, three workloads</li>
 <li>the QPU’s job: <strong>fewer samples</strong> for an average</li>
-<li><strong>Θ(1/ε)</strong> queries in place of <strong>Θ(1/ε²)</strong>
+<li><strong><img class="eq" src="assets/eq-theta-eps.svg" alt="order one over epsilon" style="height:1.84em"></strong>
+queries in place of
+<strong><img class="eq" src="assets/eq-theta-eps2.svg" alt="order one over epsilon squared" style="height:1.91em"></strong>
 samples</li>
 <li><strong>three questions</strong>: task randomness, precision, oracle
 cost</li>
 <li>Grover on a database loses to <strong>data loading</strong></li>
-<li>break-even: <strong>t_oracle &lt; t_roll / (C·P·g)</strong></li>
+<li>break-even:
+<strong><img class="eq" src="assets/eq-break-even-inline.svg" alt="t oracle less than t roll over C times P times g" style="height:1.84em"></strong></li>
 </ul>
 <div class="act">
 <a class="deck" href="a-different-computer/">View slides</a>
@@ -1017,8 +1023,11 @@ data-lesson="qoe-lesson-02" style="--accent: #4D8C55">
 probability</strong></li>
 <li><strong>amplitude estimation</strong> reads that angle to precision
 ε</li>
-<li>best of k arms: <strong>Ω(k/ε²)</strong> samples vs
-<strong>Õ(√k/ε)</strong> queries</li>
+<li>best of k arms:
+<strong><img class="eq" src="assets/eq-omega-k.svg" alt="omega of k over epsilon squared" style="height:1.91em"></strong>
+samples vs
+<strong><img class="eq" src="assets/eq-otilde-k.svg" alt="order root k over epsilon, up to logs" style="height:2.03em"></strong>
+queries</li>
 <li><strong>Go</strong> fails question 1, the <strong>bandit</strong>
 fails question 3</li>
 <li><strong>Sway</strong>: gaps of 10⁻⁴ on a 32×32 board</li>
@@ -1190,7 +1199,10 @@ style="--accent: #9598CA">
 <li>running n copies <strong>does not amortize</strong></li>
 <li>quantum memory: <strong>zero or linear</strong> in n, nothing
 between</li>
-<li><strong>log n and √n</strong> scalings ruled out</li>
+<li><strong><img class="eq" src="assets/eq-log-n.svg" alt="log n" style="height:1.73em">
+and
+<img class="eq" src="assets/eq-sqrt-n.svg" alt="root n" style="height:1.84em"></strong>
+scalings ruled out</li>
 <li>the same law for <strong>preparing states</strong></li>
 <li>SHIFTS: at least <strong>0.03 qubits per copy</strong></li>
 <li>a <strong>theorem</strong>, with constants</li>
@@ -1209,7 +1221,7 @@ style="--accent: #92BBA8">
 <li>a test with <strong>single-qubit measurements</strong> only</li>
 <li>a correct device passes <strong>every time</strong></li>
 <li>q qubits of memory pass with probability at most
-<strong>2<sup>q</sup>(1 − γ)<sup>n</sup></strong></li>
+<strong><img class="eq" src="assets/eq-mem-bound.svg" alt="two to the q times one minus gamma to the n" style="height:1.84em"></strong></li>
 <li>too little memory fails <strong>exponentially fast</strong></li>
 <li>the device stays a <strong>black box</strong></li>
 </ul>
@@ -1226,8 +1238,9 @@ data-lesson="qoe-lesson-12" style="--accent: #9F4668">
 <ul>
 <li>the AI era’s assumption: <strong>compute closes every
 gap</strong></li>
-<li>the <strong>1/g² wall</strong>: tiny gaps, irreducible
-randomness</li>
+<li>the
+<strong><img class="eq" src="assets/eq-g2.svg" alt="one over g squared" style="height:1.91em">
+wall</strong>: tiny gaps, irreducible randomness</li>
 <li><strong>weak baselines</strong>, query counts sold as runtimes</li>
 <li><strong>ignored parallelism</strong>, solver randomness as task
 randomness</li>

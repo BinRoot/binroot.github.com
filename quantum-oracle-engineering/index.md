@@ -33,10 +33,10 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - **CPU, GPU, QPU**: three devices, three workloads
 - the QPU's job: **fewer samples** for an average
-- **Θ(1/ε)** queries in place of **Θ(1/ε²)** samples
+- **<img class="eq" src="assets/eq-theta-eps.svg" alt="order one over epsilon" style="height:1.84em">** queries in place of **<img class="eq" src="assets/eq-theta-eps2.svg" alt="order one over epsilon squared" style="height:1.91em">** samples
 - **three questions**: task randomness, precision, oracle cost
 - Grover on a database loses to **data loading**
-- break-even: **t_oracle < t_roll / (C·P·g)**
+- break-even: **<img class="eq" src="assets/eq-break-even-inline.svg" alt="t oracle less than t roll over C times P times g" style="height:1.84em">**
 
 <div class="act"><a class="deck" href="a-different-computer/">View slides</a></div>
 :::
@@ -49,7 +49,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - a **query count** is not a runtime
 - the payoff qubit's angle **encodes the win probability**
 - **amplitude estimation** reads that angle to precision ε
-- best of k arms: **Ω(k/ε²)** samples vs **Õ(√k/ε)** queries
+- best of k arms: **<img class="eq" src="assets/eq-omega-k.svg" alt="omega of k over epsilon squared" style="height:1.91em">** samples vs **<img class="eq" src="assets/eq-otilde-k.svg" alt="order root k over epsilon, up to logs" style="height:2.03em">** queries
 - **Go** fails question 1, the **bandit** fails question 3
 - **Sway**: gaps of 10⁻⁴ on a 32×32 board
 - the same oracle shape fits an **epidemic model**
@@ -180,7 +180,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - running n copies **does not amortize**
 - quantum memory: **zero or linear** in n, nothing between
-- **log n and √n** scalings ruled out
+- **<img class="eq" src="assets/eq-log-n.svg" alt="log n" style="height:1.73em"> and <img class="eq" src="assets/eq-sqrt-n.svg" alt="root n" style="height:1.84em">** scalings ruled out
 - the same law for **preparing states**
 - SHIFTS: at least **0.03 qubits per copy**
 - a **theorem**, with constants
@@ -195,7 +195,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 - a test with **single-qubit measurements** only
 - a correct device passes **every time**
-- q qubits of memory pass with probability at most **2^q^(1 − γ)^n^**
+- q qubits of memory pass with probability at most **<img class="eq" src="assets/eq-mem-bound.svg" alt="two to the q times one minus gamma to the n" style="height:1.84em">**
 - too little memory fails **exponentially fast**
 - the device stays a **black box**
 
@@ -208,7 +208,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 <figure class="art"><img src="img/myth10.png" alt="Pages flying off a clipboard faster than anyone can check them" width="600" height="600" loading="lazy"></figure>
 
 - the AI era's assumption: **compute closes every gap**
-- the **1/g² wall**: tiny gaps, irreducible randomness
+- the **<img class="eq" src="assets/eq-g2.svg" alt="one over g squared" style="height:1.91em"> wall**: tiny gaps, irreducible randomness
 - **weak baselines**, query counts sold as runtimes
 - **ignored parallelism**, solver randomness as task randomness
 - oracle cost hidden behind **"assume oracle access"**

@@ -737,6 +737,9 @@ html { container-type: inline-size; }
 @media (min-width: 1280px) { .act-group { grid-template-columns: repeat(4, 1fr); } }
 /* In the two-across range the cards get wide; the art stays a picture, not a poster. */
 .lesson img { max-width: min(100%, 22em); margin-inline: auto; display: block; }
+/* Inline equations in the bullets: LaTeX rendered to SVG at build time, sized
+   in em from the SVG's own height so the mathematics sits at text size. */
+.lesson img.eq { display: inline-block; width: auto; max-width: none; margin: 0 -0.1em; vertical-align: -0.52em; }
 @media (max-width: 700px)  { .lessons { margin-inline: 0; }
                              .act-group { grid-template-columns: 1fr; } }
 .lessons > .act {
