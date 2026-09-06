@@ -6,13 +6,13 @@
 
   var deck, slides, index = 0, timerStart = 0, timerHandle = 0, wheelLock = 0;
   var segments = [];
-  var gridOpen = false, gridCols = 1, gridSpacer = null;
+  var gridOpen = false, gridCols = 1, gridSpacer = null, gridHidDrawer = false;
 
   var KEYS = [
     ['→ ↓ space', 'next step or slide'],
     ['← ↑', 'back'],
     ['wheel', 'one step per notch; keep scrolling for more'],
-    ['tap / swipe', 'touch: swipe any direction, or tap right / left'],
+    ['tap / swipe', 'touch: swipe any direction (sideways on the notes too), or tap right / left'],
     ['home / end', 'first / last slide'],
     ['o', 'outline, jump to any slide'],
     ['g', 'grid of every slide; click one to go'],
@@ -50,12 +50,15 @@
     window.addEventListener('resize', function () {
       if (gridOpen) { layoutGrid(); scrollTileIntoView(true); }
       aimArrow();
+      fitSlide();
     });
     /* The deck's font is loaded from disk, and the tab is as wide as the word
-       it sets, so the first measurement can predate the metrics it needs. */
+       it sets, so the first measurement can predate the metrics it needs.
+       The slide's own height moves with the same fonts, and with its images. */
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(aimArrow);
+      document.fonts.ready.then(function () { aimArrow(); fitSlide(); });
     }
+    window.addEventListener('load', fitSlide);
     window.addEventListener('hashchange', fromHash);
 
     document.addEventListener('pointermove', function (event) {
@@ -65,7 +68,7 @@
     deck.tabIndex = -1;
     refocus();
     fromHash();
-    if (/[?&]notes(=|&|$)/.test(window.location.search) || drawerWasOpen()) {
+    if (/[?&]notes(=|&|$)/.test(window.location.search) || drawerOpensOnLoad()) {
       toggleDrawer();
     }
     render();
@@ -139,7 +142,13 @@
      Mouse clicks never navigate (desktop has keys, and clicks select text or
      drive embedded components).  Taps that start on interactive content are
      the component's business, not the deck's; a component needing raw taps on
-     anything else can opt out with a `.no-nav` container. */
+     anything else can opt out with a `.no-nav` container.
+
+     The notes drawer is the exception to that opt-out.  On a phone it holds
+     the bottom of the screen, which is where the thumb rests, so a sideways
+     swipe on it flips the slide; taps still select text and follow links,
+     and vertical drags still scroll the note (the drawer's touch-action
+     hands those to the browser, which cancels the pointer). */
   var SWIPE = 60;   /* px before a drag counts as a swipe, either axis */
   var TAP = 8;      /* px of slop still allowed to count as a tap */
   var NO_NAV = 'a, button, input, select, textarea, label, canvas, ' +
@@ -149,9 +158,12 @@
   function onPointerDown(event) {
     refocus();
     if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+    var inDrawer = !!(event.target.closest &&
+      event.target.closest('#notes-drawer'));
     touch = {
       x: event.clientX, y: event.clientY, t: Date.now(), id: event.pointerId,
-      skip: !!(event.target.closest && event.target.closest(NO_NAV))
+      drawer: inDrawer,
+      skip: !inDrawer && !!(event.target.closest && event.target.closest(NO_NAV))
     };
   }
 
@@ -176,6 +188,8 @@
     var ax = Math.abs(dx), ay = Math.abs(dy);
     if (ax > SWIPE && ax > 1.5 * ay) {
       if (dx < 0) next(); else prev();
+    } else if (start.drawer) {
+      return;  /* a tap or a vertical drag on the notes is the notes' own */
     } else if (ay > SWIPE && ay > 1.5 * ax) {
       if (dy < 0) next(); else prev();
     } else if (ax < TAP && ay < TAP && Date.now() - start.t < 350) {
@@ -321,14 +335,22 @@
   /* The notes drawer remembers whether it was open, so a refresh does not
      shut it on a reader mid-lesson.  The key is shared by every deck: someone
      reading lesson 1 with the notes out wants them out in lesson 2 as well.
+     With nothing remembered, a touch screen starts with the notes out and
+     everything else starts with them in: a phone is a reader and the notes
+     are the lesson, while a projector has to come up clean.
      Storage can throw outright rather than return nothing (a private window,
      a browser set to block site data), so each touch is guarded and a failure
-     just means the drawer behaves as it used to, closed on load.
+     just means the drawer follows the default for the device.
      While open it shows the current slide's note and tracks navigation. */
   var DRAWER_KEY = 'qoe:notes-open';
 
-  function drawerWasOpen() {
-    try { return localStorage.getItem(DRAWER_KEY) === '1'; } catch (e) { return false; }
+  function drawerOpensOnLoad() {
+    var stored = null;
+    try { stored = localStorage.getItem(DRAWER_KEY); } catch (e) {}
+    if (stored === '1') return true;
+    if (stored === '0') return false;
+    return !!(window.matchMedia &&
+      window.matchMedia('(pointer: coarse)').matches);
   }
 
   function rememberDrawer(on) {
@@ -339,6 +361,7 @@
     var on = document.body.classList.toggle('drawer-on');
     if (on) paintDrawer();
     rememberDrawer(on);
+    fitSlide();
   }
 
   /* The drawer names the slide it belongs to, so a reader scrolling the column
@@ -385,9 +408,14 @@
     closeGrid();
   }
 
+  /* The grid wants the whole screen, so it puts the drawer away for the
+     duration and brings it back on close: on a phone the drawer is the
+     reading view, and picking a slide from the grid is not a reason to
+     lose it. */
   function toggleGrid() {
     if (gridOpen) { closeGrid(); return; }
     closeOverlays();
+    gridHidDrawer = document.body.classList.contains('drawer-on');
     document.body.classList.remove('drawer-on');
     gridOpen = true;
     document.body.classList.add('grid-on');
@@ -409,6 +437,12 @@
     if (gridSpacer) gridSpacer.style.height = '';
     deck.scrollTop = 0;
     refocus();
+    if (gridHidDrawer) {
+      gridHidDrawer = false;
+      document.body.classList.add('drawer-on');
+      paintDrawer();
+    }
+    fitSlide();
   }
 
   function layoutGrid() {
@@ -424,6 +458,7 @@
       var y = gap + Math.floor(i / gridCols) * (th + gap);
       s.style.width = W + 'px';
       s.style.height = H + 'px';
+      s.style.transformOrigin = '';  /* fitSlide may have set the current one */
       s.style.transform =
         'translate(' + x + 'px,' + y + 'px) scale(' + k + ')';
       /* Outlines scale with the element, so undo the scale to keep the
@@ -504,7 +539,176 @@
     arrow.style.top = (t.top - TIP_GAP - TIP_Y * box.height) + 'px';
   }
 
+  /* A phone with the notes out gives the slide a box shorter than the one
+     its layout was made for.  Most slides still fit.  One that does not is
+     scaled down to the height it has, in place of clipping its title under
+     the crumb and its figure under the tabs.
+
+     Scaling the slide as laid out would shrink its width with its height and
+     leave margins down both sides, with the figures narrowest exactly where
+     the screen is already narrow.  So the slide is first laid out wider than
+     the deck: its text runs into longer lines and takes fewer of them, and
+     its figures widen with it, so the slide comes out shorter in proportion
+     and the scale that fits its height also fills the width.  The width is
+     found by trying a few, each a tenth wider, keeping the one that scales
+     least, and stopping at the first whose proportions fit the box.  Text
+     reflows in whole lines, so a step can gain nothing and the next gain a
+     line; the search runs on past a flat step, but never past the width at
+     which even a slide that fit exactly would scale more than the best
+     found.  A slide of fixed-size pictures never gains: it scales as it lies.
+
+     Measured by letting the slide shrink-wrap for a moment, which counts
+     padding and every margin without a list of what to add up.  Steps hide
+     by opacity, so a slide measures the same before and after its steps
+     arrive.  Only the content scales: the paddings are there to clear the
+     crumb and the chrome, which do not shrink, so the scaled slide is
+     shifted down by what its top padding lost and its content lands in the
+     same band an unscaled slide's would. */
+  /* The figures are drawn into a 760-wide box for a slide that is wide, with
+     the drawing centred and margins either side.  On a phone the same box
+     is squeezed to the screen's width and the margins come with it, so the
+     drawing itself lands at little more than half the width it could have.
+     So on a narrow deck each figure's viewBox is tightened to what it draws
+     (plus a small margin), and the deck's own width does the rest.  The
+     autoplay control that l2.js parks in the box's bottom-right corner is
+     left out of the measurement and moved to the new corner, with the box
+     extended under the drawing when the drawing already occupies that
+     corner.  An animated figure is measured at several moments of its
+     timeline, not only its first frame, so a beam that tilts or a die that
+     rolls stays inside the box.  Elements drawn transparent are counted,
+     since they are content staged to appear, but hit areas with neither
+     fill nor stroke are not.  Restored when the deck is wide again.  A
+     figure can keep its box with data-keep-viewbox. */
+  var NARROW = 700;  /* px; the stylesheet's phone breakpoint */
+  var SHAPES = 'path, rect, circle, ellipse, line, polyline, polygon, text, ' +
+    'image, use, foreignObject';
+
+  function fitFigures(slide) {
+    var narrow = deck.clientWidth <= NARROW;
+    [].forEach.call(slide.querySelectorAll('svg[viewBox]'), function (svg) {
+      if (svg.parentElement.closest('svg') || svg.closest('.notes')) return;
+      if (svg.hasAttribute('data-keep-viewbox')) return;
+      var control = svg.querySelector(':scope > .l2-replay');
+      if (!narrow) {
+        if (svg.dataset.viewbox0) {
+          svg.setAttribute('viewBox', svg.dataset.viewbox0);
+          delete svg.dataset.viewbox0;
+          if (control) control.removeAttribute('transform');
+        }
+        return;
+      }
+      if (svg.dataset.viewbox0) return;  /* already tightened */
+      var box = svg.getBoundingClientRect();
+      if (box.width < 120 || !svg.getScreenCTM) return;
+      /* baseVal is live and would follow the attribute change below, so copy. */
+      var live = svg.viewBox.baseVal;
+      if (!live || !live.width || !live.height) return;
+      var vb = { x: live.x, y: live.y, width: live.width, height: live.height };
+      var inv = svg.getScreenCTM().inverse();
+      var pt = svg.createSVGPoint();
+      function user(x, y) { pt.x = x; pt.y = y; return pt.matrixTransform(inv); }
+      var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      var rects = [];
+      function gather() {
+        [].forEach.call(svg.querySelectorAll(SHAPES), function (el) {
+          if (control && control.contains(el)) return;
+          var cs = getComputedStyle(el);
+          if (cs.display === 'none') return;
+          if (cs.fill === 'none' && cs.stroke === 'none' && el.tagName !== 'image' &&
+              el.tagName !== 'foreignObject' && el.tagName !== 'use') return;
+          var b = el.getBoundingClientRect();
+          if (!b.width && !b.height) return;
+          var a = user(b.left, b.top), c = user(b.right, b.bottom);
+          rects.push([a.x, a.y, c.x, c.y]);
+          x0 = Math.min(x0, a.x); y0 = Math.min(y0, a.y);
+          x1 = Math.max(x1, c.x); y1 = Math.max(y1, c.y);
+        });
+      }
+      var shows = (window.L2 && window.L2._timelines || []).filter(function (t) {
+        return t.slide === slide && t.T > 0 && t.seek && svg.contains(t.host || svg);
+      });
+      if (shows.length) {
+        shows.forEach(function (t) {
+          var was = t.elapsed;
+          [0, 0.25, 0.5, 0.75, 1].forEach(function (f) { t.seek(f * t.T); gather(); });
+          t.seek(was);
+        });
+      } else {
+        gather();
+      }
+      if (!isFinite(x0) || x1 - x0 <= 0) return;
+      if (x1 - x0 >= 0.9 * vb.width) return;  /* already fills its box */
+      var padX = 0.04 * (x1 - x0), padY = 0.06 * (y1 - y0);
+      var nx = x0 - padX, ny = y0 - padY;
+      var nw = x1 - x0 + 2 * padX, nh = y1 - y0 + 2 * padY;
+      if (control) {
+        /* The control is a 26-unit circle.  If the drawing reaches into the
+           corner it will take, give it a strip of its own below. */
+        var cx = nx + nw - 40, cy = ny + nh - 36;
+        var busy = rects.some(function (r) {
+          return r[2] > cx && r[3] > cy;
+        });
+        if (busy) nh += 36;
+      }
+      svg.dataset.viewbox0 = svg.getAttribute('viewBox');
+      svg.setAttribute('viewBox', nx + ' ' + ny + ' ' + nw + ' ' + nh);
+      if (control) {
+        control.setAttribute('transform', 'translate(' +
+          (nx + nw - (vb.x + vb.width)) + ',' + (ny + nh - (vb.y + vb.height)) + ')');
+      }
+    });
+  }
+
+  function fitSlide() {
+    var slide = slides[index];
+    ['transform', 'transformOrigin', 'width', 'height', 'right', 'bottom']
+      .forEach(function (prop) { slide.style[prop] = ''; });
+    if (gridOpen) return;
+    fitFigures(slide);
+    var W = deck.clientWidth, H = deck.clientHeight;
+    var cs = getComputedStyle(slide);
+    var padTop = parseFloat(cs.paddingTop);
+    var pad = padTop + parseFloat(cs.paddingBottom);
+    var have = H - pad;
+    if (have <= 0) return;
+
+    function measure(w) {
+      slide.style.width = w + 'px';
+      slide.style.right = 'auto';
+      slide.style.bottom = 'auto';
+      slide.style.height = 'auto';
+      return slide.offsetHeight - pad;
+    }
+
+    var need = measure(W);
+    /* A table or figure wider than the phone would clip at its right edge, so
+       the search starts at the width that holds it and scales from there. */
+    var w = Math.max(W, slide.scrollWidth > W + 2 ? slide.scrollWidth : 0);
+    if (need <= have && w === W) {
+      slide.style.width = '';
+      slide.style.right = '';
+      slide.style.bottom = '';
+      slide.style.height = '';
+      return;
+    }
+    if (w !== W) need = measure(w);
+    var best = { w: w, need: need, k: Math.min(W / w, have / need) };
+    for (w = Math.round(w * 1.1); W / w > best.k; w = Math.round(w * 1.1)) {
+      var h = measure(w);
+      var k = Math.min(W / w, have / h);
+      if (k > best.k) best = { w: w, need: h, k: k };
+      if (W / w <= have / h) break;  /* proportions fit; wider only shrinks */
+    }
+    if (best.w !== w) measure(best.w);
+    w = best.w; need = best.need; k = best.k;
+    slide.style.height = (need + pad) + 'px';
+    slide.style.transformOrigin = '0 0';
+    slide.style.transform = 'translate(' + ((W - k * w) / 2) + 'px,' +
+      (padTop * (1 - k)) + 'px) scale(' + k + ')';
+  }
+
   function render() {
+    fitSlide();
     if (gridOpen) {
       slides.forEach(function (s, i) {
         s.classList.toggle('tile-current', i === index);
