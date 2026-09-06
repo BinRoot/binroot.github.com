@@ -1,0 +1,13 @@
+<div class="l2-copy">
+  <table class="l2-map">
+    <thead><tr><th>Part of the simulator</th><th>Sway</th><th>Epidemic example</th></tr></thead>
+    <tbody>
+      <tr><td>State</td><td>Empty, Black, White</td><td>Susceptible, infected, recovered</td></tr>
+      <tr><td>Valid action</td><td>Place on an empty cell</td><td>Vaccinate a susceptible site</td></tr>
+      <tr><td>Random update</td><td>Neighbor-dependent color changes</td><td>Infection and recovery</td></tr>
+      <tr><td>Stopping point</td><td>H rounds</td><td>H time steps</td></tr>
+      <tr><td>Success</td><td>Black outnumbers White</td><td>Infected count ≤ threshold</td></tr>
+    </tbody>
+  </table>
+  <p class="l2-foot">Sway is small enough to build and check in full. It exercises changing action validity, random transitions, and a final score.</p>
+</div>

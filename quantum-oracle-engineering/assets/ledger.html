@@ -1,0 +1,18 @@
+<!-- Slide 21: what the theorem does, and does not, say.  An evidence ledger
+     with four rows, one press each.  The one text-forward slide in the
+     mechanism half, kept to a phrase per cell. -->
+<style>
+  #ledger { width: min(980px, 100%); margin: 0 auto; border-collapse: collapse; font-size: 0.72em; }
+  #ledger td { padding: 0.55em 0.9em; border-bottom: 1px solid #d8d5cd; vertical-align: top; line-height: 1.35; }
+  #ledger td:first-child { width: 9.5em; font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, monospace; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 0.85em; }
+  #ledger tr.proven td:first-child   { color: #4D8C55; }
+  #ledger tr.assumed td:first-child  { color: #7c5cbf; }
+  #ledger tr.excluded td:first-child { color: #D95032; }
+  #ledger .src { display: block; margin-top: 0.7em; color: #7a7f88; font-size: 0.6em; text-align: right; }
+</style>
+<table id="ledger">
+  <tr class="proven step"><td>proven</td><td>Õ(√k/ε) upper bound · Ω(k/ε²) lower bound on the hard family</td></tr>
+  <tr class="proven step"><td>proven, robustness</td><td>the hard instance recurs across an exponential family (bounded influence)</td></tr>
+  <tr class="assumed step"><td>assumed</td><td>coherent access: <code>A</code>, <code>A†</code>, no measurement inside</td></tr>
+  <tr class="excluded step"><td>not included</td><td>unrestricted classical structure · FT overhead · wall clock</td></tr>
+</table>

@@ -1,0 +1,10 @@
+<!-- Lesson 3, several slides: the rollout in ten lines, with the current
+     line(s) lit.  The div attribute line="3,4" arrives as
+     window.l3_program_strings; the inline script queues it, and the deferred
+     renderer hands the queued values to the svgs in document order, since the
+     same fragment appears on six slides.  See assets/l3-program.js. -->
+<script>(window.__l3ProgramQueue=window.__l3ProgramQueue||[]).push((window.l3_program_strings||{}).line||'0');</script>
+<div class="l2-fig">
+<svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/l3-program.js" defer></script>

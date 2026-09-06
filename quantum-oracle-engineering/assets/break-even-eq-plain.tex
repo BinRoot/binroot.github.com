@@ -1,0 +1,22 @@
+% break-even-eq-plain.tex -- the same inequality without its braces, for the
+% handout card on the closing slide.
+%
+% Slide 42 gets the braced version (assets/break-even-eq.tex), where naming
+% every term is the whole point.  Here the card has already listed the three
+% questions and has no room for five labels, so this is the bare relation.
+% Both are set in LaTeX so the two slides do not disagree typographically.
+%
+% Rendered to assets/break-even-eq-plain.svg by the Makefile's pattern rule.
+\documentclass[border=2pt]{standalone}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\definecolor{accent}{HTML}{456AAD}
+\definecolor{ink}{HTML}{2D3140}
+\begin{document}
+\color{ink}
+$\displaystyle
+  \textcolor{accent}{t_{\mathrm{oracle}}}
+  \;<\;
+  \frac{t_{\mathrm{roll}}}{C \cdot P \cdot g}
+$
+\end{document}

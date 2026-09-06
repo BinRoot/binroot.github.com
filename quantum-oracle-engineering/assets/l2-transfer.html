@@ -1,0 +1,13 @@
+<div class="l2-copy">
+  <p class="lead">Keep the circuit structure. Supply the model's three operations.</p>
+  <table class="l2-map">
+    <thead><tr><th>Reusable operation</th><th>Sway supplies</th><th>Epidemic model supplies</th></tr></thead>
+    <tbody>
+      <tr><td>Select a valid action</td><td>An empty-cell mask</td><td>A susceptible-site mask</td></tr>
+      <tr><td>Update the state</td><td>Color-flip rules and d20 choices</td><td>Infection, recovery, and their random choices</td></tr>
+      <tr><td>Evaluate the outcome</td><td>Compare Black and White counts</td><td>Compare infected count with a threshold</td></tr>
+    </tbody>
+  </table>
+  <p class="l2-foot">Both need explicit randomness, reversible updates, and cleared temporary work. State encoding and gate costs depend on the model.</p>
+  <p class="l2-source"><a href="https://arxiv.org/html/2604.25962#S6" target="_blank" rel="noopener">Course paper, Section VI: two implementations of the template</a></p>
+</div>

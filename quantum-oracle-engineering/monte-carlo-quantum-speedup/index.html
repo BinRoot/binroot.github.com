@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Myth: Monte Carlo gets a quadratic quantum speedup | Quantum Oracle Engineering</title>
+  <title>Lesson 2: The Monte Carlo speedup | Quantum Oracle Engineering</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -22,41 +22,831 @@
     }
   </style>
   <link rel="canonical" href="https://shukla.io/quantum-oracle-engineering/monte-carlo-quantum-speedup/">
+  <meta name="description" content="From epidemic intervention to Sway: a reusable simulator structure, amplitude estimation, and the cost of building a coherent rollout oracle. Lesson 2 of Quantum Oracle Engineering.">
+  <meta name="author" content="Nishant Shukla">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Nishant Shukla">
+  <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/monte-carlo-quantum-speedup/">
+  <meta property="og:title" content="Lesson 2: The Monte Carlo speedup">
+  <meta name="twitter:title" content="Lesson 2: The Monte Carlo speedup">
+  <meta property="og:description" content="From epidemic intervention to Sway: a reusable simulator structure, amplitude estimation, and the cost of building a coherent rollout oracle. Lesson 2 of Quantum Oracle Engineering.">
+  <meta name="twitter:description" content="From epidemic intervention to Sway: a reusable simulator structure, amplitude estimation, and the cost of building a coherent rollout oracle. Lesson 2 of Quantum Oracle Engineering.">
+  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://shukla.io/quantum-oracle-engineering/img/myth02.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="600">
+  <meta name="twitter:image" content="https://shukla.io/quantum-oracle-engineering/img/myth02.png">
+  <meta name="twitter:image:alt" content="Two dice tumbling across a green felt table">
+  <meta property="og:image:alt" content="Two dice tumbling across a green felt table">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 2: The Monte Carlo speedup","description":"From epidemic intervention to Sway: a reusable simulator structure, amplitude estimation, and the cost of building a coherent rollout oracle. Lesson 2 of Quantum Oracle Engineering.","image":"https://shukla.io/quantum-oracle-engineering/img/myth02.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/monte-carlo-quantum-speedup/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quantum Oracle Engineering","item":"https://shukla.io/quantum-oracle-engineering/"},{"@type":"ListItem","position":2,"name":"Lesson 2: The Monte Carlo speedup","item":"https://shukla.io/quantum-oracle-engineering/monte-carlo-quantum-speedup/"}]}</script>
   <script>window.MathJax={options:{enableMenu:false}};</script>
-  <link rel="stylesheet" href="../slides.css?v=1829595199">
-  <script src="../slides.js?v=1829595199" defer></script>
+  <link rel="stylesheet" href="../slides.css?v=1413355062">
+  <script src="../slides.js?v=1413355062" defer></script>
   <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
 </head>
 <body>
+<nav id="deck-crumb" class="chrome" aria-label="deck"><a href="https://shukla.io/quantum-oracle-engineering/">Quantum Oracle Engineering</a><span class="crumb-sep" aria-hidden="true">/</span>Lesson 2: The Monte Carlo speedup</nav>
 <div id="deck">
-<section id="myth-2" class="center slide">
-<h1>Myth 2</h1>
-<h2 id="monte-carlo-gets-a-quadratic-quantum-speedup.">“Monte Carlo gets a quadratic quantum speedup.”</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+<section id="title" class="center slide" data-segment="A decision worth simulating" data-segment-id="seg-reopen">
+<h1>Quantum Oracle Engineering</h1>
+<h2>Lesson 2: The Monte Carlo speedup</h2>
+<p><img src="../img/myth02.png" width="600" height="600" class="boil"
+     alt="Two dice tumbling across a green felt table"
+     style="display:block; margin:0.4em auto 0; width:auto; max-height:40vh; max-width:100%;"></p>
+<p class="step" style="font-family:Georgia,serif; font-style:italic; color:#55534e; margin:0.6em auto 0;">
+“Monte Carlo gets a quadratic quantum speedup.”
+</p>
+<!-- The landing page's boil filter, ported for deck use: noise displacing the
+     artwork a couple of pixels, reseeded four times a second, so the drawn
+     illustration wobbles the way hand-drawn animation does.  Copied from
+     index.md, which documents why every number is what it is (sRGB
+     interpolation, the grey no-displacement border mask, fractions rather
+     than percentages).  It must live in the body: an <svg> in <head> ends the
+     head element as far as the parser is concerned.  Deck art renders larger
+     than the landing card, so the boil grain is finer here; baseFrequency is
+     the knob if it ever reads as shimmer instead of boil. -->
+<svg class="filters" aria-hidden="true" focusable="false">
+  <filter id="boil" x="0" y="0" width="100%" height="100%"
+          color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="raw">
+      <animate attributeName="seed" values="1;2;3;4" dur="0.5s" calcMode="discrete" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix in="raw" type="matrix" result="noise"
+                   values="1 0 0 0 0
+                           0 1 0 0 0
+                           0 0 1 0 0
+                           0 0 0 0 1"/>
+    <feFlood flood-color="#808080" result="still"/>
+    <feFlood flood-color="#ffffff" x="0.08" y="0.08" width="0.84" height="0.84" result="inside"/>
+    <feGaussianBlur in="inside" stdDeviation="0.025" result="edge"/>
+    <feComposite in="noise" in2="edge" operator="in" result="inner"/>
+    <feComposite in="inner" in2="still" operator="over" result="map"/>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="0.007" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<!-- Lesson 2 shared styles and scripts.  Included once, on the title slide;
+     styles apply deck-wide and the two deferred scripts run before every
+     later fragment's own script (deferred scripts execute in document
+     order).  sway-data.js is generated by gen/sway-gen.mjs. -->
+<style>
+  /* Evidence badge: one per quantitative slide, top-right corner. */
+  .badge {
+    position: absolute;
+    top: 4.5vh;
+    right: 5vw;
+    right: 5cqw;
+    font-size: 0.42em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.25em 0.8em;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    color: #7a7f88;
+    pointer-events: none;
+  }
+  .badge.theorem     { color: #456AAD; }
+  .badge.assumption  { color: #7c5cbf; }
+  .badge.measured    { color: #4D8C55; }
+  .badge.judgment    { color: #D95032; }
+  .badges { position: absolute; top: 4.5vh; right: 5vw; right: 5cqw; display: flex; gap: 0.5em; }
+  .badges .badge { position: static; }
+
+  /* Figure wrapper shared by every fragment. */
+  .l2-fig { display: flex; justify-content: center; margin: 4px 0; }
+  .l2-fig svg { max-width: 100%; font-family: 'Ubuntu Web', 'Ubuntu', sans-serif; }
+  .l2-note { text-align: center; color: #7a7f88; font-size: 0.5em; margin: 0.3em auto 0; }
+
+  /* Deck-wide: SVG groups marked .step follow the same reveal rules as text. */
+  svg .step { opacity: 0; }
+  svg .step.shown { opacity: 1; }
+
+  /* The persistent corner race panel, built by sway-race.js. */
+  #race-panel {
+    position: fixed;
+    right: 1.6rem;
+    bottom: 2.6rem;
+    z-index: 8;
+    width: min(26vw, 340px);
+    padding: 0.5rem 0.7rem 0.55rem;
+    background: rgba(250, 248, 244, 0.96);
+    border: 1px solid #d8d5cd;
+    border-radius: 8px;
+    display: none;
+    font-family: 'Ubuntu Web', 'Ubuntu', sans-serif;
+  }
+  body.race-on #race-panel { display: block; }
+  body.grid-on #race-panel, body.outline-on #race-panel, body.help-on #race-panel { display: none; }
+  #race-panel svg { display: block; width: 100%; height: auto; }
+  @media print { #race-panel { display: none !important; } }
+  @media (orientation: landscape) and (min-width: 900px) {
+    body.drawer-on #race-panel { right: calc(var(--notes-w) + 1.6rem); }
+  }
+</style>
+<script src="../assets/sway-data.js?v=2283849795-2321" defer></script>
+<script src="../assets/l2.js?v=3738266183-29337" defer></script>
+
+<style>
+  .l2-copy { width: min(980px, 100%); margin: 0.5em auto; font-size: 0.8em; line-height: 1.45; }
+  .l2-copy p { margin: 0.55em 0; }
+  .l2-copy .lead { font-size: 1.18em; color: #456AAD; }
+  .l2-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1em; margin: 1.1em 0; }
+  .l2-card { padding: 1em; border: 1px solid #d8d5cd; border-radius: 10px; background: #fffdf8; }
+  .l2-card h3 { margin: 0 0 0.55em; font-size: 1em; color: #456AAD; }
+  .l2-card p { font-size: 0.9em; }
+  .l2-map { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92em; }
+  .l2-map th, .l2-map td { padding: 0.6em 0.8em; border-bottom: 1px solid #d8d5cd; vertical-align: top; }
+  .l2-map th { color: #456AAD; font-weight: 600; }
+  .l2-map td:first-child { font-weight: 600; white-space: nowrap; }
+  .l2-copy .l2-source { font-size: 0.68em; color: #7a7f88; max-width: none; }
+  #intervention .l2-note { max-width: 90%; width: 90%; margin: 0.65em auto 0; }
+  .l2-controls { display: flex; flex-wrap: wrap; gap: 0.65em; justify-content: center; align-items: center; font-size: 0.55em; }
+  .l2-controls button, .l2-link { font: inherit; color: #456AAD; background: #fffdf8; border: 1px solid #456AAD; border-radius: 6px; padding: 0.45em 0.85em; cursor: pointer; }
+  .l2-link { display: inline-block; margin: 0.35em 0.7em 0.35em 0; text-decoration: none; }
+  .l2-controls button:focus-visible, .l2-link:focus-visible { outline: 3px solid #F2BF80; outline-offset: 3px; }
+  .l2-foot { margin-top: 1em; font-size: 0.86em; color: #55534e; }
+  @media (max-width: 700px) { .l2-cards { gap: 0.5em; } .l2-card { padding: 0.65em; } .l2-map th, .l2-map td { padding: 0.45em; } }
+</style>
+
 <div class="notes">
-<p>Placeholder deck. The <code>{.center}</code> class on the heading centers the slide.</p>
+<p>Today we’ll start with an intervention problem and build up to its quantum version. Sway will give us a small simulator we can inspect completely.</p>
+<p>The aim is to learn a construction we can reuse: choose valid actions, simulate random changes, and evaluate the outcome.</p>
+<p>The quantum timing discussion assumes a fault-tolerant computer. Today we establish what we can build and what its cost depends on.</p>
 </div>
 </section>
-<section id="the-folklore-with-fine-print" class="slide">
-<h1>The folklore, with fine print</h1>
-<blockquote>
-<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
-</blockquote>
-<p>The trick is <strong>precision on averages</strong>, not speed on samples.</p>
+<section id="intervention" class="slide" data-segment="A decision worth simulating" data-segment-id="seg-reopen">
+<h1>Which intervention should we choose?</h1>
+<div class="l2-fig">
+  <svg id="l2-intervention-fig" viewBox="0 0 760 330" width="980" role="img" aria-label="Two vaccination choices on the same small contact grid. Step through one simulated future, then try another."></svg>
+</div>
+<div class="l2-controls no-nav">
+  <button id="l2-epi-step" type="button">Next time step</button>
+  <button id="l2-epi-reset" type="button">Another possible future</button>
+  <span id="l2-epi-status" aria-live="polite"></span>
+</div>
+<p class="l2-note">Illustrative model · same starting state and follow-up policy · success = at most 2 infected after 6 steps</p>
+<script src="../assets/l2-intervention.js?v=289907763-3940" defer></script>
+
 <div class="notes">
-<p>Blockquote and bold both render; no bullets here, so one press advances.</p>
+<p>Suppose we can vaccinate at A or B. Which choice gives us a better chance of keeping the infected count below a threshold?</p>
+<p>Step through one future, then try another. The same choice can lead to different outcomes. Later vaccinations follow a fixed policy in both cases.</p>
+<p>This is a small illustrative model. We would need many runs to estimate either choice’s success probability.</p>
 </div>
 </section>
-<section id="where-it-flunks" class="all slide">
-<h1>Where it flunks</h1>
+<section id="simulator-parts" class="slide" data-segment="A decision worth simulating" data-segment-id="seg-reopen">
+<h1>What does the simulator need?</h1>
+<div class="l2-copy">
+  <p class="lead">Choose an action → simulate a future → check the outcome</p>
+  <div class="l2-cards">
+    <div class="l2-card"><h3>Choose</h3><p>Start from the current state. Apply one candidate action.</p></div>
+    <div class="l2-card"><h3>Simulate</h3><p>Follow fixed rules for later actions and random events, for H steps.</p></div>
+    <div class="l2-card"><h3>Score</h3><p>Return 1 if the final state meets the objective, otherwise 0.</p></div>
+  </div>
+  <p>Repeat from the same starting state and action. The average outcome estimates its chance of success.</p>
+  <p class="l2-foot">This pattern fits intervention, maintenance, and resource-allocation simulators. Each supplies its own rules and objective.</p>
+</div>
+
+<div class="notes">
+<p>One simulated future is a rollout. We choose a first action, follow a fixed policy for later actions, and record whether the final state meets our objective.</p>
+<p>The same structure appears in many planning problems. Each model supplies its own valid actions, random updates, and score.</p>
+</div>
+</section>
+<section id="three-questions" class="slide" data-segment="A decision worth simulating" data-segment-id="seg-reopen">
+<h1>Three questions, no free passes</h1>
+<!-- Slides 10-13: the screening line, with all 3 gates live, at the narrower width for a slide that also carries three bullets.  See
+     assets/gates.js; the questions live in the slide titles, and there are
+     no words in the figure. -->
+<div class="gates-viz" style="display:flex; justify-content:center; margin:12px 0;">
+<svg class="gates-fig" data-gates="4" viewBox="0 0 760 300" width="720" style="max-width:100%; font-family:'Ubuntu',sans-serif;"></svg>
+</div>
+<script src="../assets/gates.js?v=3402356024-18099" defer></script>
+
 <ul>
-<li>Nemo enim ipsam voluptatem quia voluptas</li>
-<li>Sit aspernatur aut odit aut fugit</li>
-<li>Sed quia consequuntur magni dolores</li>
+<li>still sampling?</li>
+<li>precision?</li>
+<li>worth building?</li>
 </ul>
-<p>Close calls are where quantum wins.</p>
 <div class="notes">
-<p><code>{.all}</code> opts this slide out of stepping: everything shows at once.</p>
+<p>Does the best classical method still need samples? Does getting enough precision take most of the work? Can we build an oracle at a reasonable cost?</p>
+<p>We’ll check each problem against these questions.</p>
+</div>
+</section>
+<section id="one-rule" class="slide" data-segment="A decision worth simulating" data-segment-id="seg-reopen">
+<h1>We’ll build it first in Sway</h1>
+<div class="l2-copy">
+  <table class="l2-map">
+    <thead><tr><th>Part of the simulator</th><th>Sway</th><th>Epidemic example</th></tr></thead>
+    <tbody>
+      <tr><td>State</td><td>Empty, Black, White</td><td>Susceptible, infected, recovered</td></tr>
+      <tr><td>Valid action</td><td>Place on an empty cell</td><td>Vaccinate a susceptible site</td></tr>
+      <tr><td>Random update</td><td>Neighbor-dependent color changes</td><td>Infection and recovery</td></tr>
+      <tr><td>Stopping point</td><td>H rounds</td><td>H time steps</td></tr>
+      <tr><td>Success</td><td>Black outnumbers White</td><td>Infected count ≤ threshold</td></tr>
+    </tbody>
+  </table>
+  <p class="l2-foot">Sway is small enough to build and check in full. It exercises changing action validity, random transitions, and a final score.</p>
+</div>
+
+<div class="notes">
+<p>Here is the connection to the game we’ll use. Both examples have a changing state, actions whose validity depends on that state, random transitions, and a final test.</p>
+<p>Sway makes those pieces easy to see and check. We’ll carry the construction back to the epidemic model after learning the game.</p>
+</div>
+</section>
+<section id="sway" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Call it Sway</h1>
+<!-- Slide 25: the mystery game is Sway.  The third card turns over into the curated board; the live rollouts run in the strip under it, and move to the corner panel from the next slide on.  See assets/sway-reveal.js and assets/sway-race.js. -->
+<div class="l2-fig">
+<svg id="sway-reveal-fig" viewBox="0 0 760 280" width="980"></svg>
+</div>
+<div class="l2-fig" style="margin-top:0.2em;">
+<svg class="race-inline" viewBox="0 0 760 130" width="980"></svg>
+</div>
+<script src="../assets/sway-reveal.js?v=719288419-2396" defer></script>
+<script src="../assets/sway-race.js?v=2953865739-11010" defer></script>
+
+<div class="notes">
+<p>Sway has two players placing stones on a grid. Random events can change a stone’s color, and friendly neighbors reduce that chance.</p>
+<p>The counter below starts sampling two moves while we explain the rules. It runs at a limited demonstration rate.</p>
+</div>
+</section>
+<section id="sway-round" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Black, White, then the board</h1>
+<!-- Slide 26: Black, White, then the board; one slow round, with the horizon counter.  See assets/sway-round.js. -->
+<div class="l2-fig">
+<svg id="sway-round-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/sway-round.js?v=2071065860-3421" defer></script>
+
+<div class="notes">
+<p>Black places a stone, then White places one. Every stone rolls a twenty-sided die. An orange die marks a stone that will change color, and all changes happen together.</p>
+<p>The blog game continues until the board fills. Here we use a fixed number of rounds so the circuit has a fixed shape.</p>
+</div>
+</section>
+<section id="flip-table" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Friends make a stone harder to sway</h1>
+<!-- Slide 27: friends make a stone harder to sway.  See assets/flip-table.js. -->
+<div class="l2-fig">
+<svg id="flip-table-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/flip-eq.svg" alt="probability of a flip equals four minus c over twenty">
+</div>
+<script src="../assets/flip-table.js?v=3659001427-2504" defer></script>
+
+<div class="notes">
+<p>A stone with no friendly neighbors flips on four of the twenty die faces. Each friendly neighbor removes one of those faces. With four friendly neighbors, it stays its color.</p>
+<p>Edge and corner cells have fewer neighbors, so they always have some chance of flipping.</p>
+</div>
+</section>
+<section id="sync-update" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Everyone decides from the old board</h1>
+<!-- Slide 28: everyone decides from the old board.  Synchronous event on the left; the red sequential frame on the right.  See assets/sync-update.js. -->
+<div class="l2-fig">
+<svg id="sync-update-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/sync-update.js?v=1419754680-3772" defer></script>
+
+<div class="notes">
+<p>On the left, every stone uses the board as it was at the start of the event. We apply all color changes together.</p>
+<p>On the right, updating one stone early changes the neighbor count for the next stone. That gives a different result with the same dice. In Lesson 4, we’ll make sure our circuit preserves the original board while computing the updates.</p>
+</div>
+</section>
+<section id="scoring" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>How do we score a rollout?</h1>
+<div class="l2-copy">
+  <p class="lead">Stop after H rounds. Count the Black and White stones.</p>
+  <div class="l2-cards">
+    <div class="l2-card"><h3>Black finishes ahead</h3><p>6 Black · 4 White</p><p>Outcome = 1</p></div>
+    <div class="l2-card"><h3>White finishes ahead</h3><p>4 Black · 6 White</p><p>Outcome = 0</p></div>
+    <div class="l2-card"><h3>Tie</h3><p>5 Black · 5 White</p><p>Outcome = 0</p></div>
+  </div>
+  <p>We estimate P(Black finishes ahead) for each first move, using the same policy for all later moves.</p>
+</div>
+
+<div class="notes">
+<p>We stop after a fixed number of rounds and count the stones. Black gets an outcome of 1 only if it has more stones than White. Ties count as 0.</p>
+<p>The quantity we’re estimating is the chance of that outcome under our chosen policy for later moves.</p>
+</div>
+</section>
+<section id="rollout-sway" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Follow one Sway rollout</h1>
+<!-- Slide 31: now make the rollout Sway.  See assets/rollout-sway.js. -->
+<div class="l2-fig">
+<svg id="rollout-sway-fig" viewBox="0 0 760 280" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/arm-eq.svg" alt="v_i is the probability that Black outnumbers White at horizon H given first move i under the fixed policy">
+</div>
+<script src="../assets/rollout-sway.js?v=2208777828-4042" defer></script>
+
+<div class="notes">
+<p>Fix the first move, then simulate the remaining rounds. In this browser example, both players choose later moves uniformly among the legal cells.</p>
+<p>At the end, record the payoff bit. Reset the board and repeat with fresh random choices. The average estimates Black’s win probability under this policy.</p>
+<p>Each possible first move is one candidate action, also called an arm.</p>
+</div>
+</section>
+<section id="vote" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Where would you play?</h1>
+<!-- Slide 32: where would you play?  Hands vote aloud; two presses reveal support counts, then the seeded estimates.  See assets/vote-board.js. -->
+<div class="l2-fig">
+<svg id="vote-board-fig" viewBox="0 0 760 316" width="980"></svg>
+</div>
+<script src="../assets/vote-board.js?v=2269014989-3482" defer></script>
+
+<div class="notes">
+<p>It’s Black’s turn. Which of these three moves would you choose?</p>
+<p>The first reveal shows the friendly-neighbor counts. The second shows win-rate estimates from 40,000 seeded rollouts per move, with 95% intervals.</p>
+<p>Neighbor counts give us a guess. The estimates help us check it, though two of the intervals still overlap.</p>
+</div>
+</section>
+<section id="selection" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>How good does the chosen move need to be?</h1>
+<!-- Slide 15: the selection promise.  k action cards on a value axis, a band of width epsilon from the best; tighten below the gap and one card remains.  See assets/eps-band.js. -->
+<div class="l2-fig">
+<svg id="eps-band-fig" viewBox="0 0 760 285" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/eps-correct-eq.svg" alt="probability that the value of the chosen action is at least the best value minus epsilon is at least two thirds">
+</div>
+<script src="../assets/eps-band.js?v=2488213266-4010" defer></script>
+
+<div class="notes">
+<p>We choose a tolerance ε. Any action within ε of the best value is acceptable. The selector’s guarantee is to return such an action with probability at least two thirds; higher confidence requires extra work.</p>
+<p>If we need the unique winner, ε must be smaller than its gap to the runner-up. Otherwise, either of two close moves may be good enough.</p>
+</div>
+</section>
+<section id="close-call" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Close calls can be designed and measured</h1>
+<!-- Slide 33: close calls can be designed and measured.  The corner race, full size; it has been running since slide 25.  See assets/sway-race.js. -->
+<div class="l2-fig">
+<svg class="race-full" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/sway-race.js?v=2953865739-11010" defer></script>
+
+<div class="notes">
+<p>These two estimates have been accumulating while we explained the game. Check whether their intervals still overlap.</p>
+<p>The demo is deliberately rate-limited. It illustrates sampling uncertainty; elapsed time here is not a hardware benchmark.</p>
+<p>Next we’ll compare these live estimates with a larger, seeded sample.</p>
+</div>
+</section>
+<section id="sway-q2" class="slide" data-segment="Learn the simulator" data-segment-id="seg-sway">
+<h1>Close moves need more evidence</h1>
+<!-- Slide 36: Question 2 for Sway.  See assets/sway-q.js. -->
+<div class="l2-fig">
+<svg class="swayq-fig" data-q="2" viewBox="0 0 760 320" width="980"></svg>
+</div>
+<script src="../assets/sway-q.js?v=315459836-8959" defer></script>
+
+<div class="notes">
+<p>These estimates use 400,000 rollouts per move. The easy pair has an estimated gap near 0.04. The closer pair is about 0.006 apart.</p>
+<p>We use g for the gap and ε for our chosen tolerance. With ε = 0.003, only the leading move among these candidates qualifies if the estimated gap holds.</p>
+<p>These measurements describe this board and policy. They don’t establish the cost of every Sway position.</p>
+</div>
+</section>
+<section id="coherent-rollout" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>A coherent rollout keeps every branch</h1>
+<!-- Slide 6: a coherent rollout preserves the alternatives.  The four-part
+     rollout becomes a reversible block A_i with its inverse beside it; the
+     equation beneath is the access model the theorem needs.
+     See assets/coherent-rollout.js. -->
+<div class="l2-fig">
+<svg id="coherent-rollout-fig" viewBox="0 0 760 290" width="1060"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/coherent-access-eq.svg"
+       alt="A_i on zero equals square root of one minus a_i times psi_i0 and zero, plus square root of a_i times psi_i1 and one; and A_i dagger on request">
+</div>
+<script src="../assets/coherent-rollout.js?v=3680601166-5252" defer></script>
+
+<div class="notes">
+<p>Now represent the possible paths in a quantum state. The circuit stores random choices in qubits and computes the payoff without measuring.</p>
+<p>Call that circuit A. We also need its inverse, A†, which undoes the computation. Amplitude estimation uses both directions to estimate the payoff probability.</p>
+<p>This tree is a schematic of the interface.</p>
+</div>
+</section>
+<section id="angle" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>A probability becomes an angle</h1>
+<!-- Slide 7: a probability becomes an angle.  One shared coordinate system across slides 7, 8, 9 and 11; see assets/ae-circle.js. -->
+<div class="l2-fig">
+<svg class="ae-fig" data-stage="1" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<div class="slide-equation compact"><img src="../assets/angle-eq.svg" alt="a equals sine squared theta"></div>
+<script src="../assets/ae-circle.js?v=1286934906-18477" defer></script>
+
+<div class="notes">
+<p>We can group the losing paths along one axis and the winning paths along the other.</p>
+<p>Here, x and y are amplitudes. Their squares give the loss and win probabilities, so x² + y² = 1. That puts the state on this circle.</p>
+<p>The angle θ tells us the win probability: a = sin²θ. If we can estimate θ, we can calculate a.</p>
+</div>
+</section>
+<section id="rotation" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>Two reflections make a rotation</h1>
+<!-- Slide 8: two reflections make a rotation, with the Grover iterate as gates.  One shared coordinate system across slides 7, 8, 9 and 11; see assets/ae-circle.js. -->
+<div class="l2-fig">
+<svg class="ae-fig" data-stage="2" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<div class="slide-equation compact"><img src="../assets/rotation-eq.svg" alt="Q equals minus A S zero A dagger S good, a rotation by two theta"></div>
+<script src="../assets/ae-circle.js?v=1286934906-18477" defer></script>
+
+<div class="notes">
+<p>Reflect across the losing axis, then across the initial state. Together, those reflections rotate the state by 2θ. We call this operation Q.</p>
+<p>Q uses A and A†, along with the reflections shown here. We can implement these operations even when the original win probability is unknown.</p>
+<p>For a worked example, a = 1/4 gives θ = 30°. One Q takes the state to 90°. We choose a known angle here so we can check the geometry.</p>
+</div>
+</section>
+<section id="accumulate" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>Every turn of Q adds 2θ</h1>
+<!-- Repeated applications of Q, with a fresh preparation and payoff
+     measurement in each circuit. See assets/ae-circle.js, stage 3. -->
+<div class="l2-fig">
+<svg class="ae-fig" data-stage="3" viewBox="0 0 760 300" width="980"></svg>
+</div>
+
+<script src="../assets/ae-circle.js?v=1286934906-18477" defer></script>
+
+<div class="notes">
+<p>Start this worked example at θ = 10°. Each Q adds 20°, so one, two, and four applications take the state to 30°, 50°, and 90°.</p>
+<p>A slightly different starting angle would accumulate a different rotation. That growing difference helps us estimate an unknown probability.</p>
+<p>Each row starts with a fresh preparation. Each Q costs a rollout forward and backward; measuring the payoff gives one result. Repeated results help us estimate the original angle.</p>
+</div>
+</section>
+<section id="noise-vs-phase" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>Nearby probabilities become easier to distinguish</h1>
+<!-- Slide 10: noise versus phase.  One slider for M drives both panels; the
+     two equations are one press away, after the slider has been dragged.
+     Keys [ and ] also move the slider.  See assets/noise-vs-phase.js. -->
+<div class="l2-fig">
+<svg id="noise-vs-phase-fig" viewBox="0 0 760 312" width="980"></svg>
+</div>
+<div class="step" style="display:flex; justify-content:center; gap:6vw; margin-top:0.2em;">
+  <img src="../assets/noise-eq.svg" style="height:6.5vh; width:auto;"
+       alt="signal to noise grows like epsilon root M, so M is order one over epsilon squared">
+  <img src="../assets/phase-eq.svg" style="height:6.5vh; width:auto;"
+       alt="phase gap grows like M epsilon, so M is order one over epsilon">
+</div>
+<script src="../assets/noise-vs-phase.js?v=361971428-6804" defer></script>
+
+<div class="notes">
+<p>Think of two possible values for the unknown probability. On the left, sampling uncertainty shrinks roughly as 1/√M. On the right, a small difference in rotation accumulates across coherent queries.</p>
+<p>The diagram illustrates the scaling near these probabilities. Reaching error ε takes order 1/ε² classical samples or 1/ε coherent queries at fixed confidence. The next slide explains how we read an estimate.</p>
+</div>
+</section>
+<section id="interference" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>Run, measure, refine</h1>
+<div class="l2-copy">
+  <p class="lead">Use repeated measurements to narrow the possible angles.</p>
+  <div class="l2-cards">
+    <div class="l2-card"><h3>1. Run a circuit</h3><p>Prepare with A. Apply Q a chosen number of times. Measure the payoff bit.</p></div>
+    <div class="l2-card"><h3>2. Collect results</h3><p>Repeat that circuit with fresh preparations. Count how often the bit is 1.</p></div>
+    <div class="l2-card"><h3>3. Refine the estimate</h3><p>Update the interval for θ. Choose the next number of Q applications and repeat.</p></div>
+  </div>
+  <p>Stop when the interval for a = sin²θ is narrow enough.</p>
+  <p class="l2-foot">Measurements happen between circuits. Each coherent sequence uses A and A† without measuring inside it.</p>
+  <p class="l2-source"><a href="https://arxiv.org/abs/1912.05559" target="_blank" rel="noopener">Grinko et al., Iterative Quantum Amplitude Estimation</a> · the Fourier-based readout is in the appendix.</p>
+</div>
+
+<div class="notes">
+<p>Iterative amplitude estimation chooses how many times to apply Q, then measures the payoff bit. We repeat that circuit to estimate its outcome probability and narrow the possible values of θ.</p>
+<p>The current interval guides the next choice, so we can handle the ambiguity from rotations wrapping around the circle. We finish when the probability estimate is precise enough.</p>
+<p>IQAE keeps the near-quadratic query improvement, up to logarithmic factors. The appendix shows the original Fourier-based readout.</p>
+</div>
+</section>
+<section id="contract" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
+<h1>The access contract</h1>
+<!-- Slide 12: the access contract, four checked lines; the ordinary sampling
+     endpoint beside it fails the last three, one press each.
+     See assets/contract.js. -->
+<div class="l2-fig">
+<svg class="contract-fig" data-state="contract" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/contract.js?v=2654570810-5400" defer></script>
+
+<div class="notes">
+<p>The algorithm needs a bounded payoff, a coherent circuit A, and its inverse. Random choices must be prepared inside the circuit, and measurements must wait until the coherent sequence finishes.</p>
+<p>An ordinary sampling service gives us a bounded result, but it doesn’t provide the circuit access we need.</p>
+</div>
+</section>
+<section id="solver-dice" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>Go: compare against the best classical method</h1>
+<!-- Slide 13: MCTS brought its own dice.  See assets/solver-dice.js. -->
+<div class="l2-fig">
+<svg id="solver-dice-fig" viewBox="0 0 760 310" width="980"></svg>
+</div>
+<script src="../assets/solver-dice.js?v=1395882096-4607" defer></script>
+
+<div class="notes">
+<p>In Go, the same move from the same position always gives the same next position. Monte Carlo tree search introduces randomness as a way to explore that tree.</p>
+<p>Classical methods can also use pruning, learned move preferences, and value estimates. We would need to compare against those before claiming a speedup from fewer rollouts. For this course, we set Go aside at Question 1. Other quantum approaches to game trees need their own analysis.</p>
+</div>
+</section>
+<section id="bandit" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>Two arms with nearly equal rewards</h1>
+<!-- Slide 14: the bandit card turns over.  See assets/contenders.js. -->
+<div class="l2-fig">
+<svg class="contenders-fig" data-mode="bandit" viewBox="0 0 760 330" width="980"></svg>
+</div>
+<script src="../assets/contenders.js?v=2569024301-6589" defer></script>
+
+<div class="notes">
+<p>Imagine two slot-machine arms with win probabilities 1/2 and 1/2 + ε. We want to find the better arm by pulling them.</p>
+<p>When ε is small, distinguishing them takes order 1/ε² pulls per arm. This gives us a sampling problem where precision can be expensive. Arms with a large gap are much easier to compare.</p>
+</div>
+</section>
+<section id="missing-inverse" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>The sampled bandit lacks an inverse</h1>
+<!-- Slide 23: the ordinary lever is not that circuit.  Running it backward
+     yields a fresh random bit; the contract stamps "missing A-dagger".
+     See assets/contract.js. -->
+<div class="l2-fig">
+<svg class="contract-fig" data-state="missing" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/contract.js?v=2654570810-5400" defer></script>
+
+<div class="notes">
+<p>An ordinary arm gives us a fresh result each time we pull it. The interface supplies no way to apply A†.</p>
+<p>A reversible reward circuit would provide a different kind of access, and the quantum algorithm could use it. The ordinary sampled bandit stops at Question 3. For a simple simulated coin, cheap classical samples also make the timing comparison difficult.</p>
+</div>
+</section>
+<section id="nested-bills" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>Choosing among k actions</h1>
+<!-- Slide 16: three nested bills.  Adapted from the paper's system diagram; each ring lights as its factor is spoken (one press each); the total waits for slide 20.  See assets/rings.js. -->
+<div class="l2-fig">
+<svg class="rings-fig" data-mode="bills" viewBox="0 0 760 320" width="980"></svg>
+</div>
+<script src="../assets/rings.js?v=1703094544-8092" defer></script>
+
+<div class="notes">
+<p>We have explained how to estimate one action’s value. Finding a good action among k candidates adds another layer.</p>
+<p>The quantum best-arm construction combines amplitude estimation with a search over candidates. The rings show the cost of that search, the estimates it needs, and the rollout circuit inside each estimate.</p>
+</div>
+</section>
+<section id="composition" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>The quantum composition</h1>
+<!-- Slide 20: the quantum composition; the two factors lock together.  See assets/composition.js. -->
+<div class="l2-fig">
+<svg id="composition-fig" viewBox="0 0 760 270" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/composition-eq.svg" alt="Omega of k over epsilon squared rollout pulls versus O-tilde of root k over epsilon calls to A and A dagger">
+</div>
+<script src="../assets/composition.js?v=1960410553-2106" defer></script>
+
+<div class="notes">
+<p>The coherent best-arm construction uses roughly √k/ε oracle calls, with logarithmic factors hidden by the tilde. The appendix gives the corresponding classical sampling lower bound for a hard family.</p>
+<p>This is a bound for the full selection algorithm under its access assumptions. The interval-based readout we just saw explains probability estimation; the coherent selection wrapper also has to meet its own requirements.</p>
+<p>Runtime depends on the cost of implementing each call.</p>
+</div>
+</section>
+<section id="sway-q1" class="slide" data-segment="Check the access and count the work" data-segment-id="seg-screen">
+<h1>Check the classical alternatives</h1>
+<div class="l2-copy">
+  <p class="lead">Does sampling remain expensive after the classical shortcuts?</p>
+  <div class="l2-cards">
+    <div class="l2-card"><h3>Small state space</h3><p>Enumerate outcomes or reuse repeated states. Check sampled answers against exact values.</p></div>
+    <div class="l2-card"><h3>Larger state space</h3><p>Try structure, approximations, and ways to reduce variance. Count their cost and error.</p></div>
+    <div class="l2-card"><h3>Remaining uncertainty</h3><p>Measure whether sampling still dominates at the precision the decision needs.</p></div>
+  </div>
+  <p class="l2-foot">Randomness and a large tree alone don't establish a sampling lower bound. The appendix gives a bound for a specific access model and hard family.</p>
+</div>
+
+<div class="notes">
+<p>Small Sway boards can be enumerated exactly. Larger instances need a comparison against the strongest classical methods we can use.</p>
+<p>A large number of possible futures motivates sampling, but doesn’t prove that sampling is necessary. The hard-family theorem in the appendix has specific assumptions. Each application still needs this check.</p>
+</div>
+</section>
+<section id="transfer" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>What carries over to the epidemic model?</h1>
+<div class="l2-copy">
+  <p class="lead">Keep the circuit structure. Supply the model's three operations.</p>
+  <table class="l2-map">
+    <thead><tr><th>Reusable operation</th><th>Sway supplies</th><th>Epidemic model supplies</th></tr></thead>
+    <tbody>
+      <tr><td>Select a valid action</td><td>An empty-cell mask</td><td>A susceptible-site mask</td></tr>
+      <tr><td>Update the state</td><td>Color-flip rules and d20 choices</td><td>Infection, recovery, and their random choices</td></tr>
+      <tr><td>Evaluate the outcome</td><td>Compare Black and White counts</td><td>Compare infected count with a threshold</td></tr>
+    </tbody>
+  </table>
+  <p class="l2-foot">Both need explicit randomness, reversible updates, and cleared temporary work. State encoding and gate costs depend on the model.</p>
+  <p class="l2-source"><a href="https://arxiv.org/html/2604.25962#S6" target="_blank" rel="noopener">Course paper, Section VI: two implementations of the template</a></p>
+</div>
+
+<div class="notes">
+<p>The model supplies three operations: identify valid actions, update the state, and evaluate the outcome.</p>
+<p>The circuit design has common work around them: decode action choices, keep randomness in registers, preserve enough information to reverse updates, and clear temporary work.</p>
+<p>The epidemic model has a different transition rule and payoff, so its resource counts differ too.</p>
+</div>
+</section>
+<section id="sway-q3" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>Two models, checked</h1>
+<div class="l2-copy">
+  <p class="lead">Two small oracle implementations have been checked.</p>
+  <table class="l2-map">
+    <thead><tr><th>3×3 · 2 rounds</th><th>Sway</th><th>Epidemic model</th></tr></thead>
+    <tbody>
+      <tr><td>Qubits</td><td>169</td><td>146</td></tr>
+      <tr><td>Gates</td><td>9,768</td><td>6,472</td></tr>
+      <tr><td>Sampled payoff</td><td>0.281 ± 0.028</td><td>0.883 ± 0.020</td></tr>
+      <tr><td>Exact payoff</td><td>0.271</td><td>0.891</td></tr>
+    </tbody>
+  </table>
+  <p>Tested branches agree with the classical simulations. Aggregate estimates agree with exact enumeration.</p>
+  <p class="l2-source"><a href="https://arxiv.org/html/2604.25962#S6.T1" target="_blank" rel="noopener">Course paper, Table I</a> · published validation instances, separate from the live illustration · gate counts before decomposition and error-correction overhead</p>
+</div>
+
+<div class="notes">
+<p>The course paper reports implementations for both Sway and an epidemic model. On small instances, the tested branches agree with classical rollouts, and aggregate results agree with exact enumeration.</p>
+<p>This is evidence that the construction carries across models. The larger compiled counts are in the appendix. Establishing a speed advantage also requires a full resource and timing comparison.</p>
+</div>
+</section>
+<section id="far-line" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>What would one close comparison cost?</h1>
+<!-- Slide 39: how far is the far line.  Lesson 1's break-even inequality read
+     once with today's numbers, every QPU figure an assumption: five bars on a
+     log time axis, then the threshold a coherent call would have to beat.
+     See assets/far-line.js. -->
+<div class="l2-fig">
+<svg id="far-line-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/break-even-eq-plain.svg" style="width:min(40%, 380px);"
+       alt="t oracle less than t roll over C times P times g">
+</div>
+<script src="../assets/far-line.js?v=1431745441-3388" defer></script>
+
+<div class="notes">
+<p>For a separate timing scenario, assume a gap of 0.0001, five milliseconds per classical rollout, and overhead C = 10. This is a fixed pairwise comparison; it omits the search among k actions.</p>
+<p>The model gives 5.8 days on one core or 8.3 minutes on a thousand cores with perfect scaling. A coherent call must take less than five milliseconds to beat the latter.</p>
+<p>At one millisecond per call, the quantum estimate is 100 seconds. At 100 milliseconds, it is 2.8 hours. The gap and timings are assumptions, separate from the measured 5×5 example.</p>
+</div>
+</section>
+<section id="verdict" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>What we can reuse</h1>
+<div class="l2-copy">
+  <table class="l2-map">
+    <thead><tr><th>Example</th><th>What we learned</th><th>Next step</th></tr></thead>
+    <tbody>
+      <tr><td>Go</td><td>Rollouts are one classical approach.</td><td>Compare against stronger classical methods.</td></tr>
+      <tr><td>Sampled bandit</td><td>Close arms need many samples; the interface lacks A†.</td><td>Coherent access would need a different implementation.</td></tr>
+      <tr><td>Sway + epidemic</td><td>The shared oracle structure has two implementations.</td><td>Build the components and count their costs.</td></tr>
+    </tbody>
+  </table>
+  <p class="lead">We have a reusable construction to study. A runtime advantage still depends on the instance and hardware costs.</p>
+</div>
+
+<div class="notes">
+<p>The construction applies when we can implement valid-action selection, stochastic transitions, and payoff evaluation reversibly at a manageable cost.</p>
+<p>Sway gives us a small example to learn on. The epidemic implementation shows how those pieces change in another model.</p>
+<p>For a new application, we still check the classical alternatives, the required precision, and the cost of the quantum circuit.</p>
+</div>
+</section>
+<section id="zoom" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>Zoom into one query</h1>
+<!-- Slide 40: zoom into one query.  The outer rings fade and the view dives through the rollout-oracle box until its register architecture fills the frame.  See assets/rings.js. -->
+<div class="l2-fig">
+<svg class="rings-fig" data-mode="zoom" viewBox="0 0 760 320" width="980"></svg>
+</div>
+<script src="../assets/rings.js?v=1703094544-8092" defer></script>
+
+<div class="notes">
+<p>Let’s look inside one oracle call. We need qubits for the board, move selection, dice, temporary work, and the payoff.</p>
+<p>In Lesson 3, we’ll build those pieces into a circuit.</p>
+</div>
+</section>
+<section id="next" class="slide" data-segment="Reuse the construction" data-segment-id="seg-transfer">
+<h1>Continue to Lesson 3</h1>
+<div class="l2-copy">
+  <p class="lead">Next: build one rollout circuit.</p>
+  <p>We'll implement the board, legal-move selection, random choices, and payoff in Lesson 3.</p>
+  <a class="l2-link" href="../building-a-quantum-oracle/">Continue to Lesson 3</a>
+  <a class="l2-link" href="#hard-family">Optional proof and readout details</a>
+  <p class="l2-source"><a href="https://arxiv.org/abs/2604.25962" target="_blank" rel="noopener">Course paper</a> · <a href="https://github.com/BinRoot/b01t/tree/main/demos/rollout" target="_blank" rel="noopener">Oracle implementation and proofs</a></p>
+</div>
+
+<div class="notes">
+<p>Continue to Lesson 3 to build the rollout circuit. The remaining slides are optional: the sampling lower bound, assumptions behind the theorem, an alternative readout, and larger resource counts.</p>
+</div>
+</section>
+<section id="hard-family" class="slide" data-segment="Optional: the sampling lower bound" data-segment-id="seg-proof">
+<h1>A family of almost-identical worlds</h1>
+<!-- Slide 17: a family of almost-identical worlds.  See assets/hard-family.js. -->
+<div class="l2-fig">
+<svg id="hard-family-fig" viewBox="0 0 760 320" width="980"></svg>
+</div>
+<script src="../assets/hard-family.js?v=2650815674-4269" defer></script>
+
+<div class="notes">
+<p>To prove a lower bound, we construct several similar problems with different best arms.</p>
+<p>In the starting problem, arm zero wins with probability 1/2 + 4ε. All other arms win with probability 1/2. In problem j, we raise arm j to 1/2 + 6ε, making it the winner.</p>
+</div>
+</section>
+<section id="one-pull" class="slide" data-segment="Optional: the sampling lower bound" data-segment-id="seg-proof">
+<h1>One pull reveals only ε² of evidence</h1>
+<!-- Slide 18: one pull reveals only epsilon-squared of evidence.  The paper's constants arrive in three presses.  See assets/evidence-meter.js. -->
+<div class="l2-fig">
+<svg class="meter-fig" data-mode="one" viewBox="0 0 760 300" width="900"></svg>
+</div>
+<div style="display:flex; justify-content:center; gap:4vw; align-items:center; margin-top:0.2em; min-height:6vh;">
+  <img class="step" src="../assets/kl-1.svg" style="height:5.2vh; width:auto;" alt="KL between one half and one half plus six epsilon is at most 96 epsilon squared">
+  <img class="step" src="../assets/kl-2.svg" style="height:5.2vh; width:auto;" alt="KL between one third and two thirds equals natural log two over three">
+  <img class="step" src="../assets/kl-3.svg" style="height:5.6vh; width:auto;" alt="expected pulls of contender j are at least natural log two over 288 epsilon squared">
+</div>
+<script src="../assets/evidence-meter.js?v=3104120566-4009" defer></script>
+
+<div class="notes">
+<p>Each pull gives only a little evidence about whether an arm’s probability has changed. In this construction, that information is at most 96ε² per pull.</p>
+<p>The proof requires at least ln(2)/3 total evidence. Dividing gives a lower bound of ln(2)/(288ε²) expected pulls per contender. The constant is machine-checked, and the bound also covers algorithms that choose their next arm based on earlier results.</p>
+</div>
+</section>
+<section id="every-contender" class="slide" data-segment="Optional: the sampling lower bound" data-segment-id="seg-proof">
+<h1>Every contender must be ruled out</h1>
+<!-- Slide 19: every contender must be ruled out; k-1 meters sum to Omega(k over epsilon squared).  See assets/evidence-meter.js. -->
+<div class="l2-fig">
+<svg class="meter-fig" data-mode="all" viewBox="0 0 760 310" width="980"></svg>
+</div>
+<script src="../assets/evidence-meter.js?v=3104120566-4009" defer></script>
+
+<div class="notes">
+<p>Any contender could be the arm whose probability changed. An algorithm that works across the whole family has to check each one.</p>
+<p>There are k − 1 contenders, each requiring order 1/ε² pulls. Adding them gives the classical lower bound for this sampling model.</p>
+</div>
+</section>
+<section id="theorem-scope" class="slide" data-segment="Optional: the sampling lower bound" data-segment-id="seg-proof">
+<h1>What the theorem does, and does not, say</h1>
+<!-- Slide 21: what the theorem does, and does not, say.  An evidence ledger
+     with four rows, one press each.  The one text-forward slide in the
+     mechanism half, kept to a phrase per cell. -->
+<style>
+  #ledger { width: min(980px, 100%); margin: 0 auto; border-collapse: collapse; font-size: 0.72em; }
+  #ledger td { padding: 0.55em 0.9em; border-bottom: 1px solid #d8d5cd; vertical-align: top; line-height: 1.35; }
+  #ledger td:first-child { width: 9.5em; font-family: 'Ubuntu Web Mono', 'Ubuntu Mono', ui-monospace, monospace; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 0.85em; }
+  #ledger tr.proven td:first-child   { color: #4D8C55; }
+  #ledger tr.assumed td:first-child  { color: #7c5cbf; }
+  #ledger tr.excluded td:first-child { color: #D95032; }
+  #ledger .src { display: block; margin-top: 0.7em; color: #7a7f88; font-size: 0.6em; text-align: right; }
+</style>
+<table id="ledger">
+  <tr class="proven step"><td>proven</td><td>Õ(√k/ε) upper bound · Ω(k/ε²) lower bound on the hard family</td></tr>
+  <tr class="proven step"><td>proven, robustness</td><td>the hard instance recurs across an exponential family (bounded influence)</td></tr>
+  <tr class="assumed step"><td>assumed</td><td>coherent access: <code>A</code>, <code>A†</code>, no measurement inside</td></tr>
+  <tr class="excluded step"><td>not included</td><td>unrestricted classical structure · FT overhead · wall clock</td></tr>
+</table>
+
+<div class="notes">
+<p>We have a quantum upper bound and a classical lower bound for the constructed family, each under its stated access model.</p>
+<p>The robustness result allows factors to vary when their combined influence stays below ε. The best action stays the same across those configurations. Under the modularity assumption, the lower bound extends too.</p>
+<p>Coherent access is an assumption. Classical shortcuts, error-correction costs, and runtime still need separate checks. Lessons 3 and 4 build the oracle.</p>
+</div>
+</section>
+<section id="fourier-readout" class="slide" data-segment="Optional: readout and resource details" data-segment-id="seg-details">
+<h1>The Fourier-based readout</h1>
+<!-- Slide 11: inverse QFT and measurement turn the accumulated phase into bits.  One shared coordinate system across slides 7, 8, 9 and 11; see assets/ae-circle.js. -->
+<div class="l2-fig">
+<svg class="ae-fig" data-stage="4" viewBox="0 0 760 300" width="980"></svg>
+</div>
+
+<script src="../assets/ae-circle.js?v=1286934906-18477" defer></script>
+
+<div class="notes">
+<p>The original amplitude-estimation circuit uses controlled powers of Q and an inverse Fourier transform. Measurement yields a phase estimate, which determines the payoff probability.</p>
+<p>This is an alternative to the iterative readout in the main lesson. It introduces an extra phase register.</p>
+</div>
+</section>
+<section id="gap-decay" class="slide" data-segment="Optional: readout and resource details" data-segment-id="seg-details">
+<h1>A simple model of fading influence</h1>
+<!-- Slide 34: why the gaps shrink.  The single-stone decay model as a
+     semi-log chart: one curve per support count sweeps in, then two presses
+     add the R = 40 mark on the typical-support curve and the 32x32 caption.
+     See assets/gap-decay.js. -->
+<div class="l2-fig">
+<svg id="gap-decay-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../assets/decay-eq.svg" style="width:min(60%, 620px);"
+       alt="expected contribution after R events equals one minus two p to the R">
+</div>
+<script src="../assets/gap-decay.js?v=511374143-5374" defer></script>
+
+<div class="notes">
+<p>Hold a stone’s friendly-neighbor count fixed. With flip probability p, its expected contribution to the color margin is multiplied by 1 − 2p per event.</p>
+<p>For two friends, that factor is 0.8, and 0.8⁴⁰ is about 0.00013. This calculation concerns an expected color margin. It does not determine the gap between two moves’ win probabilities on a full board.</p>
+<p>Neighbor counts change during the game. We measure action-value gaps separately.</p>
+</div>
+</section>
+<section id="resource-counts" class="slide" data-segment="Optional: readout and resource details" data-segment-id="seg-details">
+<h1>Larger compiled circuits</h1>
+<!-- Slide 37: Question 3 for Sway.  See assets/sway-q.js. -->
+<div class="l2-fig">
+<svg class="swayq-fig" data-q="3" viewBox="0 0 760 320" width="980"></svg>
+</div>
+<script src="../assets/sway-q.js?v=315459836-8959" defer></script>
+
+<p class="l2-note">
+<a href="#next">Back to Lesson 3 and course links</a>
+</p>
+<div class="notes">
+<p>These are circuit counts before gate decomposition and error-correction overhead. The small validation cases and the larger compiled-only cases are shown separately.</p>
+<p>A 20×20 Sway board over ten rounds uses about six million gates in this implementation. Converting that count into time requires a hardware model.</p>
 </div>
 </section>
 </div>
