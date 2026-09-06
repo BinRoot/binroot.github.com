@@ -29,7 +29,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 ::: {.lesson data-lesson="qoe-lesson-01" style="--accent: #456AAD"}
 ### 1. A different computer
 
-<figure class="art"><img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><a href="a-different-computer/" tabindex="-1" aria-hidden="true"><img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy"></a></figure>
 
 - **CPU, GPU, QPU**: three devices, three workloads
 - the QPU's job: **fewer samples** for an average
@@ -78,11 +78,11 @@ This course teaches the craft of building practical quantum circuits from scratc
 <figure class="art"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></figure>
 
 - amplitude estimation runs the rollout **forward and backward**
-- decide from the old board, write to a **shadow board**, swap
+- decide from the old board, write to a **shadow board**, keep the old one
 - **in-place updates** read a neighbor that already flipped
 - erase **move-selection scratch** before the board changes
 - one **payoff qubit**, everything else inverted
-- the **qubit and gate bill** as the board grows
+- the **qubit and gate count** as the board grows
 
 <button class="coming" disabled>Coming Sept 22</button>
 :::
@@ -102,7 +102,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - entangled scratch **breaks interference**
 - **Bennett**: compute, copy out, uncompute
 - the inverse must see the **same inputs** as the forward pass
-- **peak scratch** sets the qubit bill
+- **peak scratch** sets the qubit count
 - clean scratch is **necessary, not sufficient**
 
 <button class="coming" disabled>Coming Sept 29</button>
@@ -155,7 +155,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 
 ::::
 
-<p class="act">Price it, test it, judge it</p>
+<p class="act">Count it, test it, judge it</p>
 
 :::: {.act-group}
 

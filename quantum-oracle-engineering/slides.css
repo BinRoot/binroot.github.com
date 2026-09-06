@@ -85,8 +85,9 @@ html, body {
   justify-content: center;
   padding: 8vh 10vw 12vh;
   padding: 8vh 10cqw 12vh;
-  /* Nothing in a deck scrolls.  A slide too tall for the viewport clips, which
-     is an authoring signal, not something to hand the audience a scrollbar for. */
+  /* Nothing in a deck scrolls.  A slide too tall for its box is scaled down
+     whole by slides.js (fitSlide), which is what a phone with the notes out
+     needs; with scripting off it clips instead.  Never a scrollbar. */
   overflow: hidden;
   /* vw first as the fallback; cqw wins where container units are supported. */
   font-size: clamp(1.05rem, 1.9vw, 1.9rem);
@@ -173,6 +174,10 @@ html, body {
   font-style: italic;
 }
 .slide img, .slide svg { max-width: 100%; height: auto; }
+/* A figure taller than the room shrinks rather than pushing the title into
+   the crumb.  Width follows from the aspect ratio, so max-width keeps working. */
+.slide svg { max-height: 58vh; width: auto; }
+.slide:has(.slide-equation) svg { max-height: 46vh; }
 .slide img.photo { display: block; margin: 0 auto; max-height: 60vh; width: auto;
   border-radius: 6px; }
 /* Equations are rendered to SVG paths at build time: crisp on a projector,
@@ -229,9 +234,11 @@ html, body {
 .step { opacity: 0; }
 .step.shown { opacity: 1; }
 
-/* Speaker notes live in a bottom drawer, closed by default on every load so
-   the presentation view is always clean.  The notes tab (hidden while
-   fullscreen) or `n` opens it; while open it tracks the current slide. */
+/* Speaker notes live in a bottom drawer, closed on load wherever there is a
+   mouse so the presentation view comes up clean, and open on load on a touch
+   screen, where the notes are the lesson (slides.js decides, and remembers a
+   reader's choice).  The notes tab (hidden while fullscreen) or `n` toggles
+   it; while open it tracks the current slide. */
 .notes { display: none; }
 #notes-tab {
   right: 6.2rem;
@@ -304,6 +311,9 @@ body.help-on #notes-arrow { display: none; }
   body.at-start #notes-tab {
     animation: notes-tab-pulse 1.15s ease-out 1.55s 3;
   }
+  /* The pulse invites a reader to open the notes, so it has nothing to say
+     while they are already out, as on a phone. */
+  body.drawer-on #notes-tab { animation: none; }
   /* The same boil the lesson art wears, so the line reads as drawn rather
      than plotted.  Guarded on the filter existing: a deck that does not
      inject it still gets the arrow, just a steady one; the boil itself is
@@ -388,6 +398,9 @@ body.grid-on .arrow { display: none; }
   color: var(--dim);
   font-size: 0.95rem;
   line-height: 1.6;
+  /* Vertical drags scroll the note; sideways ones stay with the pointer
+     handlers, which read them as a swipe to the next or previous slide. */
+  touch-action: pan-y pinch-zoom;
 }
 body.drawer-on #notes-drawer { display: block; }
 #notes-drawer > :last-child { margin-bottom: 0; }
@@ -456,8 +469,11 @@ body.drawer-on #notes-drawer { display: block; }
   :root { --notes-h: 40vh; }
   body.drawer-on #deck { height: calc(100vh - var(--notes-h)); height: calc(100dvh - var(--notes-h)); }
   body.drawer-on #notes-drawer { height: var(--notes-h); max-height: var(--notes-h); }
-  /* Less room means less of it can go on margin, or the slide clips. */
-  body.drawer-on .slide { padding-top: 4vh; padding-bottom: 5vh; }
+  /* Less room means less of it can go on margin, but the margins still
+     have to clear the crumb above and the two rows of chrome below; what a
+     slide needs beyond that, slides.js gives it by scaling the slide down
+     whole (fitSlide) rather than letting it clip. */
+  body.drawer-on .slide { padding-top: 2.6rem; padding-bottom: 2.6rem; }
   /* Shift the chrome rather than re-pin it.  Narrow screens already give the
      reader tabs a row of their own above the counter, and rewriting each
      element's `bottom` here flattened the two rows back into one.  A translate
@@ -612,7 +628,29 @@ body.timer-on #timer { display: block; }
 body.arrows-on .arrow { opacity: 1; pointer-events: auto; }
 .arrow:hover { color: var(--ink); }
 .arrow:disabled { visibility: hidden; }
-@media (pointer: coarse) { .arrow { display: none; } }
+@media (pointer: coarse) {
+  .arrow { display: none; }
+  /* With the notes out on a phone, the slide sits in the top of the screen
+     and the thumb rests on the drawer, so the arrows come back there: pinned
+     to the screen's bottom corners over the drawer, always showing (a finger
+     has no hover to wake them).  The drawer's left padding widens to match
+     the right, which already clears the close button, so the arrows stand in
+     gutters the note's text never enters. */
+  body.drawer-on .arrow {
+    display: block;
+    top: auto;
+    bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.35em 0.3em;
+    transform: none;
+    z-index: 16;
+    opacity: 1;
+    pointer-events: auto;
+    color: var(--dim);
+  }
+  body.drawer-on #nav-prev { left: 0.4rem; }
+  body.drawer-on #nav-next { right: 0.4rem; }
+  body.drawer-on #notes-drawer { padding-left: 3.2rem; }
+}
 
 #outline, #help {
   position: fixed;
@@ -701,6 +739,17 @@ body.outline-on #outline, body.help-on #help { display: block; }
   #grid-tab, #notes-tab { bottom: 2.7rem; }
   #notes-tab { right: 1.4rem; }
   #grid-tab { right: 7.2rem; }
+  /* With the notes out, the drawer's title already carries the counter.  So
+     the counter goes, the tabs drop into its row, and the segment label
+     moves to the left edge, out from under them: a row of the deck's height
+     handed back to the slide, which has little enough on a phone. */
+  body.drawer-on #counter { display: none; }
+  body.drawer-on #grid-tab, body.drawer-on #notes-tab { bottom: 0.78rem; }
+  body.drawer-on #seglabel {
+    left: 1.4rem;
+    max-width: 50vw;
+    transform: translateY(calc(-1 * var(--notes-h)));
+  }
 }
 
 /* Print to PDF as a conference backup: one slide per page, all steps shown. */

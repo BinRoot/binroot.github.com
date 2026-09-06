@@ -94,20 +94,26 @@
       t.textContent = w.label;
     });
 
+    // A gate is either [control, ..., target] or { c: [controls], t: [targets] };
+    // the object form draws a fan-out, one control shared by several targets.
     gates.forEach((g, j) => {
       const gx = ox + (j + 0.5) * COL;
-      const ys = g.concat().map((w) => wireY(rowOf[w]));
-      const ty = wireY(rowOf[g[g.length - 1]]);
-      const top = Math.min(...ys) - (ty <= Math.min(...ys) ? R_TARG : 0);
-      const bot = Math.max(...ys) + (ty >= Math.max(...ys) ? R_TARG : 0);
+      const ctrls = Array.isArray(g) ? g.slice(0, -1) : g.c;
+      const targs = Array.isArray(g) ? [g[g.length - 1]] : g.t;
+      const ys = ctrls.concat(targs).map((w) => wireY(rowOf[w]));
+      const tys = targs.map((w) => wireY(rowOf[w]));
+      const top = Math.min(...ys) - (tys.includes(Math.min(...ys)) ? R_TARG : 0);
+      const bot = Math.max(...ys) + (tys.includes(Math.max(...ys)) ? R_TARG : 0);
       el('line', { x1: gx, y1: top, x2: gx, y2: bot, stroke: INK,
         'stroke-width': 1.8 }, parent);
-      g.slice(0, -1).forEach((w) => el('circle', {
+      ctrls.forEach((w) => el('circle', {
         cx: gx, cy: wireY(rowOf[w]), r: R_CTRL, fill: INK }, parent));
-      el('circle', { cx: gx, cy: ty, r: R_TARG, fill: 'none', stroke: INK,
-        'stroke-width': 1.8 }, parent);
-      el('line', { x1: gx - R_TARG, y1: ty, x2: gx + R_TARG, y2: ty,
-        stroke: INK, 'stroke-width': 1.8 }, parent);
+      tys.forEach((ty) => {
+        el('circle', { cx: gx, cy: ty, r: R_TARG, fill: 'none', stroke: INK,
+          'stroke-width': 1.8 }, parent);
+        el('line', { x1: gx - R_TARG, y1: ty, x2: gx + R_TARG, y2: ty,
+          stroke: INK, 'stroke-width': 1.8 }, parent);
+      });
     });
   };
 
@@ -134,20 +140,28 @@
         transform: 'translate(' + (cx - ux * 11) + ',' + (cy - uy * 11) +
           ') rotate(' + (Math.atan2(uy, ux) * 180 / Math.PI) + ')' }, g);
     });
-    caption('reads four neighbours', X0 + 75, Y0 + 176, g);
+    caption('reads the cell and its four neighbours', X0 + 75, Y0 + 176, g);
 
-    const OX = 458, OY = 62;
+    // The rule the circuit implements: the cell flips when all four
+    // neighbours differ from it (an isolated stone flips).  Column one XORs
+    // the cell's colour into each neighbour wire, so each now reads "differs
+    // from me"; column two flips the target when all four are set; column
+    // three undoes column one and hands the neighbours back unchanged.
+    // Compute, use, uncompute, depth three: that is what "shallow" means.
+    const OX = 458, OY = 40;
     circuit(g, OX, OY, [
+      { name: 'me', label: 'cell', colour: INK },
       { name: 'up', label: 'up', colour: ACCENT },
       { name: 'down', label: 'down', colour: ACCENT },
       { name: 'left', label: 'left', colour: ACCENT },
       { name: 'right', label: 'right', colour: ACCENT },
       { name: 'flip', label: 'flip = 0', colour: INK }
     ], [
-      ['up', 'down', 'flip'],
-      ['left', 'right', 'flip']
+      { c: ['me'], t: ['up', 'down', 'left', 'right'] },
+      { c: ['up', 'down', 'left', 'right'], t: ['flip'] },
+      { c: ['me'], t: ['up', 'down', 'left', 'right'] }
     ]);
-    caption('shallow', OX + 72, OY + 4 * ROW + 44, g);
+    caption('5 reads per cell, at any board size', OX + 108, OY + 5 * ROW + 36, g);
   };
 
   // ── Slide 35: the whole board and its history, deep circuit ─────────
@@ -191,17 +205,24 @@
       fill: 'none', stroke: ACCENT, 'stroke-width': 1.5, opacity: 0.65,
       'stroke-dasharray': '5,4', 'stroke-linecap': 'round'
     }, g);
-    caption('the whole board, and history', X0 + 75, Y0 + 176, g);
+    caption('the whole board, and one board back', X0 + 75, Y0 + 176, g);
 
+    // The same cell, now reading seven cells scattered across the board (the
+    // seven c wires match the seven arrows) and one cell from the previous
+    // board (the dashed arrow: history-dependent legality).  The rule itself
+    // is arbitrary, which is the point; what matters is that every clause
+    // reaches across the register, so no clause can be computed locally and
+    // the gates queue up on one target.  Ten wires and six clauses, against
+    // six wires and three columns on the previous slide.
     const OX = 296, OY = 21;
-    const wires = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'].map((n) => ({
-      name: n, label: n, colour: ACCENT
-    })).concat([{ name: 't', label: 't = 0', colour: INK }]);
+    const wires = [{ name: 'me', label: 'cell', colour: INK }]
+      .concat(['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'].map((n) => ({ name: n, label: n, colour: ACCENT })))
+      .concat([{ name: 'h', label: 'past', colour: ACCENT }, { name: 't', label: 't = 0', colour: INK }]);
     circuit(g, OX, OY, wires, [
-      ['c1', 'c7', 't'], ['c2', 'c6', 't'], ['c3', 'c5', 't'],
-      ['c1', 'c4', 't'], ['c2', 'c7', 't'], ['c3', 'c6', 't']
+      ['me', 'c1', 'c7', 't'], ['c2', 'c6', 'h', 't'], ['me', 'c3', 'c5', 't'],
+      ['c1', 'c4', 'h', 't'], ['me', 'c2', 'c7', 't'], ['c3', 'c6', 'h', 't']
     ]);
-    caption('deep', OX + 3 * COL, OY + 7 * ROW + 44, g);
+    caption('every cell and the past, per cell', OX + 3 * COL, OY + 9 * ROW + 34, g);
   };
 
   const a = document.getElementById('rules-compile-fig');

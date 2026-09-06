@@ -114,7 +114,7 @@
     stroke: ACCENT, 'stroke-width': 1.5 }, group);
   el('line', { x1: HIT.x, y1: HIT.y - 8, x2: HIT.x, y2: HIT.y + 8,
     stroke: ACCENT, 'stroke-width': 1.5 }, group);
-  const oneDart = text('1 dart', QB.x, QB.y + QB.r + 26, 14, DIM,
+  const oneDart = text('one estimated win rate', QB.x, QB.y + QB.r + 26, 14, DIM,
     'middle', 600);
   oneDart.setAttribute('opacity', 0);
 

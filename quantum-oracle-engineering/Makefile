@@ -57,7 +57,7 @@ index.html: index.md header.html signup.js spotlight.js
 	  --variable=mathjax= --variable=document-css= --variable=description-meta=
 
 # Every Sway number in the Lesson 2 deck comes from one seeded generator,
-# which reproduces the paper's Table I by enumeration before it writes
+# which reproduces the paper's Table II by enumeration before it writes
 # anything.  Not part of `all`: it takes ~15 s and its output is committed.
 sway-data:
 	node gen/sway-gen.mjs > assets/sway-data.js

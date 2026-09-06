@@ -426,6 +426,17 @@
     order: -1;
     margin: 0 0 1em;
   }
+  /* A published lesson's picture is wrapped in a link to its deck, the same
+     place the card's "View slides" button goes.  The button is the link that
+     assistive tech and the keyboard use; the picture's copy is hidden from
+     them and out of the tab order, so nothing is announced or reached twice.
+     It takes the picture's own cap and centring (see `.lesson img` below), so
+     the clickable area is the picture and not the blank either side of it. */
+  .lesson .art a {
+    display: block;
+    max-width: min(100%, 22em);
+    margin-inline: auto;
+  }
   .lesson .art img {
     display: block;
     width: 100%;
@@ -885,10 +896,6 @@
        rather than of the whole course: the eight cards in the other two acts do
        not move, and neither does the reading order the markup sets. */
     .act-group .lesson:target { order: -1; }
-    /* The heading's negative bottom margin is there to tuck it under a card's
-       top padding.  A band has an edge of its own, and the tuck lands the
-       heading on top of it, so it comes off for the act that holds one. */
-    .lessons > .act:has(+ .act-group .lesson:target) { margin-bottom: 0.9em; }
   }
   /* Four across, two across, one across: every act stays a whole block, never
      three cards and an orphan. */
@@ -898,23 +905,19 @@
   @media (max-width: 700px)  { .lessons { margin-inline: 0; }
                                .act-group { grid-template-columns: 1fr; } }
   .lessons > .act {
-    margin: 1.6em 0 -0.6em;
+    /* The heading sits clear of the grid.  It used to tuck into the cards' top
+       padding with a negative margin, but the cards paint a wash, and a heading
+       whose lower half sits on that wash reads as cut off, with the wash's top
+       edge doubling the rule beside it. */
+    margin: 1.6em 0 0.7em;
     font-size: 0.78em;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--faint);
-    display: flex;
-    align-items: baseline;
-    gap: 0.9em;
+    /* No rule of its own: the cards draw a top rule each, and a second line a
+       few pixels above it read as a doubled underline. */
   }
   .lessons > .act:first-child { margin-top: 0; }
-  .lessons > .act::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-    translate: 0 -0.35em;
-  }
   .lesson h2 {
     font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.4rem);
     line-height: 1.35;
@@ -949,7 +952,6 @@
   .pagefoot { margin-top: 5em; }
   @media (max-width: 700px) {
     .lessons > .act { justify-content: center; }
-    .lessons > .act::after { display: none; }
     .venue { margin-bottom: 1.8em; }
   }
   </style>
@@ -987,7 +989,7 @@ Choose the problem, build the oracle
 data-lesson="qoe-lesson-01" style="--accent: #456AAD">
 <h2>1. A different computer</h2>
 <figure class="art">
-<img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy">
+<a href="a-different-computer/" tabindex="-1" aria-hidden="true"><img src="img/myth01.png" alt="A robot scratching its head while holding a quantum processor chip" width="600" height="600" loading="lazy"></a>
 </figure>
 <ul>
 <li><strong>CPU, GPU, QPU</strong>: three devices, three workloads</li>
@@ -1057,13 +1059,13 @@ data-lesson="qoe-lesson-04" style="--accent: #F03836">
 <li>amplitude estimation runs the rollout <strong>forward and
 backward</strong></li>
 <li>decide from the old board, write to a <strong>shadow board</strong>,
-swap</li>
+keep the old one</li>
 <li><strong>in-place updates</strong> read a neighbor that already
 flipped</li>
 <li>erase <strong>move-selection scratch</strong> before the board
 changes</li>
 <li>one <strong>payoff qubit</strong>, everything else inverted</li>
-<li>the <strong>qubit and gate bill</strong> as the board grows</li>
+<li>the <strong>qubit and gate count</strong> as the board grows</li>
 </ul>
 <button class="coming" disabled>
 Coming Sept 22
@@ -1086,7 +1088,7 @@ data-lesson="qoe-lesson-05" style="--accent: #7E874C">
 <li><strong>Bennett</strong>: compute, copy out, uncompute</li>
 <li>the inverse must see the <strong>same inputs</strong> as the forward
 pass</li>
-<li><strong>peak scratch</strong> sets the qubit bill</li>
+<li><strong>peak scratch</strong> sets the qubit count</li>
 <li>clean scratch is <strong>necessary, not sufficient</strong></li>
 </ul>
 <button class="coming" disabled>
@@ -1156,7 +1158,7 @@ Coming Oct 20
 </section>
 </div>
 <p class="act">
-Price it, test it, judge it
+Count it, test it, judge it
 </p>
 <div class="act-group">
 <section id="where-the-quantum-lives" class="lesson"
