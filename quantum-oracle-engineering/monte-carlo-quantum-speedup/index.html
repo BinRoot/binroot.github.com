@@ -479,10 +479,14 @@
 <div class="l2-fig">
 <svg id="noise-vs-phase-fig" viewBox="0 0 760 312" width="980"></svg>
 </div>
-<div class="step" style="display:flex; justify-content:center; gap:6vw; margin-top:0.2em;">
-  <img src="../assets/noise-eq.svg" style="height:6.5vh; width:auto;"
+<!-- Sized by width, not height: an equation set by its height keeps its
+     aspect ratio and grows as wide as it likes, and two of them side by side
+     ran off a wide, short screen.  Each takes at most 42% of the slide and
+     shrinks with it. -->
+<div class="step" style="display:flex; justify-content:center; gap:4%; margin-top:0.2em; width:100%;">
+  <img src="../assets/noise-eq.svg" style="flex:0 1 42%; max-width:42%; height:auto; max-height:8vh; object-fit:contain;"
        alt="signal to noise grows like epsilon root M, so M is order one over epsilon squared">
-  <img src="../assets/phase-eq.svg" style="height:6.5vh; width:auto;"
+  <img src="../assets/phase-eq.svg" style="flex:0 1 42%; max-width:42%; height:auto; max-height:8vh; object-fit:contain;"
        alt="phase gap grows like M epsilon, so M is order one over epsilon">
 </div>
 <script src="../assets/noise-vs-phase.js?v=361971428-6804" defer></script>
