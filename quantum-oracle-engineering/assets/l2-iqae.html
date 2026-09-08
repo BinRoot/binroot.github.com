@@ -1,11 +1,6 @@
-<div class="l2-copy">
-  <p class="lead">Use repeated measurements to narrow the possible angles.</p>
-  <div class="l2-cards">
-    <div class="l2-card"><h3>1. Run a circuit</h3><p>Prepare with A. Apply Q a chosen number of times. Measure the payoff bit.</p></div>
-    <div class="l2-card"><h3>2. Collect results</h3><p>Repeat that circuit with fresh preparations. Count how often the bit is 1.</p></div>
-    <div class="l2-card"><h3>3. Refine the estimate</h3><p>Update the interval for θ. Choose the next number of Q applications and repeat.</p></div>
-  </div>
-  <p>Stop when the interval for a = sin²θ is narrow enough.</p>
-  <p class="l2-foot">Measurements happen between circuits. Each coherent sequence uses A and A† without measuring inside it.</p>
-  <p class="l2-source"><a href="https://arxiv.org/abs/1912.05559" target="_blank" rel="noopener">Grinko et al., Iterative Quantum Amplitude Estimation</a> · the Fourier-based readout is in the appendix.</p>
+<div class="l2-fig">
+  <svg id="l2-iqae-fig" viewBox="0 0 900 390" width="1100" role="img" aria-label="An iterative estimation example: run a circuit, collect payoff measurements, then narrow the possible original angles. The interval guides the next circuit."></svg>
 </div>
+<p class="l2-visual-note">Fresh preparation for every shot. Measure only after the coherent sequence.</p>
+<p class="l2-visual-source">Illustrative batches · 512 shots each · <a href="https://arxiv.org/abs/1912.05559" target="_blank" rel="noopener">Iterative Quantum Amplitude Estimation</a></p>
+<script src="../assets/l2-iqae.js" defer></script>

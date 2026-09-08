@@ -1,10 +1,7 @@
 // sway-reveal.js -- slide 25: the mystery game is Sway.
 //
-// The third card turns over and grows into the curated board from
-// assets/sway-data.js, with the d20 and the two stone colours as props on
-// the left.  The three candidate moves are marked faintly; they carry no
-// ranking until slide 33.  The corner race panel (sway-race.js) starts the
-// first time this slide is current.
+// Reveal the board, d20 and two stone colours. Candidate moves and their
+// estimated win probabilities are introduced after the rules.
 (function () {
   const svg = document.getElementById('sway-reveal-fig');
   if (!svg) return;
@@ -22,14 +19,8 @@
   L.text(back, '?', 0, 0, { size: 64, fill: L.GRAY, weight: 700 });
   const face = L.el('g', { opacity: 0 }, cardG);
   const B = L.board(face, { N: D.N, size: 200, x: -100, y: -100, board: D.board });
-  // faint candidate marks
-  D.candidates.forEach((c) => {
-    const i = c.r * D.N + c.c;
-    L.el('circle', { cx: B.cx(i) - 100, cy: B.cy(i) - 100, r: B.r, fill: 'none', stroke: L.INK, 'stroke-width': 1.5, 'stroke-dasharray': '4 3', opacity: 0.55 }, face);
-    L.text(face, c.label, B.cx(i) - 100, B.cy(i) - 100, { size: 15, weight: 700, fill: L.INK, opacity: 0.6 });
-  });
   const title = L.text(root, 'Sway', 400, 24, { size: 26, weight: 700, opacity: 0 });
-  const sub = L.text(root, `${D.N}×${D.N} · Black to move · ${D.H} rounds left`, 400, 268, { size: 13, fill: L.DIM, mono: true, opacity: 0 });
+  const sub = L.text(root, `${D.N}×${D.N} · Black to move · ${D.H} rounds left`, 400, 268, { size: 18, fill: L.INK, mono: true, opacity: 0 });
 
   const setState = (t) => {
     const flip = L.win(t, 0.5, 0.9);

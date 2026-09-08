@@ -154,12 +154,20 @@
     root.insertBefore(glow, boxes[2].node);
 
     // the worked case, one press away: the angle drawn IS the worked case
-    const worked = L.el('g', { class: 'step' }, root);
+    const worked = L.el('g', {}, root);
     L.el('rect', { x: 430, y: 176, width: 290, height: 82, rx: 12, fill: '#fff', stroke: L.RULE, 'stroke-width': 1.3 }, worked);
     L.text(worked, 'a = ¼ ,  θ = 30°', 575, 204, { size: 19, italic: true, serif: true });
     L.text(worked, 'one Q lands on |good⟩', 575, 236, { size: 16, serif: true, fill: L.BLUE });
 
     const setState = (t) => {
+      worked.setAttribute('opacity', L.win(t, 3.8, 0.4));
+      boxes.forEach((b, i) => {
+        const active = (t > 0.3 && t <= 1.6 && i === 1) ||
+          (t > 1.8 && t <= 3.2 && i >= 2);
+        const rect = b.node.querySelector('rect');
+        rect.setAttribute('fill', active ? '#fff0d8' : '#fff');
+        rect.setAttribute('stroke-width', active ? 3 : b.g.blue ? 2 : 1.5);
+      });
       // beat 1 (0.4-1.4): the axis is the mirror; the ghost swings to -theta
       const u1 = L.win(t, 0.4, 1.0);
       mirrorAxis.setAttribute('opacity', t > 0.3 && t < 1.6 ? 0.55 : 0);
@@ -178,13 +186,18 @@
       rotLab.setAttribute('opacity', L.win(t, 3.8, 0.3));
       glow.setAttribute('opacity', t > 1.9 && t < 3.2 ? 0.16 : 0);
     };
-    L.timeline(svg, { T: 4.4, setState, still: 4.4 });
+    if (L.beats) L.beats(svg, {
+      stops: [0, 1.5, 3.15, 4.4],
+      labels: ['Start at θ', 'Reflect in the losing axis', 'Reflect in the prepared state', 'Read the rotation: 2θ'],
+      draw: setState, duration: 1100
+    });
+    else L.timeline(svg, { T: 4.4, setState, still: 4.4 });
   };
 
   // ── 9. Let the phase accumulate ─────────────────────────────────────
   const stage3 = (svg, root, q, vec, arc, lab) => {
     const POW = [1, 2, 4];
-    const small = L.text(root, 'a small angle now: θ = 10°, a ≈ 0.03', C.cx + 6, C.cy + 24, { anchor: 'start', size: 13, fill: L.DIM, opacity: 0 });
+    const small = L.text(root, 'θ = 10°, a ≈ 0.03', C.cx + 6, C.cy + 24, { anchor: 'start', size: 16, fill: L.INK, opacity: 0 });
     const full = L.el('circle', { cx: C.cx, cy: C.cy, r: C.R, fill: 'none', stroke: L.FAINT, 'stroke-width': 1.2, 'stroke-dasharray': '3 4' }, root);
     root.insertBefore(full, q.g);
     const arcs = POW.map((p, i) => q.arc(TH, TH, 66 + i * 18, { color: [L.GOLD, L.ORANGE, L.BLUE][i], width: 7, opacity: 0.85 }));
@@ -194,11 +207,11 @@
     const lands = POW.map((p, i) => L.el('circle', { r: 5, fill: COLS[i], stroke: '#fff', 'stroke-width': 1.5, opacity: 0 }, root));
     // odometer
     const odo = L.text(root, '0', 600, 250, { size: 40, serif: true, weight: 700 });
-    L.text(root, 'turns of Q, one A and one A† each', 600, 282, { size: 12.5, fill: L.DIM, serif: true, italic: true });
+    L.text(root, 'turns of Q · one A and one A† each', 590, 282, { size: 15, fill: L.INK, serif: true, italic: true });
     const odoSub = L.text(root, '', 600, 216, { size: 14, serif: true, fill: L.DIM });
     // Independent circuits prepare the same state, apply Q repeatedly, and
     // measure the payoff. The Fourier readout's controlled register is stage 4.
-    L.text(root, 'fresh preparation for each circuit', 580, 22, { size: 13, fill: L.DIM });
+    L.text(root, 'fresh preparation for each circuit', 580, 22, { size: 16, fill: L.INK });
     const qops = POW.map((p, i) => {
       const row = L.el('g', {}, root);
       L.circuit(row, {
@@ -239,7 +252,12 @@
       odo.textContent = String(total);
       odoSub.textContent = total === 7 ? '1 + 2 + 4' : '';
     };
-    L.timeline(svg, { T: 5.0, setState });
+    if (L.beats) L.beats(svg, {
+      stops: [0, 1, 2.2, 3.3, 5],
+      labels: ['Start with the previous angle', 'Switch to θ = 10°', 'Apply Q: reach 30°', 'Apply Q²: reach 50°', 'Apply Q⁴: reach 90°'],
+      draw: setState, duration: 1100
+    });
+    else L.timeline(svg, { T: 5.0, setState });
   };
 
   // ── 10. Interference turns phase into bits ──────────────────────────

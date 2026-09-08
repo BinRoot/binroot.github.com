@@ -1,9 +1,5 @@
-<div class="l2-copy">
-  <p class="lead">Stop after H rounds. Count the Black and White stones.</p>
-  <div class="l2-cards">
-    <div class="l2-card"><h3>Black finishes ahead</h3><p>6 Black · 4 White</p><p>Outcome = 1</p></div>
-    <div class="l2-card"><h3>White finishes ahead</h3><p>4 Black · 6 White</p><p>Outcome = 0</p></div>
-    <div class="l2-card"><h3>Tie</h3><p>5 Black · 5 White</p><p>Outcome = 0</p></div>
-  </div>
-  <p>We estimate P(Black finishes ahead) for each first move, using the same policy for all later moves.</p>
+<div class="l2-fig">
+  <svg id="l2-score-fig" viewBox="0 0 900 340" width="1100" role="img" aria-label="Three final Sway boards. Count their stones, then reveal the payoff: Black ahead is 1; White ahead or a tie is 0."></svg>
 </div>
+<p class="l2-visual-note">Our objective: win probability. Winning by 1 or 10 both return 1.</p>
+<script src="../assets/l2-sway-score.js" defer></script>

@@ -45,7 +45,7 @@
     L.text(g, c.label, RX, y, { size: 18, weight: 700, fill: COL[c.label] });
     // support (step 1)
     const s1 = L.el('g', {}, supportG);
-    L.text(s1, `${c.support} friend${c.support === 1 ? '' : 's'}`, RX + 40, y - 6, { anchor: 'start', size: 13, fill: L.DIM });
+    L.text(s1, `${c.support} friend${c.support === 1 ? '' : 's'}`, RX + 40, y - 6, { anchor: 'start', size: 17, fill: L.INK });
     // estimate (step 2)
     const s2 = L.el('g', {}, estG);
     const e = estFor(c);
@@ -54,8 +54,8 @@
     L.el('line', { x1: AX0, y1: y + 18, x2: AX1, y2: y + 18, stroke: L.FAINT }, s2);
     L.el('rect', { x: vx(e.lo), y: y + 10, width: vx(e.hi) - vx(e.lo), height: 16, rx: 4, fill: COL[c.label], opacity: 0.35 }, s2);
     L.el('line', { x1: vx(e.mean), y1: y + 6, x2: vx(e.mean), y2: y + 30, stroke: COL[c.label], 'stroke-width': 3 }, s2);
-    L.text(s2, e.mean.toFixed(3), vx(e.mean), y + 42, { size: 12, mono: true, fill: COL[c.label] });
-    if (k === D.candidates.length - 1) L.text(s2, `${e.n.toLocaleString()} rollouts per move, 95% intervals`, (AX0 + AX1) / 2, y + 62, { size: 11, fill: L.DIM });
+    L.text(s2, e.mean.toFixed(3), vx(e.mean), y + 44, { size: 17, mono: true, fill: COL[c.label], weight: 600 });
+    if (k === D.candidates.length - 1) L.text(s2, `${e.n.toLocaleString()} rollouts / move · 95% intervals`, (AX0 + AX1) / 2, y + 73, { size: 15, fill: L.INK });
     return g;
   });
 })();

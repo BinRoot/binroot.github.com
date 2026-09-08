@@ -1,6 +1,7 @@
-// A small SIR illustration. This is separate from the paper's validation data.
-// S -> I depends on infected neighbors; I -> R is absorbing. Vaccination is S -> R.
-// Both candidate arms reuse the same random tape per future for a fair illustration.
+// Small illustrative instance of qcaai/qce26/qiskit/epidemic_oracle.py:
+// d8, infection threshold min(2*k, 8), recovery threshold 2 (default β=γ=1/4).
+// Later selectors range over all sites; out-of-range legal ranks are no-ops.
+// The first vaccination is fixed to A or B. Both reuse the same random tape.
 (function () {
   const svg = document.getElementById('l2-intervention-fig');
   if (!svg) return;
@@ -16,15 +17,16 @@
       const rankDraw = rnd();
       if (h > 0) {
         const eligible = board.map((v, i) => v === 0 ? i : -1).filter(i => i >= 0);
-        if (eligible.length) board[eligible[Math.floor(rankDraw * eligible.length)]] = 2;
+        const rank = Math.floor(rankDraw * N * N);
+        if (rank < eligible.length) board[eligible[rank]] = 2;
       }
       const next = board.slice();
       for (let i = 0; i < board.length; i++) {
-        const infection = rnd(), recovery = rnd();
+        const die = Math.floor(rnd() * 8);
         if (board[i] === 0) {
           const infected = nb[i].filter(j => board[j] === 1).length;
-          if (infection < 1 - Math.pow(0.75, infected)) next[i] = 1;
-        } else if (board[i] === 1 && recovery < 0.2) next[i] = 2;
+          if (die < Math.min(2 * infected, 8)) next[i] = 1;
+        } else if (board[i] === 1 && die < 2) next[i] = 2;
       }
       board = next; frames.push(board.slice());
     }
@@ -52,11 +54,12 @@
       const count = board.filter(v => v === 1).length;
       L.text(g, `${count} infected` + (step === H ? ` → outcome ${count <= 2 ? 1 : 0}` : ''), x + 105, 260, { size: 18, weight: 600 });
     });
-    [70, 265, 440].forEach((x, i) => {
-      L.el('circle', { cx: x, cy: 309, r: 6, fill: colors[i] }, g);
-      L.text(g, labels[i], x + 14, 309, { size: 13, anchor: 'start', fill: L.DIM });
+    [55, 265, 425].forEach((x, i) => {
+      L.el('circle', { cx: x, cy: 309, r: 12, fill: colors[i] }, g);
+      L.text(g, ['S', 'I', 'R'][i], x, 309, { size: 14, fill: '#fff', weight: 700 });
+      L.text(g, labels[i], x + 21, 309, { size: 18, anchor: 'start', fill: L.INK });
     });
-    document.getElementById('l2-epi-status').textContent = `Future ${run} · step ${step} of ${H}`;
+    document.getElementById('l2-epi-status').textContent = `Step ${step} / ${H}`;
     document.getElementById('l2-epi-step').disabled = step === H;
   }
   function reset() { step = 0; futures = candidates.map(c => simulate(c, 20260907 + run)); paint(); }

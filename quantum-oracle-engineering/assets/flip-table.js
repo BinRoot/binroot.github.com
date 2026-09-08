@@ -31,7 +31,7 @@
   // inset: a corner cell can have at most 2 neighbours
   const inset = L.el('g', { transform: 'translate(220,240)' }, root);
   L.board(inset, { N: 3, size: 60, x: 0, y: 0, board: [1, 1, 0, 1, 0, 0, 0, 0, 0] });
-  L.text(inset, 'corner: 2 at most', 30, 74, { size: 11, fill: L.DIM });
+  L.text(inset, 'corner: ≤ 2 friends', 30, 79, { size: 14, fill: L.INK });
 
   const setState = (t) => {
     const c = Math.min(4, Math.floor(t / 1.0));
@@ -40,13 +40,12 @@
     for (let k = 0; k < c; k++) board[around[k]] = 1;
     B.redraw(board);
     marker.setAttribute('y', 58 + c * 46 - 20);
-    rows.forEach((r, i) => r.setAttribute('opacity', i === c ? 1 : 0.5));
+    rows.forEach((r) => r.setAttribute('opacity', 1));
     // the die shows a face; shade it when it would flip
     const face = [3, 2, 1, 6, 9][c];
     die.textContent = '';
-    L.die(root, 0, 0, 0, null, {});
     const flips = face - 1 < 4 - c;
-    const d2 = L.die(die, 0, 0, 22, face, { fill: flips ? L.ORANGE : '#fff', ink: flips ? '#fff' : L.INK });
+    L.die(die, 0, 0, 22, face, { fill: flips ? L.ORANGE : '#fff', ink: flips ? '#fff' : L.INK });
   };
   L.timeline(svg, { T: 5.4, setState });
 })();

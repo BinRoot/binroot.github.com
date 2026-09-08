@@ -11,11 +11,19 @@
   .l2-map th { color: #456AAD; font-weight: 600; }
   .l2-map td:first-child { font-weight: 600; white-space: nowrap; }
   .l2-copy .l2-source { font-size: 0.68em; color: #7a7f88; max-width: none; }
-  #intervention .l2-note { max-width: 90%; width: 90%; margin: 0.65em auto 0; }
+  .slide .l2-intervention-goal { max-width: none; text-align: center; font-size: 0.85em; color: #456AAD; margin: 0 0 0.45em; }
+  .l2-controls.l2-intervention-controls { font-size: 0.72em; margin-top: 0.7em; }
   .l2-controls { display: flex; flex-wrap: wrap; gap: 0.65em; justify-content: center; align-items: center; font-size: 0.55em; }
   .l2-controls button, .l2-link { font: inherit; color: #456AAD; background: #fffdf8; border: 1px solid #456AAD; border-radius: 6px; padding: 0.45em 0.85em; cursor: pointer; }
   .l2-link { display: inline-block; margin: 0.35em 0.7em 0.35em 0; text-decoration: none; }
   .l2-controls button:focus-visible, .l2-link:focus-visible { outline: 3px solid #F2BF80; outline-offset: 3px; }
+  .l2-beat-controls { margin: 0.55em auto; font-size: 0.62em; }
+  .l2-beat-controls span { min-width: 15em; text-align: center; color: #55534e; }
+  .l2-beat-controls button:disabled { opacity: 0.5; cursor: default; }
+  .slide .l2-visual-note { width: 100%; max-width: none; text-align: center; color: #55534e; font-size: 0.65em; margin: 0.5em auto; }
+  .slide .l2-visual-source { width: 100%; max-width: none; text-align: center; font-size: 0.48em; color: #55534e; margin: 0.3em auto; }
+  @media print { .l2-beat-controls { display: none; } }
   .l2-foot { margin-top: 1em; font-size: 0.86em; color: #55534e; }
   @media (max-width: 700px) { .l2-cards { gap: 0.5em; } .l2-card { padding: 0.65em; } .l2-map th, .l2-map td { padding: 0.45em; } }
 </style>
+<script src="../assets/l2-beats.js" defer></script>
