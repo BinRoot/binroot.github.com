@@ -44,7 +44,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 ::: {.lesson data-lesson="qoe-lesson-02" style="--accent: #4D8C55"}
 ### 2. The Monte Carlo speedup
 
-<figure class="art"><img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><a href="the-monte-carlo-speedup/" tabindex="-1" aria-hidden="true"><img src="img/myth02.png" alt="Two dice tumbling across a green felt table" width="600" height="600" loading="lazy"></a></figure>
 
 - a **query count** is not a runtime
 - the payoff qubit's angle **encodes the win probability**
@@ -54,7 +54,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - **Sway**: gaps of 10⁻⁴ on a 32×32 board
 - the same oracle shape fits an **epidemic model**
 
-<button class="coming" disabled>Coming Sept 8</button>
+<div class="act"><a class="deck" href="the-monte-carlo-speedup/">View slides</a></div>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-03" style="--accent: #C35523"}
