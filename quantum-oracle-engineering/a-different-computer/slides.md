@@ -3,7 +3,7 @@ pagetitle: "Lesson 1: A different computer | Quantum Oracle Engineering"
 description: "Why most AI problems don't qualify for quantum speedups: a dice game played out by rollouts, what precision costs, the CPU/GPU/QPU stack, three screening questions to ask before building an oracle, and the wall-clock test. Lesson 1 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026."
 image: img/myth01.png
 date: 2026-08-31
-modified: 2026-09-05
+modified: 2026-09-11
 image-alt: "A robot scratching its head while holding a quantum processor chip"
 ---
 
@@ -32,6 +32,13 @@ This first lesson is about **developing the intuition for when a quantum compute
 
 Controls: click the arrows, use the arrow keys, or scroll. On mobile, tap the slide or swipe.
 -->
+
+## First to 100 {#pig .center}
+
+::: {#pig-play}
+:::
+
+<!-- Play a few turns of Pig: roll to add the die to your turn total, hold to bank it, and a 1 ends the turn with nothing. -->
 
 ## Which move should we choose? {#which-move}
 

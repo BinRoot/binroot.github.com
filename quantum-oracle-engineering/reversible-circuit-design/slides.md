@@ -1,6 +1,6 @@
 ---
 pagetitle: "Lesson 4: Reversible by design | Quantum Oracle Engineering"
-description: "Running the finished circuit backward is one line of code. The design that makes it mean something is not: the in-place update that changes the game, the counter that must unwind before the stone lands, records against scratch, and the qubit count as the board grows. Lesson 4 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026."
+description: "Design and test a reversible quantum oracle: preserve the inputs cleanup needs, return borrowed scratch to zero, distinguish semantic correctness from invertibility, and build the full amplitude-estimation iterate. Includes executable Qiskit examples."
 image: img/myth04.png
 image-alt: "A cassette tape with its ribbon spooled out in a loop behind it"
 ---
@@ -23,161 +23,177 @@ image-alt: "A cassette tape with its ribbon spooled out in a loop behind it"
 ::: {#l2-style}
 :::
 
+::: {#l4-context}
+:::
+
 <!--
-Lesson 3 built the rollout and ran it forward. Today we run it backward, and find out why that is the easy part.
+Last time we built the rollout circuit. **Today we'll run it backward and see why we kept all that extra data.**
 
-Press once for the myth: "Reversibility is just bookkeeping." **Half of it is. The wrong half.**
-
-Same controls: arrows, arrow keys, or scroll.
+**The inverse is one line of code. Getting the forward computation right takes more work.**
 -->
 
 ## One line of code {#one-line}
 
-::: {#l4-mirror}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="mirror" viewBox="0 0 760 260" width="1000"></svg></div>
+
+<div class="l4-code">
+
+```python
+A_dagger = A.inverse()
+```
+
+</div>
 
 <!--
-Here is the bookkeeping. **One call, and the whole rollout runs backward:** the gate list reversed, every gate replaced by its inverse. Qiskit does it for any unitary and never complains.
+**A.inverse() reverses the gate order and replaces each gate with its inverse.** Qiskit handles that part for us.
 
-So if backward is one line, what fills a lesson? Two forward habits that backward cannot fix.
+**It will also happily undo the wrong computation.** It has no idea what the Sway rules are, or whether we cleared our scratch at the right time.
+
+A includes preparation, the rollout, and the payoff. This assumes a unitary circuit; measurements and resets stay outside it.
 -->
 
-## Two habits left {#two-habits}
+## Three questions to answer {#two-habits}
 
-::: {#l4-checklist-three}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="objectives" viewBox="0 0 760 300" width="1000"></svg></div>
 
 <!--
-Lesson 3's checklist, three of five. Peeking and rolling as you go are dead.
+Lesson 3 made three choices: keep the old colors, clear the selector before placing a stone, put randomness in registers. Today each becomes a question about that circuit.
 
-**Overwriting and leaving notes behind are still standing.** Both fall today, and the second item, old and new apart, gets the reason Lesson 3 owed you.
+**What must the inverse still read? When can scratch return to zero? How do we check the circuit plays the right game?** The checks are small Qiskit circuits that run, on tiny boards.
 -->
 
-# Why backward {#seg-backward}
+# Keep the inputs that undo needs {#seg-keep}
 
-## Forward once, backward once {#turn-of-q}
+## Why three color registers? {#one-board}
 
-::: {#l4-turn}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="boards" viewBox="0 0 760 300" width="1000"></svg></div>
+
 
 <!--
-Why backward at all. Lesson 2's rotation, one turn: **A forward, a reflection, A backward, a reflection.**
+Same moves and dice as Lesson 3. These pictures show the board at the round boundaries. Later placements can still write to the current color register.
 
-Every turn of Q plays the rollout once forward and once in reverse. Hundreds of turns, and every one needs the reverse to be exact.
+**Two rounds use three color registers: 27 qubits.** Occupancy has its own nine qubits.
+
+**Could we save 18 qubits by changing the colors in place?** Let's try it.
 -->
 
-# Rule one: keep what the outcome does not determine {#seg-keep}
+## Predict the second stone {#find-bug}
 
-## Why three boards? {#one-board}
+<div class="l2-fig"><svg class="l4-demo" data-scene="predict" viewBox="0 0 760 300" width="1000"></svg></div>
 
-::: {#l4-one-board}
-:::
 
 <!--
-A tempting shortcut. Lesson 3 kept a fresh color board for every round: twenty-seven qubits for three boards.
+Let's use just two stones: Black at cell 0, White at cell 1. Their dice are 0 and 3. Both have zero friendly neighbors.
 
-**Why not one board, flipped in place?** Eighteen qubits back, and a shorter circuit. Let's build it.
+**A stone flips when its die is less than 4 minus its friendly neighbors.** We're numbering cells and die faces from zero; the die has faces 0–19.
+
+**Cell 0 flips to White. What should cell 1 do?** And what happens if it reads that neighbor after the flip?
+
+Give everyone about 30 seconds before advancing.
 -->
 
-## Find the bug {#find-bug}
+## Cell 1 read a flipped neighbor {#read-flipped}
 
-::: {#l4-inplace-run}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="inplace" viewBox="0 0 760 300" width="1000"></svg></div>
 
 <!--
-Same board, same dice, two circuits. Left, the shortcut: each stone flips the moment it decides. Right, Lesson 3's version.
+**Reading the old board, cell 1 should flip to Black.** White sees Black, so it has zero friends and 3 < 4.
 
-**The boards come out different.** Thirty seconds: where is the bug? Hands up for the die, the neighbor read, the flag, or nothing at all.
+**Update cell 0 first, and the same dice leave cell 1 White.** It now sees a White neighbor. One friend, so 3 < 3 is false.
+
+**Every decision needs to read the old colors.** We can run the gates one after another and still follow that rule.
 -->
 
-## Cell two read a flipped neighbor {#read-flipped}
+## Cleanup can read a changed input too {#stranded}
 
-::: {#l4-inplace-diagnose}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="stranded" viewBox="0 0 760 300" width="1000"></svg></div>
+
 
 <!--
-The neighbor read. **Cell two counted its friends after cell one had already flipped.** Later stones see a board the rules never defined.
+Here's another problem with changing the input. Start with two Black stones and a work bit at zero.
 
-Exact enumeration: the two games differ by four thousandths of win rate. Below the noise of a classical estimate, and larger than the gaps Lesson 2 set out to resolve.
+**The equality check writes 1 because the colors match.** Now flip the first stone and run the check again. The colors differ, so we XOR zero into the work bit.
+
+**Changing the input before cleanup leaves the work bit at 1.** The second comparison is answering a different question.
+
+Writing the new color somewhere else keeps the original comparison available to undo.
 -->
 
-## You already know this bug {#life}
-
-::: {#l4-life}
-:::
-
-<!--
-You have met this bug. Conway's Life, updated in place, reads cells that already changed, and the toad on the right stops being a toad.
-
-**Every cellular automaton needs two buffers.** The quantum version adds one clause: the old buffer cannot be freed.
--->
-
-## The comparison is stranded {#stranded}
-
-::: {#l4-stranded}
-:::
-
-<!--
-The second failure hides in the scratch. The bits that count friends compare each neighbor against the cell's own color.
-
-**Flip the color, then uncompute them, and they compare against a different color.** They do not return to zero. The next cell borrows dirty qubits.
--->
-
-## Occupancy updates in place, and that is fine {#occ-in-place}
+## Occupancy can update in place {#occ-in-place}
 
 ::: {#l4-occ}
 :::
 
-<!--
-Not every in-place update is a sin. Occupancy is one register for the whole rollout, and it only ever gains stones.
 
-**The move index says where, so the step can be undone.** In place is fine when a record of the change is kept.
+<!--
+Occupancy is simpler. These are the same four moves from Lesson 3: 4, 1, 3, 6. A color flip doesn't change whether a cell is occupied.
+
+**Keep the move index, and we can undo the placement.** XOR the occupancy bit at that index again. The sentinel index does nothing.
+
+**Going backward, remove the stone before clearing its move index.** Later operations have to be undone first, of course.
 -->
 
-## Two boards, one result {#merge}
+## Two inputs, one visible result {#merge}
 
 ::: {#l4-merge}
 :::
 
 <!--
-Why the move index must stay. Two boards, the same rank, the same result.
+Both boards ask for rank zero, the first empty cell. That's cell 0 on the top board and cell 1 on the bottom.
 
-**From the result alone you cannot tell which move was made**, so a circuit that forgot the index could not run backward. Two paths into one state is the shape of every irreversible step.
+**Both placements give the same visible board.** From that board alone, how would we know which input to go back to?
+
+**The saved move index keeps the two cases distinct.** A unitary needs that distinction somewhere. It doesn't mean this is the only way to store it.
 -->
 
-## Keep what the outcome does not determine {#keep-rule}
+## Records persist; scratch is borrowed {#keep-rule}
 
 ::: {#l4-records}
 :::
 
-<!--
-The rule under both bugs. **Keep what the outcome does not determine**: old colors, move indices, dice, ranks.
 
-Everything the kept data determines is scratch, and scratch must return to zero before anyone borrows it. Records against scratch. The rest of the lesson is the second column.
+<!--
+**Records stay around until the inverse has finished using them.** That's our dice, boards, move indices, and ranks.
+
+**Scratch goes back to zero before the next block borrows it.** We can clear it while the inputs that produced it are still available.
+
+The selector borrows four bits each for its prefix, equality check, and temporary index, plus one match flag.
+
+We copy the temporary index into a move record, then clear the temporary copy. This is our chosen storage layout; other designs could recompute some records.
 -->
 
-# Rule two: scratch returns to zero before it is borrowed {#seg-zero}
+# Return scratch before the next borrower {#seg-zero}
 
-## Thirteen qubits, borrowed by every block {#pool}
+## Thirteen qubits, borrowed repeatedly {#pool}
 
 ::: {#l4-pool}
 :::
 
-<!--
-Thirteen qubits of scratch, shared. **Rank-select borrows all thirteen; the event borrows eight for each cell; the payoff count borrows them too.**
 
-Every block returns them at zero. The pool is why the count is 169 and not several hundred.
+<!--
+The selector needs 13 work qubits. One event cell needs eight. The payoff needs nine.
+
+**The selector, event, and payoff can share the same 13 qubits.** The picture shows one borrower of each kind. Each dip to zero is a cleanup boundary.
+
+The rollout repeats this pattern. Even neighboring event cells take turns borrowing the pool.
+
+**The next block expects those qubits to be zero.** A circuit can still be reversible with dirty work, but the next borrower may compute the wrong result.
 -->
 
-## Place first, or unwind first? {#order-vote}
+## Place first, or clear the counter first? {#order-vote}
 
 ::: {#l4-order-ask}
 :::
 
-<!--
-Second vote. The scan fills the counter, the move register takes the index, and a stone has to land.
 
-**Unwind the counter before the stone, or after?** Left or right. Hands up.
+<!--
+Back to round 2. Seven empty cells, rank two, and we've already saved cell 3 as the move.
+
+**The scan leaves the counter at seven. Do we place the stone first, or clear the counter first?**
+
+**What will the counter hold in each case?** Take a moment before advancing.
+
+We're following just the counter here; the full selector clears its other work bits too.
 -->
 
 ## Undo must see what do saw {#undo-reads}
@@ -186,88 +202,187 @@ Second vote. The scan fills the counter, the move register takes the index, and 
 :::
 
 <!--
-After loses. The scan counted five empties; after the stone landed the unwind finds four, and the counter ends at one.
+**Place first, and the counter ends at one.** There are only six empty cells left: seven increments, six decrements.
 
-**Undo must see what do saw.** Lesson 3 unwound first without saying why. Now you know why.
+**Clear the counter first, and it returns to zero. Then place using the saved index.** All seven empties were still there for the seven decrements. Clearing undoes only the scratch; the stone is the result, and the global inverse undoes it later.
+
+**Undo has to see what do saw.** The downloadable demo runs both orders on this board with a real four-bit counter.
 -->
 
-## Dirty scratch, wrong game {#dirty-game}
+## The next borrower assumes zero {#dirty-game}
 
-::: {#l4-dirty}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="dirty" viewBox="0 0 760 300" width="1000"></svg></div>
 
 <!--
-What one leftover does. The next placement starts its count at one, picks the cell before the one it meant, and rank zero places nothing. Then two. Then three.
+Try a new rank-two query on the same board, but start the counter at one.
 
-**Exact enumeration: Black wins .439 instead of .271.** The circuit runs. Nothing raises.
+**The clean counter picks cell 3. The dirty counter picks cell 2.** Every comparison is shifted by one.
+
+**Rank zero doesn't find a match at all.** On this board the dirty counter never reaches zero or wraps around.
+
+That's one leftover bit changing the next move. We're looking at the decoder here, not estimating a whole game's win rate.
 -->
 
-## Every branch is a classical run {#every-branch}
+## Compute, copy the bit, uncompute {#payoff-cleanup}
 
-::: {#l4-branch}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="payoff" viewBox="0 0 760 300" width="1000"></svg></div>
 
 <!--
-How you catch both. **Every branch of the rollout is a classical run**: a basis state in, a basis state out.
+W counts Black, counts White, and checks whether Black has more stones.
 
-Fix a seed, run the circuit as a permutation, compare the board, and check every scratch bit is zero. Linearity carries what the seeds show to the superposition.
+```python
+circuit.compose(W, inplace=True)
+circuit.cx(win_flag, payoff)
+circuit.compose(W.inverse(), inplace=True)
+```
+
+**Compute the win flag, copy it into the payoff, then undo W.** The payoff starts at zero, so a CNOT does the copy.
+
+**All nine work bits return to zero. The board and payoff stay.** Keep the board unchanged until cleanup finishes.
+
+On a superposition, that CNOT can entangle the payoff with the board. We're copying a Boolean result, not cloning an arbitrary quantum state.
 -->
 
-# The myth {#seg-reveal}
+# Test the meaning as well as the inverse {#seg-reveal}
 
-## Backward cannot catch a forward bug {#backward-forward}
+## Three checks, three different claims {#every-branch}
 
-::: {#l4-roundtrip}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="tests" viewBox="0 0 760 300" width="1000"></svg></div>
+
 
 <!--
-The myth, settled. Run the shortcut forward and backward: every register returns to zero, as it must, because the inverse of a unitary is exact.
+**First, does the circuit agree with the classical rules?** Check the output, the inputs we promised to keep, and every scratch bit. Our tiny event has only four color inputs, so we check all four.
 
-**The round trip passes and the answer is wrong.** Reversibility is a discipline for the forward pass. The backward pass is bookkeeping.
+**Then check amplitudes, including phases.** Probabilities alone can hide a phase error. The demo also checks a superposition of those four inputs.
+
+**Finally, does forward followed by backward restore the input?**
+
+demo.py checks these little circuits, not the full 169-qubit statevector. A few sampled full rollouts wouldn't prove the whole oracle correct.
 -->
 
-# The count {#seg-count}
+## A round trip can pass the wrong game {#backward-forward}
 
-## Records and scratch, 169 {#map}
+<div class="l2-fig"><svg class="l4-demo" data-scene="roundtrip" viewBox="0 0 760 300" width="1000"></svg></div>
+
+<!--
+Start Black, White. **The in-place circuit gives White, White. The game required White, Black.** Even the scratch comes out clean on this branch.
+
+Now run its inverse. **We get the original input back perfectly.** Both the correct and wrong circuits pass that check.
+
+**A passing round trip doesn't tell us we played the right game.** We still need the comparison against the rules.
+-->
+
+# Put the complete oracle into Q {#seg-backward}
+
+## One preparation, then repeated turns {#turn-of-q}
+
+<div class="l2-fig"><svg class="l4-demo" data-scene="iterate" viewBox="0 0 760 300" width="1000"></svg></div>
+
+
+<!--
+**Prepare A once. Then each turn goes: mark the payoff, run A backward, reflect about all zero, run A forward.** Read the boxes left to right.
+
+The payoff mark is Z on the payoff qubit. The zero reflection includes every input register, including work and payoff. The usual overall minus sign only changes a global phase here.
+
+**A includes the randomness preparation, rollout, and payoff.** We need the inverse of all of it. That's the Q rotation from Lesson 2.
+-->
+
+## After the phase mark, zero is not the goal {#phase-mark}
+
+<div class="l2-fig"><svg class="l4-demo" data-scene="phase" viewBox="0 0 760 300" width="1000"></svg></div>
+
+
+<!--
+Here we use two uniform data bits. We win only when both are zero, so a = 1/4.
+
+**After marking the payoff, should A backward give us all zero again?** Pause, then advance for the answer.
+
+**Without the mark, yes. With the mark, this example gives all zero only a quarter of the time.** Here a = 1/4, so that probability is (1 − 2a)².
+
+**The phase mark changed the state we're trying to undo.** The inverse still works.
+
+Finish the turn with the zero reflection and A. The good probability goes from 1/4 to 1, just like Lesson 2.
+-->
+
+# Count the cost and review a design {#seg-count}
+
+## Records and scratch: 169 qubits {#map}
 
 ::: {#l4-map}
 :::
 
-<!--
-The 169, relabeled. Dice, boards, move indices, ranks: 155 records the inverse will read. Thirteen scratch, borrowed and returned. One payoff.
 
-**Everything but fourteen qubits is the memory of a decision.**
+<!--
+**169 qubits: 155 records, 13 scratch, one payoff.** This is the paper's 3×3, two-round layout. We haven't shown that it's the smallest possible allocation.
+
+The records are 90 dice qubits, 36 for state, 16 for move indices, and 13 for ranks. State includes occupancy and all three color registers.
+
+**Most of the storage is the history we're keeping.** Clearing scratch helps, but saving much more means finding a way to release or recompute some of those records.
 -->
 
-## Grow the board {#growth}
+## Larger boards and longer rollouts {#growth}
 
-::: {#l4-growth}
-:::
+<table class="l4-table">
+<thead><tr><th>Board · rounds</th><th>Qubits</th><th>Gates</th></tr></thead>
+<tbody>
+<tr><td>3×3 · 2</td><td>169</td><td>9,768</td></tr>
+<tr><td>5×5 · 5</td><td>916</td><td>76,720</td></tr>
+<tr class="focus"><td>10×10 · 5</td><td>3,363</td><td>481,201</td></tr>
+<tr class="focus"><td>10×10 · 10</td><td>6,503</td><td>793,901</td></tr>
+<tr><td>20×20 · 10</td><td>25,189</td><td>6,072,641</td></tr>
+</tbody>
+</table>
+
+
 
 <!--
-Grow the board and the records grow with it: cells times rounds. Scratch grows with the logarithm.
+These are counts for one forward call, from the paper's resource and scaling tables.
 
-**A full 19 by 19 game is about four hundred thousand qubits, and twenty-eight of them are scratch.** The records are the cost, and Lesson 5 asks whether any can be returned early.
+They're before native-gate decomposition and fault-tolerance overhead, so they aren't hardware timings.
+
+**Look at the two 10×10 rows. Twice as many rounds nearly doubles the qubits.** The gate count grows too, though setup and payoff work don't double.
+
+**We pay for those gates again when we run backward.** Q also needs its reflections.
+
+Back to Lesson 1: **What does each oracle call cost?**
 -->
 
-# Hand to Lesson 5 {#seg-handoff}
+## Review the order, not just the gate list {#five-of-five}
 
-## Five of five {#five-of-five}
-
-::: {#l4-checklist-five}
-:::
+<div class="l2-fig"><svg class="l4-demo" data-scene="checklist" viewBox="0 0 760 300" width="1000"></svg></div>
 
 <!--
-Five of five. Round semantics, old and new apart, scratch erased before the board changes, read-only randomness, runs backward after the payoff is marked.
+One last check. **We compute a win flag, change the board, then undo the comparison. What goes wrong?**
 
-**The last two were today's**, and the second is now justified rather than decreed.
+Give everyone about 45 seconds to suggest a fix.
+
+**Cleanup needs the original board. Copy the flag to payoff and undo the comparison before changing the board.** Or keep the old board until cleanup is done.
+
+**Calling inverse() won't fix the order for us.**
 -->
 
-## Continue to Lesson 5 {#next .bare}
+# Try it, then reduce the history {#seg-handoff}
 
-::: {#l4-qr}
-:::
+## Run the examples {#next}
+
+<div class="l4-code">
+
+```sh
+uv run demo.py
+```
+
+</div>
+
+<div class="l4-links">
+<a href="demo.py" download>Download demo.py</a><br>
+<a href="../building-a-quantum-oracle/">Lesson 3</a> · <a href="../">Course</a>
+</div>
+
 
 <!--
-Pre-reads: the playable Sway game, and Section III of the QCE26 paper for the register layout. Click the link to open Lesson 5.
+**Download demo.py and run it with uv.** It'll install Qiskit and check the examples we've just used.
+
+These are small circuits we can inspect, including the two bugs and one full turn of Q. The code doesn't simulate all 169 qubits.
+
+**Next we'll look at garbage collection: which records can we release early, and what would we have to recompute?**
 -->

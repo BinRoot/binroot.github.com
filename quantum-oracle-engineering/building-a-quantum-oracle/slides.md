@@ -1,6 +1,6 @@
 ---
 pagetitle: "Lesson 3: Ship it | Quantum Oracle Engineering"
-description: "Building a rollout oracle line by line: a board made of qubits, randomness loaded up front, picking a legal move without measuring, a d20 on five qubits, and the 169-qubit count. Lesson 3 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026."
+description: "Build a coherent Sway rollout from one worked trace: prepare a d20, decode legal moves without measuring, update colors, mark the payoff, and account for 169 qubits."
 image: img/myth03.png
 image-alt: "An open crate of machine parts sitting on an unread blueprint"
 ---
@@ -23,12 +23,15 @@ image-alt: "An open crate of machine parts sitting on an unread blueprint"
 ::: {#l2-style}
 :::
 
+::: {#l3-context}
+:::
+
 <!--
-Lesson 2 chose the problem and justified the query model. Today we build one query: a circuit that plays one Sway rollout coherently on a 3 by 3 board, two rounds, and reports one bit.
+Lesson 2 identified the sampling task. Today we build the circuit inside one coherent query.
 
-Press once for the myth: "It's just an implementation detail." **By the end you will know which detail, and why it took a new primitive.**
+**By the end, you should be able to trace a rank into a legal move, a die into a color change, and a terminal board into a payoff bit.**
 
-Same controls: arrows, arrow keys, or scroll.
+We use one worked branch throughout: an empty 3×3 board, two rounds, four placements. The circuit contains a superposition of branches; the trace lets us inspect what its gates do to one of them.
 -->
 
 ## The rollout in ten lines {#program}
@@ -37,9 +40,22 @@ Same controls: arrows, arrow keys, or scroll.
 :::
 
 <!--
-Here is the whole rollout, ten lines. **Every number in Lesson 2 came out of this function.** A board, two placements, a die per stone, a threshold, a flip, a comparison.
+The familiar classical program is our map: place Black, place White, decide all flips from the same board, and finally compare the counts.
 
-A classical programmer reads it and sees nothing hard. Today we translate it line by line into a circuit that can run backward, and we find out which lines resist.
+**We will build its dependencies first:** represent a cell, prepare randomness, decode a move, apply an event, then evaluate the result. The highlighted lines keep us oriented as we return to the program.
+-->
+
+## What does one call compute? {#contract}
+
+::: {#l3-contract}
+:::
+
+<!--
+The benchmark starts empty and randomizes all four placements uniformly over the legal cells. Each round ends with an independent die per cell. After two rounds, Black wins only when it outnumbers White; a tie is zero.
+
+**This benchmark averages over first moves. To evaluate a candidate action i from Lesson 2, supply that first move and randomize the continuation.** Do not read the benchmark's aggregate .271 as the value of a particular candidate.
+
+Inside A, prepare randomness coherently, make no measurements, and retain the records needed for A†. Temporary scratch returns to zero. One payoff bit is the output we estimate; the trajectory registers may still be entangled with it.
 -->
 
 ## Which line is the hard one? {#vote-line}
@@ -48,171 +64,65 @@ A classical programmer reads it and sees nothing hard. Today we translate it lin
 :::
 
 <!--
-Before we start, a vote: which of these four lines is the hardest to make coherent? Hands up for each.
+Which line needs the most work to turn into a coherent circuit? Hands up for each.
 
-Most rooms pick the die. **Hold your answer; slide 32 settles it.**
+Keep the answers in mind. We will return to them immediately after building the legal-move decoder.
 -->
 
-## Four rules that kill four habits {#rules}
-
-::: {#l3-rules}
-:::
-
-<!--
-The contract from Lesson 2, as four rules. Each one kills a habit a classical program has: peeking, rolling as you go, overwriting, leaving notes behind.
-
-**Today meets the first two head-on. Lesson 4 meets the other two.**
--->
-
-# Line 1: the board {#seg-board}
+# Represent the state and prepare the randomness {#seg-board}
 
 ## Two qubits per cell {#cell-qubits}
 
 ::: {#l3-cell-qubits}
 :::
 
-<!--
-A cell has three states: empty, black, white. Two qubits per cell: **one for occupied, one for color.**
-
-Nine cells, eighteen qubits per board. The color qubit means nothing while the occupancy qubit is zero, and the circuit never reads it then.
--->
-
-## A fresh board every round {#board-copies}
-
-::: {#l3-board-copies}
-:::
+<p class="l3-caption">One occupancy register; a new color register for each round.</p>
 
 <!--
-Lesson 2's simulator overwrote its board every round. This one may not.
+A cell has three states: empty, black, white. **One qubit stores occupancy and one stores color.** In these diagrams color 0 means Black and 1 means White; while empty, color is ignored.
 
-**Every round writes a fresh copy of the board.** Two rounds, three boards. Take it as today's rule; Lesson 4 shows what breaks when you skip it.
+This board is our trace after round 1. Black placed at cell 4; White placed at cell 1 and then flipped.
+
+One instantaneous board takes eighteen qubits. Across two rounds, the layout retains one occupancy register and three color registers: **9 + 3×9 = 36 state qubits.** Occupancy can update in place because move indices are retained; Lesson 4 explains that choice.
 -->
 
-## A cell knows its neighbors {#neighborhood}
-
-::: {#l3-neighborhood}
-:::
-
-<!--
-A stone's flip odds depend on its friendly orthogonal neighbors. Corners have two neighbors, edges three, the center four.
-
-So the count runs from zero to four: **a three-qubit register holds it.** Every cell will borrow that register, count, use the count, and give it back.
--->
-
-# Lines 3 and 4: pick a random empty cell {#seg-pick}
-
-## “Pick a random empty cell” {#pick}
-
-::: {#l3-program line="3,4"}
-:::
-
-<!--
-Line three. In a classical program, one call to the random number generator and one array index.
-
-**Here it is the hardest line in the function**, and the next six slides are about it.
--->
-
-## Random means a register {#selector}
-
-::: {#l3-selector m="9" w="4"}
-:::
-
-<!--
-Random means a register. The move is chosen by a rank r, held in a small register prepared in an equal superposition over the legal count.
-
-**Under a fixed horizon the legal count is known in advance:** nine, then eight, then seven, then six. Four, three, three, three qubits, uniform over the first m of their states. Remember this state; it comes back for the dice.
--->
-
-## You may not measure the board {#no-measure}
-
-::: {#l3-no-measure}
-:::
-
-<!--
-The rank says "the r-th empty cell." Which cell that is depends on the board, and the board is in superposition: in one branch the fourth empty cell is here, in another it is there.
-
-**You may not measure to find out.** The decoding has to happen inside the superposition, correct in every branch at once. That is a totalized coherent rank-select, and it is the primitive this oracle needed.
--->
-
-## Count the empties as you go {#scan}
-
-::: {#l3-scan}
-:::
-
-<!--
-The decoder is a scan. Walk the cells left to right with a counter of empties seen so far.
-
-**At a cell that is empty and whose counter equals r, write that cell's index into the move register.** The index is the move. The counter unwinds first; then one controlled gate reads the index and flips that cell's occupancy, and color for White.
--->
-
-## The equality test as gates {#eq-gates}
-
-::: {#l3-eq-gates}
-:::
-
-<!--
-The equality test, as gates. XOR the counter into a scratch register, XOR the rank on top, flip every bit: **the scratch reads all ones only where counter equals rank.**
-
-One multi-controlled X, controlled on all ones and the cell being empty, sets the mark. Then undo the XORs so the scratch is clean for the next cell.
--->
-
-## Unwind the counter {#unwind}
-
-::: {#l3-unwind}
-:::
-
-<!--
-After the scan the counter holds the number of empties. It has to go back to zero, because the next placement needs it.
-
-**Run the scan's increments backward and the counter unwinds.** Then the stone lands. Compute, use, uncompute. Lesson 5 makes that a discipline; today it is a habit.
--->
-
-## No library has this block {#no-library}
-
-::: {#l3-no-library}
-:::
-
-<!--
-Adders, comparators, Fourier transforms: standard blocks, in every library. **Select the r-th set bit of a register that is itself in superposition: no block.**
-
-The scan costs the number of cells times the counter width, per placement. Nine times four here. It is the block that had to be built.
--->
-
-# Line 6: roll a d20 {#seg-dice}
-
-## “Roll a d20” {#roll}
-
-::: {#l3-program line="6"}
-:::
-
-<!--
-Line six. Roll a d20 for every stone.
-
-The same idea as the move: **the die is a register, prepared before anything runs, read and never written.**
--->
+# Prepare a d20 before decoding a move {#seg-dice}
 
 ## Twenty faces on five qubits {#d20}
 
 ::: {#l3-selector m="20" w="5"}
 :::
 
-<!--
-Five qubits give thirty-two states. A fair d20 wants twenty. **Prepare an equal superposition over the first twenty of the thirty-two**, amplitude one over root twenty each.
+::: {.l3-code}
+~~~python
+from math import sqrt
+from qiskit import QuantumCircuit, QuantumRegister
+from qiskit.circuit.library import StatePreparation
 
-The same state preparation as the move selector, with m equal to twenty. Prepared once, it is a read-only tape.
+die = QuantumRegister(5, "die")
+qc = QuantumCircuit(die)
+amplitudes = [1 / sqrt(20)] * 20 + [0] * 12
+qc.append(StatePreparation(amplitudes), die)
+~~~
+:::
+
+<!--
+Five qubits have 32 basis states. A fair d20 needs **equal amplitude on 0 through 19 and zero on 20 through 31**. We encode the faces starting at zero, so die < 4 means four successful faces.
+
+This is an executable preparation circuit. StatePreparation is a unitary gate with an inverse. Qiskit's Initialize also resets qubits, so it is not the operation to put inside this unitary oracle.
+
+The whole A includes preparation; A† reverses it. During the rollout body the prepared die is read without being overwritten. Registers can be prepared just before their first use; placing preparation up front makes the randomness tape explicit.
 -->
 
-## Two fixes that break the game {#wrong-dice}
+## Two shortcuts change the computation {#wrong-dice}
 
 ::: {#l3-wrong-dice}
 :::
 
 <!--
-Two tempting fixes, both wrong.
+**Measuring the face and rerolling on rejection** introduces measurement inside A. That classical loop does not supply the coherent circuit we need. This does not rule out more elaborate coherent preparation methods.
 
-Reroll on a bad face: **rerolling is measuring**, and measuring is forbidden inside.
-
-Use all thirty-two faces and scale nothing: a threshold of four on thirty-two faces is one flip in eight, not one in five. **That is a different game**, and Lesson 2's numbers are gone.
+Using Hadamards on all five qubits and keeping the same threshold changes a flip probability from 4/20 to 4/32. It simulates a different transition rule. Preparing the desired distribution avoids both problems.
 -->
 
 ## Ninety qubits of dice {#dice-grid}
@@ -221,12 +131,124 @@ Use all thirty-two faces and scale nothing: a threshold of four on thirty-two fa
 :::
 
 <!--
-Every stone rolls, so every cell gets a die, every round. Nine cells, two rounds, five qubits each: **ninety qubits of dice.**
+Nine cells, two rounds, five qubits each: **ninety qubits of dice**. Empty cells have a die too; the occupied control prevents it from affecting the board.
 
-Hold that number; it is more than half the machine.
+The displayed values are the explicit tape for our worked branch. In round 1, cell 1 rolls zero and flips White to Black. In round 2, cells 4 and 6 roll one and two; we will calculate their thresholds later.
+
+The tape has independent registers for every cell and round. We do not reuse one die across several events, which would correlate those events.
 -->
 
-# Lines 7 to 9: decide, then flip {#seg-event}
+# Lines 3 and 4: decode a legal move {#seg-pick}
+
+## “Pick a random empty cell” {#pick}
+
+::: {#l3-program line="3,4"}
+:::
+
+<!--
+We can now prepare a random rank using the same state-preparation idea as the die.
+
+**A rank is not a cell index.** Rank two means the third empty cell, and its position depends on the board. The next slides build that translation.
+-->
+
+## Random means a register {#selector}
+
+::: {#l3-selector m="7" w="3"}
+:::
+
+<p class="l3-caption">Our trace: round 2, Black's rank is 2.</p>
+
+<!--
+At the start of round 2 there are seven empty cells. Prepare equal amplitude on ranks zero through six; rank seven has zero amplitude.
+
+**The legal count is known here because each placement adds exactly one stone and events only change color.** Starting empty, the four placement counts are 9, 8, 7, 6. Their rank registers need 4, 3, 3, 3 qubits.
+
+A fixed horizon alone does not make a model's legal count predictable. When the legal count varies between branches, preparation and the rollout policy need their own treatment.
+-->
+
+## Which cell does the rank select? {#no-measure}
+
+::: {#l3-no-measure}
+:::
+
+<!--
+Both branches have seven empty cells. The numbers on the boards are cell indices, starting at zero. **Before advancing, find the third empty cell in each board.**
+
+Advance once to reveal: rank two selects cell three in our trace and cell four in the other branch.
+
+The circuit must preserve both possibilities. Measuring which board we have would destroy the coherence needed by amplitude estimation. The decoder instead computes the board-dependent index within each branch.
+-->
+
+## Compare first, then increment {#scan}
+
+::: {#l3-scan}
+:::
+
+<!--
+Scan cells in index order. The prefix counter holds the number of empties **strictly before the current cell**.
+
+At each cell, first compare the prefix with the rank. If the cell is empty and they match, record its index. Only then increment the prefix if the cell is empty.
+
+Our trace selects cell three at prefix two. The counter eventually reaches seven while the move index stays three. Four counter qubits cover every possible occupancy mask on nine cells, including the empty board with nine empties.
+-->
+
+## The equality test as gates {#eq-gates}
+
+::: {#l3-eq-gates}
+:::
+
+<!--
+XOR the counter into scratch, XOR the rank on top, then flip the scratch bits. They are all one exactly when counter equals rank.
+
+An MCX controlled on those bits and occupied = 0 toggles the match flag. The open control means zero; filled controls mean one. Use the match to write the cell index, then undo the equality scratch and match flag.
+
+The picture uses two bits for legibility. **The real counter is four bits; shorter rank registers are zero-extended for comparison.**
+-->
+
+## Unwind before placing {#unwind}
+
+::: {#l3-unwind}
+:::
+
+<!--
+The counter still holds seven. Run its controlled increments backward while occupancy is unchanged, bringing it to zero.
+
+**Keep the selected move index. Clear temporary selection scratch, then decode that index to place Black at cell three.** The index remains a record of which cell changed.
+
+We have now implemented the correct ordering. Lesson 4 will deliberately reverse that ordering to show why it matters.
+-->
+
+## Every rank has a defined result {#no-library}
+
+::: {#l3-no-library}
+:::
+
+<!--
+This separate example has three empty cells. Ranks zero, one, and two select indices two, five, and six. **All larger ranks return sentinel N = 9**, which downstream placement treats as a no-op. That is what totalized means.
+
+The output index needs four bits: positions zero through eight plus the sentinel. Initialize it to nine; on the unique match, XOR nine XOR the selected index into it. With no match, nine remains.
+
+Today's preparation gives invalid ranks zero amplitude. A selector over full bitstrings would instead give the no-op branches positive probability, which is a different policy from uniform sampling among legal actions. **The decoder must have defined behavior either way.**
+-->
+
+## The decoder was the hard part {#vote-answer}
+
+::: {#l3-vote-answer}
+:::
+
+<p class="l3-caption">Sequential scan: O(Nw) gates and O(w) reusable scratch, w = ⌈log₂(N + 1)⌉.</p>
+
+<!--
+Return to the opening vote now that the decoder is concrete.
+
+The key extra work was translating a rank into an index when the validity mask itself depends on the branch. We built that block explicitly, including invalid ranks and scratch cleanup.
+
+**The paper's sequential scan costs O(Nw) gates with O(w) reusable scratch.** That is an asymptotic bound, not an exact count of nine times four elementary gates. Other layouts and the paper's blocked decoder belong in a later resource discussion.
+
+We have dealt with move selection. The remaining program lines count neighbors, decide flips, and evaluate the terminal board.
+-->
+
+# Lines 7 to 9: decide from one board, write the next {#seg-event}
 
 ## “Decide, then flip” {#decide}
 
@@ -234,9 +256,20 @@ Hold that number; it is more than half the machine.
 :::
 
 <!--
-Lines seven to nine. Count friends, compare the die, mark, and flip every marked stone together.
+Black has landed at cell three. White's rank three then selects cell six. The board now has four stones.
 
-**Every decision reads the board as it was before anyone flipped.**
+Every event decision reads this same board. **We can process cells one at a time, provided every decision reads old colors and every flip writes new colors.**
+-->
+
+## A cell knows its neighbors {#neighborhood}
+
+::: {#l3-neighborhood}
+:::
+
+<!--
+Corners have two orthogonal neighbors, edges three, and the center four. The blue markers show neighbor positions, not occupied stones.
+
+The number of friends can therefore range from zero to four. A three-qubit register is enough. Next we count the actual friends of the center stone in our trace.
 -->
 
 ## Count the friends {#same-flags}
@@ -245,100 +278,105 @@ Lines seven to nine. Count friends, compare the die, mark, and flip every marked
 :::
 
 <!--
-For each neighbor: both cells occupied and the colors equal. **One four-control pattern per neighbor sets a same-color flag.**
+Our center stone is Black. The upper and left neighbors are Black; the other two positions are empty.
 
-Count the flags into the three-qubit register. That count is c, the number of friends.
+For each neighbor, test that both cells are occupied and their colors agree. The 00 and 11 color cases each use a four-control pattern. Count the same-color flags into the three-qubit counter.
+
+**Cell four has c = 2 friends.** The die threshold is therefore 4 − 2 = 2.
 -->
 
-## Die below threshold, as gates {#compare}
+## Die below threshold, as control patterns {#compare}
 
 ::: {#l3-compare}
 :::
 
 <!--
-The die flips the stone when it reads below four minus c. **Below a threshold is a toggle for each face beneath it:** three faces for threshold three, two for two, one for one.
+The worked die is one, encoded 00001. With threshold two, faces zero and one pass.
 
-Five qubits, one flag. A comparator, built out of controlled X gates.
+These disjoint face patterns are the Boolean predicate die < 2. The next slide combines each face pattern with the required count and occupied bit into one control pattern. **We do not need to retain one comparison flag per threshold.**
 -->
 
-## One flag per possible count {#multiplex}
+## Five cases, one flip flag {#multiplex}
 
 ::: {#l3-multiplex}
 :::
 
 <!--
-The threshold depends on c, so build one comparison flag per possible count. **The flip fires when the count matches c, that flag is set, and the cell is occupied.**
+The count may be in superposition. For each possible c, combine occupied = 1, count = c, and each face below 4 − c as a joint control pattern on one flip flag.
 
-Five lanes into one flag. Four friends has no lane: threshold zero, never flips.
+These cases are mutually exclusive. The rows are logical cases, not five allocated flag qubits. Four friends has threshold zero and contributes no toggles.
+
+Our trace follows the c = 2, die = 1 case. The center stone's flip flag becomes one.
 -->
 
-## The old board decides, the new board receives {#old-new}
+## Read old colors, write new colors {#old-new}
 
 ::: {#l3-old-new}
 :::
 
 <!--
-The colors are copied into the next round's register first. **The flip flag toggles the new copy; every decision reads the old one.**
+Copy the old color bits into a fresh zeroed color register using CNOTs. This copies computational-basis labels: in superposition the registers become entangled, not independent clones of an unknown quantum state.
 
-That is why every round got a fresh board on slide 6. Lesson 4 shows the circuit that skips this step and what it gets wrong.
+Then each cell computes its flip flag from old colors, toggles its destination color, and clears its scratch. Logical simultaneity does not require storing all nine flags.
+
+**In our trace, cells four and six flip.** The final board has Black at cells one, three, and six; White at cell four.
+
+Keep one occupancy register and three nine-qubit color registers: 36 state qubits. Move records make occupancy updates reversible. Lesson 4 examines the information that has to survive.
 -->
 
-## Thirteen qubits, reused nine times {#scratch}
+## Eight qubits borrowed from the shared pool {#scratch}
 
 ::: {#l3-scratch}
 :::
 
 <!--
-Same-color flags, the count, the comparison flags, one work qubit: thirteen qubits of scratch. **Every cell fills them, uses them, and empties them again**, so the next cell can borrow the same thirteen.
+The event uses four same-color flags, a three-bit count, and one flip flag: **eight qubits**. After each cell's destination color is toggled, reverse the flag and count computations.
 
-The first pile of scratch. Small, because every block returns it.
+The whole oracle shares a thirteen-qubit pool: rank-select needs thirteen, this event needs eight, and terminal counting uses the pool too. The pool size is the peak requirement, not the sum across blocks.
+
+Only scratch returns to zero here. Dice, move indices, ranks, and retained colors are records that A† will use.
 -->
 
-## One round, three blocks {#round}
+## Assemble the two rounds {#round}
 
 ::: {#l3-round}
 :::
 
 <!--
-One round: select and place Black, select and place White, the event. **Three blocks, composed, reusable.** Two rounds is two copies.
+One round is select-and-place Black, select-and-place White, then the event.
 
-The Qiskit shape: build each block as its own circuit, compose them, turn the round into an instruction.
+The first round's ranks 4 and 1 select cells 4 and 1. The second round's ranks 2 and 3 select cells 3 and 6. Its event produces the final board shown at right.
+
+The Qiskit calls illustrate composition after the subcircuits and wire lists have been built. **Each round maps to its own rank, die, move-record, and destination-color registers.** Repeating a circuit on the same wire list would not supply fresh randomness or a fresh destination.
 -->
 
-# Line 10: return black > white {#seg-payoff}
+# Line 10: mark the terminal payoff {#seg-payoff}
 
-## “Return black > white” {#return}
-
-::: {#l3-program line="10"}
-:::
-
-<!--
-Line ten. The only line that leaves a mark: **one bit, black outnumbers white.**
--->
-
-## Two counters {#counters}
+## Count the final colors {#counters}
 
 ::: {#l3-counters}
 :::
 
 <!--
-Scan the final board once. Occupied and black increments one counter, occupied and white the other.
+The final program line returns Black > White. Scan the occupied cells, incrementing one counter for Black and the other for White.
 
-**Both counters are scratch too.** Lesson 4 gets to how they are cleaned.
+Our trace gives **Black three, White one**. The counters are temporary: use them to toggle the payoff, then run their increments backward while the final board is unchanged.
 -->
 
-## Every pair of totals, at once {#payoff-compare}
+## A comparator includes unreachable inputs {#payoff-compare}
 
 ::: {#l3-payoff-compare}
 :::
 
 <!--
-The board is in superposition, so the two totals are too: **every pair of counts is a branch of the same state.** The circuit has to flip the payoff in the winning branches and leave the others alone, in one pass.
+The comparator's truth table: forty-five blue entries where Black > White. A tie leaves the payoff at zero.
 
-Forty-five winning pairs, one multi-controlled pattern each. **At this size, the last line of the program is the costliest block in the oracle.** A tie is not a win.
+**Our rollout reaches only the outlined diagonal, the four-stone boards.** Our trace is (3, 1): payoff one.
+
+A count of Black stones and the test Black > 2 would do the same job here. We keep the general comparator so its measured counts stay comparable.
 -->
 
-# The count {#seg-count}
+# Count the circuit and check the result {#seg-count}
 
 ## How many qubits? {#vote-qubits}
 
@@ -346,9 +384,9 @@ Forty-five winning pairs, one multi-controlled pattern each. **At this size, the
 :::
 
 <!--
-Second vote, hands up.
+We already know the ninety dice qubits and thirty-six state qubits. Estimate the total after adding ranks, move records, shared scratch, and the payoff.
 
-Most rooms guess low. **Dice do not feel like qubits until you count them.**
+Ask people to explain one term in their estimate before advancing.
 -->
 
 ## Where the 169 go {#qubit-map}
@@ -357,46 +395,39 @@ Most rooms guess low. **Dice do not feel like qubits until you count them.**
 :::
 
 <!--
-More than half the machine is dice. Then the boards, the move records, and the rank registers. **Everything but thirteen qubits is a record the inverse will need.** The scratch is the thirteen, borrowed and returned by every block.
+90 dice + 36 state + 16 move records + 13 ranks + 13 scratch + 1 payoff = **169 qubits**.
 
-**The gates are mostly multi-controlled X, two to eight controls each**, counted before decomposition to a native gate set.
+The four move indices each use four bits. The rank widths are 4, 3, 3, 3. Scratch is shared across blocks; it is counted once. This is 155 record qubits, thirteen scratch, and one payoff.
+
+The QCE26 benchmark reports 9,768 gates and depth 3,079 before decomposition into a native gate set. These are implementation-specific circuit counts, not runtime or a lower bound. State preparation is part of a full call; changing a preparation or comparator requires recounting.
 -->
 
-## Shipped means tested {#tested}
+## Check the trace, then the distribution {#tested}
 
 ::: {#l3-tested}
 :::
 
 <!--
-Shipped means tested. Two checks.
+Our shared trace ends at Black three, White one, payoff one. The same explicit ranks and dice must produce that board in the classical rollout and the reversible body.
 
-**Branch by branch:** fix a seed, run the classical rollout and the circuit on the same seed, compare the final boards bit for bit. Every sampled branch agrees.
+The reported validation compares 256 sampled branches bit for bit. The Monte Carlo result uses 1,000 seeded basis-circuit runs: .281 ± .028 is a 95% interval, containing the exact enumeration result .271.
 
-**In aggregate:** the circuit's win rate, .281 plus or minus .028, against the exact .271 from enumeration. Inside the interval.
+**These are preparation-free basis emulations, not a full coherent simulation or hardware execution.** They check sampled transition and payoff behavior. Check preparation amplitudes and scratch restoration separately; matching sampled outputs alone does not establish either property.
 -->
 
 # Hand to Lesson 4 {#seg-handoff}
 
-## The hard line was the innocent one {#vote-answer}
-
-::: {#l3-vote-answer}
-:::
-
-<!--
-The vote from slide 3, answered. The die was bookkeeping, the count was routine, the comparison was expensive but standard.
-
-**Picking an empty cell was the one line with no block to buy.** The hard line was the innocent one.
--->
-
-## Everything ran forward {#forward-only}
+## It reverses. Does it simulate the right game? {#forward-only}
 
 ::: {#l3-forward}
 :::
 
 <!--
-Everything today ran forward. Amplitude estimation needs the whole thing backward, and **one wrong ordering breaks that without an error message.**
+We implemented the forward choices: old and new colors apart, selection scratch cleared before placement, and explicit randomness retained.
 
-The checklist: round semantics defined; old and new state apart; selection scratch erased before the board changes; every branch from read-only randomness; runs backward after the payoff is marked. **Three of five today.** Lesson 4 takes the other two.
+A unitary and its exact inverse return the input even if the forward computation implements the wrong transition rule. **A round-trip test alone cannot catch the wrong game.**
+
+Lesson 4 changes the ordering, compares the resulting boards, and explains why the records and cleanup boundaries we used today are needed.
 -->
 
 ## Continue to Lesson 4 {#next .bare}
@@ -405,6 +436,7 @@ The checklist: round semantics defined; old and new state apart; selection scrat
 :::
 
 <!--
-Two pre-reads again: the playable Sway game, and Section III of the QCE26 paper, which is this lesson in theorem form. Click the link to open Lesson 4.
--->
+Continue directly to Lesson 4. Its first experiment asks whether changing the forward ordering changes the game, even when inversion is exact.
 
+Section III of the QCE26 paper gives the decoder and composition statements. The course site remains available through the breadcrumb and QR code.
+-->

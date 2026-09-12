@@ -504,6 +504,80 @@ body.drawer-on #notes-drawer { display: block; }
   cursor: pointer;
 }
 #notes-close:hover { color: var(--dim); }
+/* Beside the close: the same notes in a window of their own, for a talk
+   whose slides are screen-shared (slides.js, ?presenter).  A coarse pointer
+   opens a tab rather than a window, so the phone does without it. */
+#notes-popout {
+  position: absolute;
+  top: 0.78rem;
+  right: 2.9rem;
+  padding: 0.1rem 0.55rem;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  color: var(--faint);
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  cursor: pointer;
+}
+#notes-popout:hover { color: var(--dim); border-color: var(--dim); }
+@media (orientation: landscape) and (min-width: 900px) {
+  body.drawer-on #notes-popout { top: 1.15rem; right: 3.1rem; }
+}
+@media (pointer: coarse) { #notes-popout { display: none; } }
+
+/* The presenter window: this page opened with ?presenter by the pop-out
+   above.  The notes fill the window, the slides and their chrome are gone,
+   and the timer stands in the top corner.  This block undoes whatever the
+   strip and column rules above set, so it has to come after them. */
+body.presenter #deck,
+body.presenter #deck-crumb,
+body.presenter #chapters,
+body.presenter #progress,
+body.presenter #seglabel,
+body.presenter #counter,
+body.presenter #notes-tab,
+body.presenter #grid-tab,
+body.presenter #notes-arrow,
+body.presenter #notes-close,
+body.presenter #notes-popout,
+body.presenter .arrow { display: none; }
+body.presenter #notes-drawer {
+  display: block;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  max-height: none;
+  padding: 2.4rem 2.6rem 3rem;
+  border: 0;
+  font-size: 1.2rem;
+  line-height: 1.7;
+}
+body.presenter #notes-drawer .drawer-body { max-width: 40em; }
+body.presenter #notes-drawer .drawer-next {
+  margin: 1.6em 0 0;
+  padding-top: 1em;
+  border-top: 1px solid var(--rule);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+body.presenter #notes-drawer .drawer-next b { color: var(--dim); font-weight: 600; }
+body.presenter #timer {
+  display: block;
+  z-index: 20;  /* above the drawer, which is the whole window here */
+  top: 1.15rem;
+  right: 1.6rem;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  font-size: 0.9rem;
+}
 
 /* Fixed chrome.  Built by slides.js, except the crumb below, which slides.lua
    emits so the way back survives scripting being off. */

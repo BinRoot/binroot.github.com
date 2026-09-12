@@ -7,7 +7,8 @@
   if (!svg) return;
   const L = window.L2;
   const root = L.el('g', {}, svg);
-  const N = 3, BOARD = [0, 1, 0, 0, 2, 0, 1, 0, 0];
+  const N = 3, BOARD = window.L3.rounds[0].after;
+  L.text(root, 'our trace, after round 1', 145, 27, { size: 13, weight: 700 });
   const B = L.board(root, { N, size: 210, x: 40, y: 45, board: BOARD });
   // the register grid: each cell a pair of boxes
   const GX = 380, GY = 62, CELL = 108, BW = 40, BH = 40;
@@ -27,7 +28,7 @@
   });
   const flyer = L.el('circle', { r: 10, fill: L.ORANGE, opacity: 0 }, root);
   const total = L.text(root, '', 145, 282, { size: 16, weight: 700, mono: true, opacity: 0 });
-  L.text(root, 'colour reads 0 black, 1 white, and means nothing while empty', 380 + 160, 292, { size: 11, fill: L.DIM, italic: true });
+  L.text(root, '0 black, 1 white; color is ignored while empty', 380 + 160, 292, { size: 11, fill: L.DIM, italic: true });
   const STEP = 0.32;
   L.timeline(svg, { T: STEP * 9 + 0.8, setState: (t) => {
     let n = 0;
@@ -37,6 +38,6 @@
     flyer.setAttribute('cx', L.lerp(40 + B.cx(k), GX + c * CELL + 22 + BW + 4, L.ease(f)));
     flyer.setAttribute('cy', L.lerp(45 + B.cy(k), GY + r * 74 + BH / 2, L.ease(f)) - 30 * Math.sin(Math.PI * f));
     flyer.setAttribute('opacity', t > 0.2 && t < 0.2 + 9 * STEP ? 0.8 : 0);
-    total.textContent = `${2 * n} qubits`; total.setAttribute('opacity', n > 0 ? 1 : 0);
+    total.textContent = `${2 * n} qubits per state`; total.setAttribute('opacity', n > 0 ? 1 : 0);
   } });
 })();

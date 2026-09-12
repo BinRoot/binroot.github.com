@@ -5,7 +5,8 @@
 //
 // Left, "one-off stored data": the phone book (one entry marked gold) feeds page by
 // page down a fat arrow; the box fills with the million loaded records and
-// the counter reads "1,000,000 records loaded".  Then a stop sign slams at
+// the counter reads "1,000,000 records written into gates", since a QPU has
+// no memory to page into and data enters only as gates.  Then a stop sign slams at
 // its door and a grey line appears: a classical scan reads 1,000,000 too.
 // The loading alone already spent the entire classical budget, so that
 // loading has already consumed the scale of a classical scan.
@@ -152,7 +153,7 @@
     'middle', 700);
   loadCount.setAttribute('font-family',
     "'Ubuntu Mono', ui-monospace, Menlo, monospace");
-  text('records loaded', LBOX.x + LBOX.w / 2, 224, 13, DIM, 'middle', 600);
+  text('records written into gates', LBOX.x + LBOX.w / 2, 224, 13, DIM, 'middle', 600);
 
   // The baseline that makes the dead end legible: a classical scan reads the
   // same million.  Loading alone spent the whole classical budget.

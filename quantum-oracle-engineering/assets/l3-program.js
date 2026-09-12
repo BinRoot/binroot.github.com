@@ -4,7 +4,7 @@
 // numbers blue, the two random ingredients orange (a random cell, a d20),
 // the two players in ink.  The same card appears on the opening slide with
 // nothing lit and at the head of each translation segment with that
-// segment's lines on a gold bar and a "today" bracket; unlit lines dim.
+// segment's lines on a gold bar and a "now" bracket; unlit lines dim.
 (function () {
   if (window.__l3ProgramInit) return;
   window.__l3ProgramInit = true;
@@ -51,7 +51,7 @@
       const first = Math.min(...lit), last = Math.max(...lit);
       const y0 = Y0 + (first - 1) * DY, y1 = Y0 + (last - 1) * DY;
       L.el('path', { d: `M ${CX + CWID + 12} ${y0 - 12} h 10 V ${y1 + 12} h -10`, fill: 'none', stroke: L.ORANGE, 'stroke-width': 2 }, root);
-      L.text(root, 'today', CX + CWID + 32, (y0 + y1) / 2, { anchor: 'start', size: 13, weight: 700, fill: L.ORANGE });
+      L.text(root, 'now', CX + CWID + 32, (y0 + y1) / 2, { anchor: 'start', size: 13, weight: 700, fill: L.ORANGE });
     }
   });
 })();

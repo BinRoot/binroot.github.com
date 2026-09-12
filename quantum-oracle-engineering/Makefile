@@ -62,7 +62,12 @@ index.html: index.md header.html signup.js spotlight.js
 sway-data:
 	node gen/sway-gen.mjs > assets/sway-data.js
 
+# Small executable circuits behind Lesson 4's diagrams. Separate from the
+# offline HTML build; uv installs the script's pinned dependency.
+l4-evidence:
+	uv run reversible-circuit-design/demo.py --javascript > assets/l4-evidence.js
+
 clean:
 	rm -f $(PAGES) header.gen.html $(EQ_SVG)
 
-.PHONY: all clean sway-data
+.PHONY: all clean sway-data l4-evidence

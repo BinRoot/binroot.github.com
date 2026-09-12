@@ -13,10 +13,10 @@
     answer: ['roll a d20', 'pick a random empty cell', 'count the friendly neighbors', 'black > white']
   };
   const VERDICT = [
-    ['bookkeeping', '90 qubits, cheap gates', L.DIM],
-    ['the hard one', 'no block to buy: a new primitive', L.GREEN],
+    ['state preparation', 'reuse it for dice and ranks', L.DIM],
+    ['the decoder we built', 'board-dependent index; clean scratch', L.GREEN],
     ['routine', 'flags and a counter', L.DIM],
-    ['expensive, but off the shelf', 'the costliest block at this size', L.ORANGE]
+    ['terminal predicate', 'next: count colors and compare', L.ORANGE]
   ];
   document.querySelectorAll('svg.l3-vote').forEach((svg) => {
     const mode = svg.dataset.mode || 'line';

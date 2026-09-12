@@ -23,7 +23,7 @@
     const cells = [];
     for (let r = 0; r < 10; r++) for (let c = 0; c < 25; c++) cells.push(L.el('rect', { x: 440 + c * 10, y: 60 + r * 10, width: 8, height: 8, rx: 1.5, fill: '#eee' }, wall));
     const tallyR = L.text(root, '', 560, 190, { size: 14, weight: 700, mono: true, opacity: 0 });
-    const okR = L.text(root, 'the gap is the result', 560, 216, { size: 14, weight: 700, fill: L.ORANGE, opacity: 0 });
+    const okR = L.text(root, 'the gap begins to matter', 560, 216, { size: 14, weight: 700, fill: L.ORANGE, opacity: 0 });
     L.text(root, 'ranking two strategies, tuning a player, a tournament', 560, 240, { size: 12, fill: L.DIM });
     const rnd = L.prng(11);
     const winsA = cells.map(() => rnd() < 0.505);

@@ -7,9 +7,9 @@
   const L = window.L2;
   const root = L.el('g', {}, svg);
   const N = 3, X = 60, Y = 45, SIZE = 210;
-  const BOARD = [0, 1, 0, 0, 1, 2, 0, 1, 0];        // centre black; up black, right white, down black, left empty
+  const BOARD = window.L3.event.before;
   const B = L.board(root, { N, size: SIZE, x: X, y: Y, board: BOARD });
-  const nb = L.sway.neighbors(N)[4];
+  const nb = window.L3.neighbors[window.L3.focus];
   const ring = L.el('circle', { cx: X + B.cx(4), cy: Y + B.cy(4), r: B.r + 4, fill: 'none', stroke: L.ORANGE, 'stroke-width': 3 }, root);
   const probe = L.el('circle', { r: B.r + 4, fill: 'none', stroke: L.BLUE, 'stroke-width': 2.5, 'stroke-dasharray': '5 3', opacity: 0 }, root);
   const RX = 420;
@@ -23,7 +23,7 @@
   const bits = [0, 1, 2].map((k) => { L.el('rect', { x: RX + 30 + k * 50, y: 170, width: 40, height: 40, rx: 6, fill: '#fff', stroke: L.INK, 'stroke-width': 1.5 }, root);
     return L.text(root, '0', RX + 30 + k * 50 + 20, 190, { size: 18, mono: true, weight: 700 }); });
   const cap = L.text(root, '', RX + 100, 250, { size: 14, weight: 700, opacity: 0 });
-  const rule = L.text(root, 'both occupied, colours equal', RX + 100, 276, { size: 12, fill: L.DIM, italic: true });
+  const rule = L.text(root, 'round 2, cell 4: both occupied, colors equal', RX + 100, 276, { size: 12, fill: L.DIM, italic: true });
   const STEP = 0.9;
   L.timeline(svg, { T: STEP * 4 + 1.2, setState: (t) => {
     const k = Math.min(3, Math.floor(t / STEP));

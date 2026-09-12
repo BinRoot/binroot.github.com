@@ -20,17 +20,81 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="canonical" href="https://shukla.io/quantum-oracle-engineering/building-a-quantum-oracle/">
-  <meta name="description" content="Building a rollout oracle line by line: a board made of qubits, randomness loaded up front, picking a legal move without measuring, a d20 on five qubits, and the 169-qubit count. Lesson 3 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta name="description" content="Build a coherent Sway rollout from one worked trace: prepare a d20, decode legal moves without measuring, update colors, mark the payoff, and account for 169 qubits.">
   <meta name="author" content="Nishant Shukla">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Nishant Shukla">
   <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/building-a-quantum-oracle/">
   <meta property="og:title" content="Lesson 3: Ship it">
   <meta name="twitter:title" content="Lesson 3: Ship it">
-  <meta property="og:description" content="Building a rollout oracle line by line: a board made of qubits, randomness loaded up front, picking a legal move without measuring, a d20 on five qubits, and the 169-qubit count. Lesson 3 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
-  <meta name="twitter:description" content="Building a rollout oracle line by line: a board made of qubits, randomness loaded up front, picking a legal move without measuring, a d20 on five qubits, and the 169-qubit count. Lesson 3 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta property="og:description" content="Build a coherent Sway rollout from one worked trace: prepare a d20, decode legal moves without measuring, update colors, mark the payoff, and account for 169 qubits.">
+  <meta name="twitter:description" content="Build a coherent Sway rollout from one worked trace: prepare a d20, decode legal moves without measuring, update colors, mark the payoff, and account for 169 qubits.">
   <meta name="twitter:card" content="summary">
   <meta property="og:image" content="https://shukla.io/quantum-oracle-engineering/img/myth03.png">
   <meta property="og:image:width" content="600">
@@ -38,11 +102,11 @@
   <meta name="twitter:image" content="https://shukla.io/quantum-oracle-engineering/img/myth03.png">
   <meta name="twitter:image:alt" content="An open crate of machine parts sitting on an unread blueprint">
   <meta property="og:image:alt" content="An open crate of machine parts sitting on an unread blueprint">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 3: Ship it","description":"Building a rollout oracle line by line: a board made of qubits, randomness loaded up front, picking a legal move without measuring, a d20 on five qubits, and the 169-qubit count. Lesson 3 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.","image":"https://shukla.io/quantum-oracle-engineering/img/myth03.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/building-a-quantum-oracle/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 3: Ship it","description":"Build a coherent Sway rollout from one worked trace: prepare a d20, decode legal moves without measuring, update colors, mark the payoff, and account for 169 qubits.","image":"https://shukla.io/quantum-oracle-engineering/img/myth03.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/building-a-quantum-oracle/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quantum Oracle Engineering","item":"https://shukla.io/quantum-oracle-engineering/"},{"@type":"ListItem","position":2,"name":"Lesson 3: Ship it","item":"https://shukla.io/quantum-oracle-engineering/building-a-quantum-oracle/"}]}</script>
   <script>window.MathJax={options:{enableMenu:false}};</script>
-  <link rel="stylesheet" href="../slides.css?v=1413355062">
-  <script src="../slides.js?v=1413355062" defer></script>
+  <link rel="stylesheet" href="../slides.css?v=2538285854">
+  <script src="../slides.js?v=2538285854" defer></script>
   <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
 </head>
 <body>
@@ -145,12 +209,32 @@
   }
 </style>
 <script src="../assets/sway-data.js?v=2283849795-2321" defer></script>
-<script src="../assets/l2.js?v=3738266183-29337" defer></script>
+<script src="../assets/l2.js?v=3814641028-30292" defer></script>
+
+<script src="../assets/l3-data.js?v=2295731919-1392" defer></script>
+<script>
+// Preserve bookmarks to material merged into another slide.
+(function () {
+  const aliases = { rules: 'contract', roll: 'd20', 'board-copies': 'old-new', return: 'counters' };
+  const redirect = () => {
+    const target = aliases[location.hash.slice(1)];
+    if (target) location.replace('#' + target);
+  };
+  window.addEventListener('hashchange', redirect);
+  redirect();
+})();
+</script>
+<style>
+  .l3-code { max-width: 44em; margin: .5em auto; font-size: .72em; text-align: left; }
+  .slide .l3-code pre { background: #fffdf8; border: 1px solid #dedbd2; border-radius: 8px; padding: .6em .8em; font-size: 1em; }
+  .slide .l3-code code { white-space: pre-wrap; font-size: 1em; }
+  .l3-caption { text-align: center; font-size: .52em; color: #55534e; margin: .4em auto; max-width: 50em; }
+</style>
 
 <div class="notes">
-<p>Lesson 2 chose the problem and justified the query model. Today we build one query: a circuit that plays one Sway rollout coherently on a 3 by 3 board, two rounds, and reports one bit.</p>
-<p>Press once for the myth: “It’s just an implementation detail.” <strong>By the end you will know which detail, and why it took a new primitive.</strong></p>
-<p>Same controls: arrows, arrow keys, or scroll.</p>
+<p>Lesson 2 identified the sampling task. Today we build the circuit inside one coherent query.</p>
+<p><strong>By the end, you should be able to trace a rank into a legal move, a die into a color change, and a terminal board into a payoff bit.</strong></p>
+<p>We use one worked branch throughout: an empty 3×3 board, two rounds, four placements. The circuit contains a superposition of branches; the trace lets us inspect what its gates do to one of them.</p>
 </div>
 </section>
 <section id="program" class="slide" data-segment="Open the crate" data-segment-id="seg-open">
@@ -165,11 +249,22 @@
 <div class="l2-fig">
 <svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-program.js?v=2056871383-3802" defer></script>
+<script src="../assets/l3-program.js?v=2990592238-3798" defer></script>
 
 <div class="notes">
-<p>Here is the whole rollout, ten lines. <strong>Every number in Lesson 2 came out of this function.</strong> A board, two placements, a die per stone, a threshold, a flip, a comparison.</p>
-<p>A classical programmer reads it and sees nothing hard. Today we translate it line by line into a circuit that can run backward, and we find out which lines resist.</p>
+<p>The familiar classical program is our map: place Black, place White, decide all flips from the same board, and finally compare the counts.</p>
+<p><strong>We will build its dependencies first:</strong> represent a cell, prepare randomness, decode a move, apply an event, then evaluate the result. The highlighted lines keep us oriented as we return to the program.</p>
+</div>
+</section>
+<section id="contract" class="slide" data-segment="Open the crate" data-segment-id="seg-open">
+<h1>What does one call compute?</h1>
+<div class="l2-fig"><svg id="l3-contract-fig" viewBox="0 0 760 300" width="980"></svg></div>
+<script src="../assets/l3-contract.js?v=3928092327-1267" defer></script>
+
+<div class="notes">
+<p>The benchmark starts empty and randomizes all four placements uniformly over the legal cells. Each round ends with an independent die per cell. After two rounds, Black wins only when it outnumbers White; a tie is zero.</p>
+<p><strong>This benchmark averages over first moves. To evaluate a candidate action i from Lesson 2, supply that first move and randomize the continuation.</strong> Do not read the benchmark’s aggregate .271 as the value of a particular candidate.</p>
+<p>Inside A, prepare randomness coherently, make no measurements, and retain the records needed for A†. Temporary scratch returns to zero. One payoff bit is the output we estimate; the trajectory registers may still be entangled with it.</p>
 </div>
 </section>
 <section id="vote-line" class="slide" data-segment="Open the crate" data-segment-id="seg-open">
@@ -178,66 +273,87 @@
 <div class="l2-fig">
 <svg class="l3-vote" data-mode="line" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-vote.js?v=340966730-2318" defer></script>
+<script src="../assets/l3-vote.js?v=2277590639-2329" defer></script>
 
 <div class="notes">
-<p>Before we start, a vote: which of these four lines is the hardest to make coherent? Hands up for each.</p>
-<p>Most rooms pick the die. <strong>Hold your answer; slide 32 settles it.</strong></p>
+<p>Which line needs the most work to turn into a coherent circuit? Hands up for each.</p>
+<p>Keep the answers in mind. We will return to them immediately after building the legal-move decoder.</p>
 </div>
 </section>
-<section id="rules" class="slide" data-segment="Open the crate" data-segment-id="seg-open">
-<h1>Four rules that kill four habits</h1>
-<!-- Lesson 3, slide 4: four rules that kill four habits.  See assets/l3-rules.js. -->
-<div class="l2-fig">
-<svg id="l3-rules-fig" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-rules.js?v=2144367484-2922" defer></script>
-
-<div class="notes">
-<p>The contract from Lesson 2, as four rules. Each one kills a habit a classical program has: peeking, rolling as you go, overwriting, leaving notes behind.</p>
-<p><strong>Today meets the first two head-on. Lesson 4 meets the other two.</strong></p>
-</div>
-</section>
-<section id="cell-qubits" class="slide" data-segment="Line 1: the board" data-segment-id="seg-board">
+<section id="cell-qubits" class="slide" data-segment="Represent the state and prepare the randomness" data-segment-id="seg-board">
 <h1>Two qubits per cell</h1>
 <!-- Lesson 3, slide 5: two qubits per cell.  See assets/l3-cell-qubits.js. -->
 <div class="l2-fig">
 <svg id="l3-cell-qubits-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-cell-qubits.js?v=891191261-2922" defer></script>
+<script src="../assets/l3-cell-qubits.js?v=2471689301-2996" defer></script>
 
+<p class="l3-caption">
+One occupancy register; a new color register for each round.
+</p>
 <div class="notes">
-<p>A cell has three states: empty, black, white. Two qubits per cell: <strong>one for occupied, one for color.</strong></p>
-<p>Nine cells, eighteen qubits per board. The color qubit means nothing while the occupancy qubit is zero, and the circuit never reads it then.</p>
+<p>A cell has three states: empty, black, white. <strong>One qubit stores occupancy and one stores color.</strong> In these diagrams color 0 means Black and 1 means White; while empty, color is ignored.</p>
+<p>This board is our trace after round 1. Black placed at cell 4; White placed at cell 1 and then flipped.</p>
+<p>One instantaneous board takes eighteen qubits. Across two rounds, the layout retains one occupancy register and three color registers: <strong>9 + 3×9 = 36 state qubits.</strong> Occupancy can update in place because move indices are retained; Lesson 4 explains that choice.</p>
 </div>
 </section>
-<section id="board-copies" class="slide" data-segment="Line 1: the board" data-segment-id="seg-board">
-<h1>A fresh board every round</h1>
-<!-- Lesson 3, slide 6: a fresh board every round.  See assets/l3-board-copies.js. -->
+<section id="d20" class="slide" data-segment="Prepare a d20 before decoding a move" data-segment-id="seg-dice">
+<h1>Twenty faces on five qubits</h1>
+<script>window.l3_selector_strings = {"m":"20","w":"5"};</script>
+<!-- Lesson 3, slides 9 and 16: an equal superposition over the first m of 2^w
+     states.  The div attributes m and w arrive as window.l3_selector_strings;
+     the inline script queues them and the deferred renderer hands them to
+     the svgs in document order.  See assets/l3-selector.js. -->
+<script>(window.__l3SelectorQueue=window.__l3SelectorQueue||[]).push(window.l3_selector_strings||{m:'9',w:'4'});</script>
 <div class="l2-fig">
-<svg id="l3-board-copies-fig" viewBox="0 0 760 300" width="980"></svg>
+<svg class="l3-selector" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-board-copies.js?v=220592930-2194" defer></script>
+<script src="../assets/l3-selector.js?v=2896746640-3944" defer></script>
 
+<div class="l3-code">
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qiskit <span class="im">import</span> QuantumCircuit, QuantumRegister</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> qiskit.circuit.library <span class="im">import</span> StatePreparation</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>die <span class="op">=</span> QuantumRegister(<span class="dv">5</span>, <span class="st">&quot;die&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>qc <span class="op">=</span> QuantumCircuit(die)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>amplitudes <span class="op">=</span> [<span class="dv">1</span> <span class="op">/</span> sqrt(<span class="dv">20</span>)] <span class="op">*</span> <span class="dv">20</span> <span class="op">+</span> [<span class="dv">0</span>] <span class="op">*</span> <span class="dv">12</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>qc.append(StatePreparation(amplitudes), die)</span></code></pre></div>
+</div>
 <div class="notes">
-<p>Lesson 2’s simulator overwrote its board every round. This one may not.</p>
-<p><strong>Every round writes a fresh copy of the board.</strong> Two rounds, three boards. Take it as today’s rule; Lesson 4 shows what breaks when you skip it.</p>
+<p>Five qubits have 32 basis states. A fair d20 needs <strong>equal amplitude on 0 through 19 and zero on 20 through 31</strong>. We encode the faces starting at zero, so die &lt; 4 means four successful faces.</p>
+<p>This is an executable preparation circuit. StatePreparation is a unitary gate with an inverse. Qiskit’s Initialize also resets qubits, so it is not the operation to put inside this unitary oracle.</p>
+<p>The whole A includes preparation; A† reverses it. During the rollout body the prepared die is read without being overwritten. Registers can be prepared just before their first use; placing preparation up front makes the randomness tape explicit.</p>
 </div>
 </section>
-<section id="neighborhood" class="slide" data-segment="Line 1: the board" data-segment-id="seg-board">
-<h1>A cell knows its neighbors</h1>
-<!-- Lesson 3, slide 7: a cell knows its neighbours; the count fits in three qubits.  See assets/l3-neighborhood.js. -->
+<section id="wrong-dice" class="slide" data-segment="Prepare a d20 before decoding a move" data-segment-id="seg-dice">
+<h1>Two shortcuts change the computation</h1>
+<!-- Lesson 3, slide 17: two fixes that break the game.  See assets/l3-wrong-dice.js. -->
 <div class="l2-fig">
-<svg id="l3-neighborhood-fig" viewBox="0 0 760 300" width="980"></svg>
+<svg id="l3-wrong-dice-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-neighborhood.js?v=775873265-2470" defer></script>
+<script src="../assets/l3-wrong-dice.js?v=2828978561-2478" defer></script>
 
 <div class="notes">
-<p>A stone’s flip odds depend on its friendly orthogonal neighbors. Corners have two neighbors, edges three, the center four.</p>
-<p>So the count runs from zero to four: <strong>a three-qubit register holds it.</strong> Every cell will borrow that register, count, use the count, and give it back.</p>
+<p><strong>Measuring the face and rerolling on rejection</strong> introduces measurement inside A. That classical loop does not supply the coherent circuit we need. This does not rule out more elaborate coherent preparation methods.</p>
+<p>Using Hadamards on all five qubits and keeping the same threshold changes a flip probability from 4/20 to 4/32. It simulates a different transition rule. Preparing the desired distribution avoids both problems.</p>
 </div>
 </section>
-<section id="pick" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
+<section id="dice-grid" class="slide" data-segment="Prepare a d20 before decoding a move" data-segment-id="seg-dice">
+<h1>Ninety qubits of dice</h1>
+<!-- Lesson 3, slide 18: ninety qubits of dice.  See assets/l3-dice-grid.js. -->
+<div class="l2-fig">
+<svg id="l3-dice-grid-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/l3-dice-grid.js?v=3256400680-1574" defer></script>
+
+<div class="notes">
+<p>Nine cells, two rounds, five qubits each: <strong>ninety qubits of dice</strong>. Empty cells have a die too; the occupied control prevents it from affecting the board.</p>
+<p>The displayed values are the explicit tape for our worked branch. In round 1, cell 1 rolls zero and flips White to Black. In round 2, cells 4 and 6 roll one and two; we will calculate their thresholds later.</p>
+<p>The tape has independent registers for every cell and round. We do not reuse one die across several events, which would correlate those events.</p>
+</div>
+</section>
+<section id="pick" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
 <h1>“Pick a random empty cell”</h1>
 <script>window.l3_program_strings = {"line":"3,4"};</script>
 <!-- Lesson 3, several slides: the rollout in ten lines, with the current
@@ -249,16 +365,16 @@
 <div class="l2-fig">
 <svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-program.js?v=2056871383-3802" defer></script>
+<script src="../assets/l3-program.js?v=2990592238-3798" defer></script>
 
 <div class="notes">
-<p>Line three. In a classical program, one call to the random number generator and one array index.</p>
-<p><strong>Here it is the hardest line in the function</strong>, and the next six slides are about it.</p>
+<p>We can now prepare a random rank using the same state-preparation idea as the die.</p>
+<p><strong>A rank is not a cell index.</strong> Rank two means the third empty cell, and its position depends on the board. The next slides build that translation.</p>
 </div>
 </section>
-<section id="selector" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
+<section id="selector" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
 <h1>Random means a register</h1>
-<script>window.l3_selector_strings = {"m":"9","w":"4"};</script>
+<script>window.l3_selector_strings = {"m":"7","w":"3"};</script>
 <!-- Lesson 3, slides 9 and 16: an equal superposition over the first m of 2^w
      states.  The div attributes m and w arrive as window.l3_selector_strings;
      the inline script queues them and the deferred renderer hands them to
@@ -267,143 +383,106 @@
 <div class="l2-fig">
 <svg class="l3-selector" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-selector.js?v=1116518225-2798" defer></script>
+<script src="../assets/l3-selector.js?v=2896746640-3944" defer></script>
 
+<p class="l3-caption">
+Our trace: round 2, Black’s rank is 2.
+</p>
 <div class="notes">
-<p>Random means a register. The move is chosen by a rank r, held in a small register prepared in an equal superposition over the legal count.</p>
-<p><strong>Under a fixed horizon the legal count is known in advance:</strong> nine, then eight, then seven, then six. Four, three, three, three qubits, uniform over the first m of their states. Remember this state; it comes back for the dice.</p>
+<p>At the start of round 2 there are seven empty cells. Prepare equal amplitude on ranks zero through six; rank seven has zero amplitude.</p>
+<p><strong>The legal count is known here because each placement adds exactly one stone and events only change color.</strong> Starting empty, the four placement counts are 9, 8, 7, 6. Their rank registers need 4, 3, 3, 3 qubits.</p>
+<p>A fixed horizon alone does not make a model’s legal count predictable. When the legal count varies between branches, preparation and the rollout policy need their own treatment.</p>
 </div>
 </section>
-<section id="no-measure" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
-<h1>You may not measure the board</h1>
-<!-- Lesson 3, slide 10: the r-th empty cell is a different cell in every branch.  See assets/l3-no-measure.js. -->
+<section id="no-measure" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
+<h1>Which cell does the rank select?</h1>
+<!-- Lesson 3: predict the cell selected by the same rank in two branches. -->
 <div class="l2-fig">
 <svg id="l3-no-measure-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-no-measure.js?v=923774566-2567" defer></script>
+<script src="../assets/l3-no-measure.js?v=2788664846-1637" defer></script>
 
 <div class="notes">
-<p>The rank says “the r-th empty cell.” Which cell that is depends on the board, and the board is in superposition: in one branch the fourth empty cell is here, in another it is there.</p>
-<p><strong>You may not measure to find out.</strong> The decoding has to happen inside the superposition, correct in every branch at once. That is a totalized coherent rank-select, and it is the primitive this oracle needed.</p>
+<p>Both branches have seven empty cells. The numbers on the boards are cell indices, starting at zero. <strong>Before advancing, find the third empty cell in each board.</strong></p>
+<p>Advance once to reveal: rank two selects cell three in our trace and cell four in the other branch.</p>
+<p>The circuit must preserve both possibilities. Measuring which board we have would destroy the coherence needed by amplitude estimation. The decoder instead computes the board-dependent index within each branch.</p>
 </div>
 </section>
-<section id="scan" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
-<h1>Count the empties as you go</h1>
+<section id="scan" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
+<h1>Compare first, then increment</h1>
 <!-- Lesson 3, slide 11: count the empties as you go.  See assets/l3-scan.js. -->
 <div class="l2-fig">
 <svg class="l3-scan" data-mode="scan" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-scan.js?v=558582383-4157" defer></script>
+<script src="../assets/l3-scan.js?v=601650543-3879" defer></script>
 
 <div class="notes">
-<p>The decoder is a scan. Walk the cells left to right with a counter of empties seen so far.</p>
-<p><strong>At a cell that is empty and whose counter equals r, write that cell’s index into the move register.</strong> The index is the move. The counter unwinds first; then one controlled gate reads the index and flips that cell’s occupancy, and color for White.</p>
+<p>Scan cells in index order. The prefix counter holds the number of empties <strong>strictly before the current cell</strong>.</p>
+<p>At each cell, first compare the prefix with the rank. If the cell is empty and they match, record its index. Only then increment the prefix if the cell is empty.</p>
+<p>Our trace selects cell three at prefix two. The counter eventually reaches seven while the move index stays three. Four counter qubits cover every possible occupancy mask on nine cells, including the empty board with nine empties.</p>
 </div>
 </section>
-<section id="eq-gates" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
+<section id="eq-gates" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
 <h1>The equality test as gates</h1>
 <!-- Lesson 3, slide 12: the equality test as gates, on a two-bit counter for legibility.  See assets/l3-eq-gates.js. -->
 <div class="l2-fig">
 <svg id="l3-eq-gates-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-eq-gates.js?v=2454534333-3259" defer></script>
+<script src="../assets/l3-eq-gates.js?v=2753905723-3358" defer></script>
 
 <div class="notes">
-<p>The equality test, as gates. XOR the counter into a scratch register, XOR the rank on top, flip every bit: <strong>the scratch reads all ones only where counter equals rank.</strong></p>
-<p>One multi-controlled X, controlled on all ones and the cell being empty, sets the mark. Then undo the XORs so the scratch is clean for the next cell.</p>
+<p>XOR the counter into scratch, XOR the rank on top, then flip the scratch bits. They are all one exactly when counter equals rank.</p>
+<p>An MCX controlled on those bits and occupied = 0 toggles the match flag. The open control means zero; filled controls mean one. Use the match to write the cell index, then undo the equality scratch and match flag.</p>
+<p>The picture uses two bits for legibility. <strong>The real counter is four bits; shorter rank registers are zero-extended for comparison.</strong></p>
 </div>
 </section>
-<section id="unwind" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
-<h1>Unwind the counter</h1>
+<section id="unwind" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
+<h1>Unwind before placing</h1>
 <!-- Lesson 3, slide 13: unwind the counter.  See assets/l3-scan.js. -->
 <div class="l2-fig">
 <svg class="l3-scan" data-mode="unwind" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-scan.js?v=558582383-4157" defer></script>
+<script src="../assets/l3-scan.js?v=601650543-3879" defer></script>
 
 <div class="notes">
-<p>After the scan the counter holds the number of empties. It has to go back to zero, because the next placement needs it.</p>
-<p><strong>Run the scan’s increments backward and the counter unwinds.</strong> Then the stone lands. Compute, use, uncompute. Lesson 5 makes that a discipline; today it is a habit.</p>
+<p>The counter still holds seven. Run its controlled increments backward while occupancy is unchanged, bringing it to zero.</p>
+<p><strong>Keep the selected move index. Clear temporary selection scratch, then decode that index to place Black at cell three.</strong> The index remains a record of which cell changed.</p>
+<p>We have now implemented the correct ordering. Lesson 4 will deliberately reverse that ordering to show why it matters.</p>
 </div>
 </section>
-<section id="no-library" class="slide" data-segment="Lines 3 and 4: pick a random empty cell" data-segment-id="seg-pick">
-<h1>No library has this block</h1>
-<!-- Lesson 3, slide 14: no library has this block.  See assets/l3-no-library.js. -->
+<section id="no-library" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
+<h1>Every rank has a defined result</h1>
+<!-- Lesson 3: totalized rank-select, including the sentinel no-op case. -->
 <div class="l2-fig">
 <svg id="l3-no-library-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-no-library.js?v=2865282203-2372" defer></script>
+<script src="../assets/l3-no-library.js?v=3598506619-940" defer></script>
 
 <div class="notes">
-<p>Adders, comparators, Fourier transforms: standard blocks, in every library. <strong>Select the r-th set bit of a register that is itself in superposition: no block.</strong></p>
-<p>The scan costs the number of cells times the counter width, per placement. Nine times four here. It is the block that had to be built.</p>
+<p>This separate example has three empty cells. Ranks zero, one, and two select indices two, five, and six. <strong>All larger ranks return sentinel N = 9</strong>, which downstream placement treats as a no-op. That is what totalized means.</p>
+<p>The output index needs four bits: positions zero through eight plus the sentinel. Initialize it to nine; on the unique match, XOR nine XOR the selected index into it. With no match, nine remains.</p>
+<p>Today’s preparation gives invalid ranks zero amplitude. A selector over full bitstrings would instead give the no-op branches positive probability, which is a different policy from uniform sampling among legal actions. <strong>The decoder must have defined behavior either way.</strong></p>
 </div>
 </section>
-<section id="roll" class="slide" data-segment="Line 6: roll a d20" data-segment-id="seg-dice">
-<h1>“Roll a d20”</h1>
-<script>window.l3_program_strings = {"line":"6"};</script>
-<!-- Lesson 3, several slides: the rollout in ten lines, with the current
-     line(s) lit.  The div attribute line="3,4" arrives as
-     window.l3_program_strings; the inline script queues it, and the deferred
-     renderer hands the queued values to the svgs in document order, since the
-     same fragment appears on six slides.  See assets/l3-program.js. -->
-<script>(window.__l3ProgramQueue=window.__l3ProgramQueue||[]).push((window.l3_program_strings||{}).line||'0');</script>
+<section id="vote-answer" class="slide" data-segment="Lines 3 and 4: decode a legal move" data-segment-id="seg-pick">
+<h1>The decoder was the hard part</h1>
+<!-- Lesson 3: a hands-up vote (answer).  See assets/l3-vote.js. -->
 <div class="l2-fig">
-<svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
+<svg class="l3-vote" data-mode="answer" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-program.js?v=2056871383-3802" defer></script>
+<script src="../assets/l3-vote.js?v=2277590639-2329" defer></script>
 
+<p class="l3-caption">
+Sequential scan: O(Nw) gates and O(w) reusable scratch, w = ⌈log₂(N + 1)⌉.
+</p>
 <div class="notes">
-<p>Line six. Roll a d20 for every stone.</p>
-<p>The same idea as the move: <strong>the die is a register, prepared before anything runs, read and never written.</strong></p>
+<p>Return to the opening vote now that the decoder is concrete.</p>
+<p>The key extra work was translating a rank into an index when the validity mask itself depends on the branch. We built that block explicitly, including invalid ranks and scratch cleanup.</p>
+<p><strong>The paper’s sequential scan costs O(Nw) gates with O(w) reusable scratch.</strong> That is an asymptotic bound, not an exact count of nine times four elementary gates. Other layouts and the paper’s blocked decoder belong in a later resource discussion.</p>
+<p>We have dealt with move selection. The remaining program lines count neighbors, decide flips, and evaluate the terminal board.</p>
 </div>
 </section>
-<section id="d20" class="slide" data-segment="Line 6: roll a d20" data-segment-id="seg-dice">
-<h1>Twenty faces on five qubits</h1>
-<script>window.l3_selector_strings = {"m":"20","w":"5"};</script>
-<!-- Lesson 3, slides 9 and 16: an equal superposition over the first m of 2^w
-     states.  The div attributes m and w arrive as window.l3_selector_strings;
-     the inline script queues them and the deferred renderer hands them to
-     the svgs in document order.  See assets/l3-selector.js. -->
-<script>(window.__l3SelectorQueue=window.__l3SelectorQueue||[]).push(window.l3_selector_strings||{m:'9',w:'4'});</script>
-<div class="l2-fig">
-<svg class="l3-selector" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-selector.js?v=1116518225-2798" defer></script>
-
-<div class="notes">
-<p>Five qubits give thirty-two states. A fair d20 wants twenty. <strong>Prepare an equal superposition over the first twenty of the thirty-two</strong>, amplitude one over root twenty each.</p>
-<p>The same state preparation as the move selector, with m equal to twenty. Prepared once, it is a read-only tape.</p>
-</div>
-</section>
-<section id="wrong-dice" class="slide" data-segment="Line 6: roll a d20" data-segment-id="seg-dice">
-<h1>Two fixes that break the game</h1>
-<!-- Lesson 3, slide 17: two fixes that break the game.  See assets/l3-wrong-dice.js. -->
-<div class="l2-fig">
-<svg id="l3-wrong-dice-fig" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-wrong-dice.js?v=2828978561-2478" defer></script>
-
-<div class="notes">
-<p>Two tempting fixes, both wrong.</p>
-<p>Reroll on a bad face: <strong>rerolling is measuring</strong>, and measuring is forbidden inside.</p>
-<p>Use all thirty-two faces and scale nothing: a threshold of four on thirty-two faces is one flip in eight, not one in five. <strong>That is a different game</strong>, and Lesson 2’s numbers are gone.</p>
-</div>
-</section>
-<section id="dice-grid" class="slide" data-segment="Line 6: roll a d20" data-segment-id="seg-dice">
-<h1>Ninety qubits of dice</h1>
-<!-- Lesson 3, slide 18: ninety qubits of dice.  See assets/l3-dice-grid.js. -->
-<div class="l2-fig">
-<svg id="l3-dice-grid-fig" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-dice-grid.js?v=3390989340-1564" defer></script>
-
-<div class="notes">
-<p>Every stone rolls, so every cell gets a die, every round. Nine cells, two rounds, five qubits each: <strong>ninety qubits of dice.</strong></p>
-<p>Hold that number; it is more than half the machine.</p>
-</div>
-</section>
-<section id="decide" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
+<section id="decide" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
 <h1>“Decide, then flip”</h1>
 <script>window.l3_program_strings = {"line":"7,8,9"};</script>
 <!-- Lesson 3, several slides: the rollout in ten lines, with the current
@@ -415,149 +494,151 @@
 <div class="l2-fig">
 <svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-program.js?v=2056871383-3802" defer></script>
+<script src="../assets/l3-program.js?v=2990592238-3798" defer></script>
 
 <div class="notes">
-<p>Lines seven to nine. Count friends, compare the die, mark, and flip every marked stone together.</p>
-<p><strong>Every decision reads the board as it was before anyone flipped.</strong></p>
+<p>Black has landed at cell three. White’s rank three then selects cell six. The board now has four stones.</p>
+<p>Every event decision reads this same board. <strong>We can process cells one at a time, provided every decision reads old colors and every flip writes new colors.</strong></p>
 </div>
 </section>
-<section id="same-flags" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
+<section id="neighborhood" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>A cell knows its neighbors</h1>
+<!-- Lesson 3, slide 7: a cell knows its neighbours; the count fits in three qubits.  See assets/l3-neighborhood.js. -->
+<div class="l2-fig">
+<svg id="l3-neighborhood-fig" viewBox="0 0 760 300" width="980"></svg>
+</div>
+<script src="../assets/l3-neighborhood.js?v=46577777-2433" defer></script>
+
+<div class="notes">
+<p>Corners have two orthogonal neighbors, edges three, and the center four. The blue markers show neighbor positions, not occupied stones.</p>
+<p>The number of friends can therefore range from zero to four. A three-qubit register is enough. Next we count the actual friends of the center stone in our trace.</p>
+</div>
+</section>
+<section id="same-flags" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
 <h1>Count the friends</h1>
 <!-- Lesson 3, slide 20: count the friends.  See assets/l3-same-flags.js. -->
 <div class="l2-fig">
 <svg id="l3-same-flags-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-same-flags.js?v=1117214695-2772" defer></script>
+<script src="../assets/l3-same-flags.js?v=3329863210-2727" defer></script>
 
 <div class="notes">
-<p>For each neighbor: both cells occupied and the colors equal. <strong>One four-control pattern per neighbor sets a same-color flag.</strong></p>
-<p>Count the flags into the three-qubit register. That count is c, the number of friends.</p>
+<p>Our center stone is Black. The upper and left neighbors are Black; the other two positions are empty.</p>
+<p>For each neighbor, test that both cells are occupied and their colors agree. The 00 and 11 color cases each use a four-control pattern. Count the same-color flags into the three-qubit counter.</p>
+<p><strong>Cell four has c = 2 friends.</strong> The die threshold is therefore 4 − 2 = 2.</p>
 </div>
 </section>
-<section id="compare" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
-<h1>Die below threshold, as gates</h1>
+<section id="compare" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>Die below threshold, as control patterns</h1>
 <!-- Lesson 3, slide 21: die below threshold, as gates.  See assets/l3-compare.js. -->
 <div class="l2-fig">
 <svg id="l3-compare-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-compare.js?v=627066052-3062" defer></script>
+<script src="../assets/l3-compare.js?v=672692682-3036" defer></script>
 
 <div class="notes">
-<p>The die flips the stone when it reads below four minus c. <strong>Below a threshold is a toggle for each face beneath it:</strong> three faces for threshold three, two for two, one for one.</p>
-<p>Five qubits, one flag. A comparator, built out of controlled X gates.</p>
+<p>The worked die is one, encoded 00001. With threshold two, faces zero and one pass.</p>
+<p>These disjoint face patterns are the Boolean predicate die &lt; 2. The next slide combines each face pattern with the required count and occupied bit into one control pattern. <strong>We do not need to retain one comparison flag per threshold.</strong></p>
 </div>
 </section>
-<section id="multiplex" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
-<h1>One flag per possible count</h1>
+<section id="multiplex" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>Five cases, one flip flag</h1>
 <!-- Lesson 3, slide 22: one comparison flag per possible count.  See assets/l3-multiplex.js. -->
 <div class="l2-fig">
 <svg id="l3-multiplex-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-multiplex.js?v=222375855-2165" defer></script>
+<script src="../assets/l3-multiplex.js?v=1701024422-2350" defer></script>
 
 <div class="notes">
-<p>The threshold depends on c, so build one comparison flag per possible count. <strong>The flip fires when the count matches c, that flag is set, and the cell is occupied.</strong></p>
-<p>Five lanes into one flag. Four friends has no lane: threshold zero, never flips.</p>
+<p>The count may be in superposition. For each possible c, combine occupied = 1, count = c, and each face below 4 − c as a joint control pattern on one flip flag.</p>
+<p>These cases are mutually exclusive. The rows are logical cases, not five allocated flag qubits. Four friends has threshold zero and contributes no toggles.</p>
+<p>Our trace follows the c = 2, die = 1 case. The center stone’s flip flag becomes one.</p>
 </div>
 </section>
-<section id="old-new" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
-<h1>The old board decides, the new board receives</h1>
+<section id="old-new" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>Read old colors, write new colors</h1>
 <!-- Lesson 3, slide 23: the old board decides, the new board receives.  See assets/l3-old-new.js. -->
 <div class="l2-fig">
 <svg id="l3-old-new-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-old-new.js?v=773416977-2245" defer></script>
+<script src="../assets/l3-old-new.js?v=1451989332-2195" defer></script>
 
 <div class="notes">
-<p>The colors are copied into the next round’s register first. <strong>The flip flag toggles the new copy; every decision reads the old one.</strong></p>
-<p>That is why every round got a fresh board on slide 6. Lesson 4 shows the circuit that skips this step and what it gets wrong.</p>
+<p>Copy the old color bits into a fresh zeroed color register using CNOTs. This copies computational-basis labels: in superposition the registers become entangled, not independent clones of an unknown quantum state.</p>
+<p>Then each cell computes its flip flag from old colors, toggles its destination color, and clears its scratch. Logical simultaneity does not require storing all nine flags.</p>
+<p><strong>In our trace, cells four and six flip.</strong> The final board has Black at cells one, three, and six; White at cell four.</p>
+<p>Keep one occupancy register and three nine-qubit color registers: 36 state qubits. Move records make occupancy updates reversible. Lesson 4 examines the information that has to survive.</p>
 </div>
 </section>
-<section id="scratch" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
-<h1>Thirteen qubits, reused nine times</h1>
-<!-- Lesson 3, slide 24: thirteen qubits of scratch, reused nine times.  See assets/l3-scratch.js. -->
+<section id="scratch" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>Eight qubits borrowed from the shared pool</h1>
+<!-- Lesson 3: eight event qubits borrowed from the shared scratch pool. -->
 <div class="l2-fig">
 <svg id="l3-scratch-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-scratch.js?v=3301828331-2125" defer></script>
+<script src="../assets/l3-scratch.js?v=822222233-2096" defer></script>
 
 <div class="notes">
-<p>Same-color flags, the count, the comparison flags, one work qubit: thirteen qubits of scratch. <strong>Every cell fills them, uses them, and empties them again</strong>, so the next cell can borrow the same thirteen.</p>
-<p>The first pile of scratch. Small, because every block returns it.</p>
+<p>The event uses four same-color flags, a three-bit count, and one flip flag: <strong>eight qubits</strong>. After each cell’s destination color is toggled, reverse the flag and count computations.</p>
+<p>The whole oracle shares a thirteen-qubit pool: rank-select needs thirteen, this event needs eight, and terminal counting uses the pool too. The pool size is the peak requirement, not the sum across blocks.</p>
+<p>Only scratch returns to zero here. Dice, move indices, ranks, and retained colors are records that A† will use.</p>
 </div>
 </section>
-<section id="round" class="slide" data-segment="Lines 7 to 9: decide, then flip" data-segment-id="seg-event">
-<h1>One round, three blocks</h1>
+<section id="round" class="slide" data-segment="Lines 7 to 9: decide from one board, write the next" data-segment-id="seg-event">
+<h1>Assemble the two rounds</h1>
 <!-- Lesson 3, slide 25: one round, three blocks, composed.  See assets/l3-round.js. -->
 <div class="l2-fig">
 <svg id="l3-round-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-round.js?v=2400760578-2233" defer></script>
+<script src="../assets/l3-round.js?v=2076126809-2480" defer></script>
 
 <div class="notes">
-<p>One round: select and place Black, select and place White, the event. <strong>Three blocks, composed, reusable.</strong> Two rounds is two copies.</p>
-<p>The Qiskit shape: build each block as its own circuit, compose them, turn the round into an instruction.</p>
+<p>One round is select-and-place Black, select-and-place White, then the event.</p>
+<p>The first round’s ranks 4 and 1 select cells 4 and 1. The second round’s ranks 2 and 3 select cells 3 and 6. Its event produces the final board shown at right.</p>
+<p>The Qiskit calls illustrate composition after the subcircuits and wire lists have been built. <strong>Each round maps to its own rank, die, move-record, and destination-color registers.</strong> Repeating a circuit on the same wire list would not supply fresh randomness or a fresh destination.</p>
 </div>
 </section>
-<section id="return" class="slide" data-segment="Line 10: return black &gt; white" data-segment-id="seg-payoff">
-<h1>“Return black &gt; white”</h1>
-<script>window.l3_program_strings = {"line":"10"};</script>
-<!-- Lesson 3, several slides: the rollout in ten lines, with the current
-     line(s) lit.  The div attribute line="3,4" arrives as
-     window.l3_program_strings; the inline script queues it, and the deferred
-     renderer hands the queued values to the svgs in document order, since the
-     same fragment appears on six slides.  See assets/l3-program.js. -->
-<script>(window.__l3ProgramQueue=window.__l3ProgramQueue||[]).push((window.l3_program_strings||{}).line||'0');</script>
-<div class="l2-fig">
-<svg class="l3-program" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-program.js?v=2056871383-3802" defer></script>
-
-<div class="notes">
-<p>Line ten. The only line that leaves a mark: <strong>one bit, black outnumbers white.</strong></p>
-</div>
-</section>
-<section id="counters" class="slide" data-segment="Line 10: return black &gt; white" data-segment-id="seg-payoff">
-<h1>Two counters</h1>
+<section id="counters" class="slide" data-segment="Line 10: mark the terminal payoff" data-segment-id="seg-payoff">
+<h1>Count the final colors</h1>
 <!-- Lesson 3, slide 27: two counters over the final board.  See assets/l3-counters.js. -->
 <div class="l2-fig">
 <svg id="l3-counters-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-counters.js?v=1140644208-1686" defer></script>
+<script src="../assets/l3-counters.js?v=3827747850-1778" defer></script>
 
 <div class="notes">
-<p>Scan the final board once. Occupied and black increments one counter, occupied and white the other.</p>
-<p><strong>Both counters are scratch too.</strong> Lesson 4 gets to how they are cleaned.</p>
+<p>The final program line returns Black &gt; White. Scan the occupied cells, incrementing one counter for Black and the other for White.</p>
+<p>Our trace gives <strong>Black three, White one</strong>. The counters are temporary: use them to toggle the payoff, then run their increments backward while the final board is unchanged.</p>
 </div>
 </section>
-<section id="payoff-compare" class="slide" data-segment="Line 10: return black &gt; white" data-segment-id="seg-payoff">
-<h1>Every pair of totals, at once</h1>
+<section id="payoff-compare" class="slide" data-segment="Line 10: mark the terminal payoff" data-segment-id="seg-payoff">
+<h1>A comparator includes unreachable inputs</h1>
 <!-- Lesson 3, slide 28: comparing two counts, the most expensive block.  See assets/l3-payoff-compare.js. -->
 <div class="l2-fig">
 <svg id="l3-payoff-compare-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-payoff-compare.js?v=1893299374-2677" defer></script>
+<script src="../assets/l3-payoff-compare.js?v=548660536-2730" defer></script>
 
 <div class="notes">
-<p>The board is in superposition, so the two totals are too: <strong>every pair of counts is a branch of the same state.</strong> The circuit has to flip the payoff in the winning branches and leave the others alone, in one pass.</p>
-<p>Forty-five winning pairs, one multi-controlled pattern each. <strong>At this size, the last line of the program is the costliest block in the oracle.</strong> A tie is not a win.</p>
+<p>The comparator’s truth table: forty-five blue entries where Black &gt; White. A tie leaves the payoff at zero.</p>
+<p><strong>Our rollout reaches only the outlined diagonal, the four-stone boards.</strong> Our trace is (3, 1): payoff one.</p>
+<p>A count of Black stones and the test Black &gt; 2 would do the same job here. We keep the general comparator so its measured counts stay comparable.</p>
 </div>
 </section>
-<section id="vote-qubits" class="slide" data-segment="The count" data-segment-id="seg-count">
+<section id="vote-qubits" class="slide" data-segment="Count the circuit and check the result" data-segment-id="seg-count">
 <h1>How many qubits?</h1>
 <!-- Lesson 3: a hands-up vote (qubits).  See assets/l3-vote.js. -->
 <div class="l2-fig">
 <svg class="l3-vote" data-mode="qubits" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-vote.js?v=340966730-2318" defer></script>
+<script src="../assets/l3-vote.js?v=2277590639-2329" defer></script>
 
 <div class="notes">
-<p>Second vote, hands up.</p>
-<p>Most rooms guess low. <strong>Dice do not feel like qubits until you count them.</strong></p>
+<p>We already know the ninety dice qubits and thirty-six state qubits. Estimate the total after adding ranks, move records, shared scratch, and the payoff.</p>
+<p>Ask people to explain one term in their estimate before advancing.</p>
 </div>
 </section>
-<section id="qubit-map" class="slide" data-segment="The count" data-segment-id="seg-count">
+<section id="qubit-map" class="slide" data-segment="Count the circuit and check the result" data-segment-id="seg-count">
 <h1>Where the 169 go</h1>
 <!-- Lesson 3, slide 30: where the 169 qubits go, and the gate and depth counts.  See assets/l3-qubit-map.js. -->
 <div class="l2-fig">
@@ -566,64 +647,53 @@
 <script src="../assets/l3-qubit-map.js?v=1240465332-2282" defer></script>
 
 <div class="notes">
-<p>More than half the machine is dice. Then the boards, the move records, and the rank registers. <strong>Everything but thirteen qubits is a record the inverse will need.</strong> The scratch is the thirteen, borrowed and returned by every block.</p>
-<p><strong>The gates are mostly multi-controlled X, two to eight controls each</strong>, counted before decomposition to a native gate set.</p>
+<p>90 dice + 36 state + 16 move records + 13 ranks + 13 scratch + 1 payoff = <strong>169 qubits</strong>.</p>
+<p>The four move indices each use four bits. The rank widths are 4, 3, 3, 3. Scratch is shared across blocks; it is counted once. This is 155 record qubits, thirteen scratch, and one payoff.</p>
+<p>The QCE26 benchmark reports 9,768 gates and depth 3,079 before decomposition into a native gate set. These are implementation-specific circuit counts, not runtime or a lower bound. State preparation is part of a full call; changing a preparation or comparator requires recounting.</p>
 </div>
 </section>
-<section id="tested" class="slide" data-segment="The count" data-segment-id="seg-count">
-<h1>Shipped means tested</h1>
+<section id="tested" class="slide" data-segment="Count the circuit and check the result" data-segment-id="seg-count">
+<h1>Check the trace, then the distribution</h1>
 <!-- Lesson 3, slide 31: shipped means tested.  See assets/l3-tested.js. -->
 <div class="l2-fig">
 <svg id="l3-tested-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-tested.js?v=552040927-2987" defer></script>
+<script src="../assets/l3-tested.js?v=3343826615-3116" defer></script>
 
 <div class="notes">
-<p>Shipped means tested. Two checks.</p>
-<p><strong>Branch by branch:</strong> fix a seed, run the classical rollout and the circuit on the same seed, compare the final boards bit for bit. Every sampled branch agrees.</p>
-<p><strong>In aggregate:</strong> the circuit’s win rate, .281 plus or minus .028, against the exact .271 from enumeration. Inside the interval.</p>
-</div>
-</section>
-<section id="vote-answer" class="slide" data-segment="Hand to Lesson 4" data-segment-id="seg-handoff">
-<h1>The hard line was the innocent one</h1>
-<!-- Lesson 3: a hands-up vote (answer).  See assets/l3-vote.js. -->
-<div class="l2-fig">
-<svg class="l3-vote" data-mode="answer" viewBox="0 0 760 300" width="980"></svg>
-</div>
-<script src="../assets/l3-vote.js?v=340966730-2318" defer></script>
-
-<div class="notes">
-<p>The vote from slide 3, answered. The die was bookkeeping, the count was routine, the comparison was expensive but standard.</p>
-<p><strong>Picking an empty cell was the one line with no block to buy.</strong> The hard line was the innocent one.</p>
+<p>Our shared trace ends at Black three, White one, payoff one. The same explicit ranks and dice must produce that board in the classical rollout and the reversible body.</p>
+<p>The reported validation compares 256 sampled branches bit for bit. The Monte Carlo result uses 1,000 seeded basis-circuit runs: .281 ± .028 is a 95% interval, containing the exact enumeration result .271.</p>
+<p><strong>These are preparation-free basis emulations, not a full coherent simulation or hardware execution.</strong> They check sampled transition and payoff behavior. Check preparation amplitudes and scratch restoration separately; matching sampled outputs alone does not establish either property.</p>
 </div>
 </section>
 <section id="forward-only" class="slide" data-segment="Hand to Lesson 4" data-segment-id="seg-handoff">
-<h1>Everything ran forward</h1>
-<!-- Lesson 3, slide 33: everything ran forward; the checklist, three of five.  See assets/l3-forward.js. -->
+<h1>It reverses. Does it simulate the right game?</h1>
+<!-- Lesson 3: the forward choices are implemented; Lesson 4 explains why they matter. -->
 <div class="l2-fig">
 <svg id="l3-forward-fig" viewBox="0 0 760 300" width="980"></svg>
 </div>
-<script src="../assets/l3-forward.js?v=2148724615-2227" defer></script>
+<script src="../assets/l3-forward.js?v=755344536-1135" defer></script>
 
 <div class="notes">
-<p>Everything today ran forward. Amplitude estimation needs the whole thing backward, and <strong>one wrong ordering breaks that without an error message.</strong></p>
-<p>The checklist: round semantics defined; old and new state apart; selection scratch erased before the board changes; every branch from read-only randomness; runs backward after the payoff is marked. <strong>Three of five today.</strong> Lesson 4 takes the other two.</p>
+<p>We implemented the forward choices: old and new colors apart, selection scratch cleared before placement, and explicit randomness retained.</p>
+<p>A unitary and its exact inverse return the input even if the forward computation implements the wrong transition rule. <strong>A round-trip test alone cannot catch the wrong game.</strong></p>
+<p>Lesson 4 changes the ordering, compares the resulting boards, and explains why the records and cleanup boundaries we used today are needed.</p>
 </div>
 </section>
 <section id="next" class="bare slide" data-segment="Hand to Lesson 4" data-segment-id="seg-handoff">
 <h1>Continue to Lesson 4</h1>
-<!-- Lesson 3, slide 34: continue to Lesson 4.  Card art, cliffhanger, QR and URL in one
-     link; the QR matrix is the one Lesson 1 ships (see assets/qr.html for how
-     it was generated).  See assets/l3-qr.js. -->
+<!-- Lesson 3: art and headline open Lesson 4; QR and URL open the course.
+     The QR matrix is the one Lesson 1 ships. See assets/l3-qr.js. -->
 <style> #qr-l3-fig a { cursor: pointer; text-decoration: none; } </style>
 <div class="l2-fig">
 <svg id="qr-l3-fig" viewBox="0 0 760 350" width="1000"></svg>
 </div>
 <script>window.qr_data = { n: 33, d: "M0 0h7v1h-7zM8 0h5v1h-5zM16 0h1v1h-1zM18 0h3v1h-3zM23 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM16 1h2v1h-2zM21 1h3v1h-3zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM10 2h2v1h-2zM13 2h2v1h-2zM16 2h1v1h-1zM18 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM18 3h1v1h-1zM21 3h1v1h-1zM23 3h2v1h-2zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM9 4h3v1h-3zM16 4h1v1h-1zM18 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM11 5h2v1h-2zM15 5h4v1h-4zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h3v1h-3zM12 7h1v1h-1zM15 7h3v1h-3zM19 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h3v1h-3zM9 8h1v1h-1zM14 8h5v1h-5zM21 8h2v1h-2zM26 8h1v1h-1zM29 8h1v1h-1zM31 8h2v1h-2zM0 9h1v1h-1zM2 9h1v1h-1zM7 9h2v1h-2zM10 9h2v1h-2zM13 9h1v1h-1zM16 9h2v1h-2zM19 9h2v1h-2zM23 9h1v1h-1zM26 9h2v1h-2zM29 9h2v1h-2zM32 9h1v1h-1zM1 10h6v1h-6zM9 10h2v1h-2zM12 10h2v1h-2zM18 10h1v1h-1zM21 10h9v1h-9zM31 10h2v1h-2zM0 11h1v1h-1zM5 11h1v1h-1zM8 11h1v1h-1zM11 11h2v1h-2zM15 11h3v1h-3zM19 11h5v1h-5zM27 11h1v1h-1zM29 11h1v1h-1zM1 12h1v1h-1zM4 12h3v1h-3zM8 12h2v1h-2zM14 12h3v1h-3zM20 12h6v1h-6zM27 12h3v1h-3zM31 12h2v1h-2zM0 13h1v1h-1zM2 13h1v1h-1zM5 13h1v1h-1zM11 13h4v1h-4zM17 13h1v1h-1zM20 13h2v1h-2zM24 13h1v1h-1zM27 13h1v1h-1zM31 13h1v1h-1zM0 14h1v1h-1zM3 14h5v1h-5zM9 14h3v1h-3zM14 14h1v1h-1zM18 14h4v1h-4zM26 14h1v1h-1zM29 14h1v1h-1zM2 15h1v1h-1zM4 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h2v1h-2zM28 15h3v1h-3zM1 16h1v1h-1zM4 16h1v1h-1zM6 16h3v1h-3zM11 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM21 16h2v1h-2zM25 16h2v1h-2zM28 16h3v1h-3zM1 17h1v1h-1zM3 17h2v1h-2zM9 17h1v1h-1zM14 17h2v1h-2zM18 17h1v1h-1zM20 17h1v1h-1zM22 17h3v1h-3zM26 17h1v1h-1zM28 17h2v1h-2zM31 17h2v1h-2zM5 18h2v1h-2zM8 18h2v1h-2zM11 18h1v1h-1zM15 18h2v1h-2zM18 18h1v1h-1zM20 18h2v1h-2zM25 18h1v1h-1zM27 18h2v1h-2zM30 18h1v1h-1zM0 19h2v1h-2zM3 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h5v1h-5zM20 19h1v1h-1zM22 19h5v1h-5zM28 19h1v1h-1zM31 19h2v1h-2zM0 20h1v1h-1zM2 20h1v1h-1zM6 20h5v1h-5zM14 20h3v1h-3zM19 20h1v1h-1zM22 20h1v1h-1zM29 20h2v1h-2zM0 21h1v1h-1zM2 21h2v1h-2zM7 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM15 21h2v1h-2zM20 21h1v1h-1zM22 21h2v1h-2zM25 21h2v1h-2zM29 21h1v1h-1zM32 21h1v1h-1zM4 22h3v1h-3zM10 22h1v1h-1zM12 22h4v1h-4zM17 22h4v1h-4zM23 22h2v1h-2zM26 22h2v1h-2zM29 22h4v1h-4zM1 23h2v1h-2zM7 23h1v1h-1zM10 23h1v1h-1zM13 23h3v1h-3zM18 23h1v1h-1zM20 23h1v1h-1zM26 23h1v1h-1zM29 23h1v1h-1zM0 24h1v1h-1zM5 24h2v1h-2zM12 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM19 24h2v1h-2zM22 24h7v1h-7zM31 24h2v1h-2zM8 25h2v1h-2zM11 25h1v1h-1zM14 25h3v1h-3zM19 25h1v1h-1zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h2v1h-2zM0 26h7v1h-7zM8 26h2v1h-2zM13 26h2v1h-2zM17 26h5v1h-5zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM11 27h2v1h-2zM14 27h7v1h-7zM23 27h2v1h-2zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM9 28h1v1h-1zM12 28h1v1h-1zM15 28h5v1h-5zM22 28h7v1h-7zM30 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM11 29h4v1h-4zM16 29h2v1h-2zM19 29h1v1h-1zM21 29h2v1h-2zM27 29h1v1h-1zM29 29h1v1h-1zM31 29h2v1h-2zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h2v1h-2zM15 30h2v1h-2zM20 30h1v1h-1zM22 30h1v1h-1zM26 30h2v1h-2zM29 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM13 31h2v1h-2zM17 31h2v1h-2zM20 31h1v1h-1zM22 31h3v1h-3zM26 31h3v1h-3zM32 31h1v1h-1zM0 32h7v1h-7zM8 32h5v1h-5zM14 32h1v1h-1zM16 32h2v1h-2zM19 32h1v1h-1zM21 32h3v1h-3zM25 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1z" };</script>
-<script src="../assets/l3-qr.js?v=4093902131-1885" defer></script>
+<script src="../assets/l3-qr.js?v=2878176584-2002" defer></script>
 
 <div class="notes">
-<p>Two pre-reads again: the playable Sway game, and Section III of the QCE26 paper, which is this lesson in theorem form. Click the link to open Lesson 4.</p>
+<p>Continue directly to Lesson 4. Its first experiment asks whether changing the forward ordering changes the game, even when inversion is exact.</p>
+<p>Section III of the QCE26 paper gives the decoder and composition statements. The course site remains available through the breadcrumb and QR code.</p>
 </div>
 </section>
 </div>

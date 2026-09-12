@@ -45,7 +45,7 @@
       tr.pend.setAttribute('x', sx(base)); tr.pend.setAttribute('width', Math.max(0, sx(base + (k < 0 ? D.pos.k : turn)) - sx(base)));
       other.pend.setAttribute('width', 0);
       dieG.textContent = '';
-      if (ev && ev.die !== undefined) L.die(dieG, 380, 185, 24, ev.die, { fill: ev.bust ? L.RED : '#fff', stroke: L.INK, ink: ev.bust ? '#fff' : L.INK });
+      if (ev && ev.die !== undefined) L.d6(dieG, 380, 185, 24, ev.die, { fill: ev.bust ? L.RED : '#fff', stroke: L.INK, ink: ev.bust ? '#fff' : L.INK });
       turnT.textContent = k < 0 ? `your turn total: ${D.pos.k}, you roll` : ev.bust ? (who === 'me' ? 'a 1: your turn total is wiped' : 'a 1: the opponent busts') : ev.hold !== undefined ? (who === 'me' ? `you hold, +${ev.hold}` : `opponent holds, +${ev.hold}`) : (who === 'me' ? `your turn total: ${turn}` : `opponent's turn total: ${turn}`);
       which.textContent = `rollout ${ri + 1}`;
     };

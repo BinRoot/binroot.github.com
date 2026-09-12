@@ -41,8 +41,8 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 2: The Monte Carlo speedup","description":"From epidemic intervention to Sway: a reusable simulator structure, amplitude estimation, and the cost of building a coherent rollout oracle. Lesson 2 of Quantum Oracle Engineering.","image":"https://shukla.io/quantum-oracle-engineering/img/myth02.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/the-monte-carlo-speedup/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quantum Oracle Engineering","item":"https://shukla.io/quantum-oracle-engineering/"},{"@type":"ListItem","position":2,"name":"Lesson 2: The Monte Carlo speedup","item":"https://shukla.io/quantum-oracle-engineering/the-monte-carlo-speedup/"}]}</script>
   <script>window.MathJax={options:{enableMenu:false}};</script>
-  <link rel="stylesheet" href="../slides.css?v=1413355062">
-  <script src="../slides.js?v=1413355062" defer></script>
+  <link rel="stylesheet" href="../slides.css?v=2538285854">
+  <script src="../slides.js?v=2538285854" defer></script>
   <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
 </head>
 <body>
@@ -145,7 +145,7 @@
   }
 </style>
 <script src="../assets/sway-data.js?v=2283849795-2321" defer></script>
-<script src="../assets/l2.js?v=3738266183-29337" defer></script>
+<script src="../assets/l2.js?v=3814641028-30292" defer></script>
 
 <style>
   .l2-copy { width: min(980px, 100%); margin: 0.5em auto; font-size: 0.8em; line-height: 1.45; }
@@ -340,7 +340,7 @@
 <div class="slide-equation compact">
   <img src="../assets/arm-eq.svg" alt="v_i is the probability that Black outnumbers White at horizon H given first move i under the fixed policy">
 </div>
-<script src="../assets/rollout-sway.js?v=2208777828-4042" defer></script>
+<script src="../assets/rollout-sway.js?v=1171316831-4721" defer></script>
 
 <div class="notes">
 <p>Fix the first move, then simulate the remaining rounds.</p>
@@ -356,7 +356,7 @@
 <div class="l2-fig">
 <svg id="vote-board-fig" viewBox="0 0 760 316" width="980"></svg>
 </div>
-<script src="../assets/vote-board.js?v=2271532005-3495" defer></script>
+<script src="../assets/vote-board.js?v=2814493116-3667" defer></script>
 
 <div class="notes">
 <p>It’s Black’s turn. <strong>Which of these three moves would you choose?</strong></p>
@@ -436,7 +436,7 @@
 <svg class="ae-fig" data-stage="1" viewBox="0 0 760 300" width="980"></svg>
 </div>
 <div class="slide-equation compact"><img src="../assets/angle-eq.svg" alt="a equals sine squared theta"></div>
-<script src="../assets/ae-circle.js?v=3821054928-19334" defer></script>
+<script src="../assets/ae-circle.js?v=24077818-19969" defer></script>
 
 <div class="notes">
 <p><strong>We can group the losing paths along one axis and the winning paths along the other.</strong></p>
@@ -451,7 +451,7 @@
 <svg class="ae-fig" data-stage="2" viewBox="0 0 760 300" width="980"></svg>
 </div>
 <div class="slide-equation compact"><img src="../assets/rotation-eq.svg" alt="Q equals minus A S zero A dagger S good, a rotation by two theta"></div>
-<script src="../assets/ae-circle.js?v=3821054928-19334" defer></script>
+<script src="../assets/ae-circle.js?v=24077818-19969" defer></script>
 
 <div class="notes">
 <p>Reflect across the x axis (the losing axis), and inspect the mirror image.</p>
@@ -470,14 +470,13 @@
 <svg class="ae-fig" data-stage="3" viewBox="0 0 760 300" width="980"></svg>
 </div>
 
-<script src="../assets/ae-circle.js?v=3821054928-19334" defer></script>
+<script src="../assets/ae-circle.js?v=24077818-19969" defer></script>
 
 <div class="notes">
 <p>The first advance changes the previous example’s angle to θ = 10°.</p>
-<p>Each Q adds 20°, so one, two, and four applications take the state to 30°, 50°, and 90°.</p>
-<p><strong>A slightly different starting angle would accumulate a different rotation. That growing difference helps us estimate an unknown probability.</strong></p>
-<p>Each row starts with a fresh preparation.</p>
-<p><strong>Each Q costs a rollout forward and backward; measuring the payoff gives one result.</strong> Repeated results help us estimate the original angle.</p>
+<p>Each Q adds 20°: one, two, and four applications reach 30°, 50°, and 90°. Eight overshoot to 170°, where a win is read only 3% of the time.</p>
+<p><strong>The state never settles on the winning axis. The odds rise and fall, and the rate of that wave is what we estimate.</strong></p>
+<p>Each row starts with a fresh preparation. <strong>Each Q costs a rollout forward and backward; measuring the payoff gives one result.</strong></p>
 </div>
 </section>
 <section id="noise-vs-phase" class="slide" data-segment="Estimate a probability with a circuit" data-segment-id="seg-mechanism">
@@ -809,7 +808,7 @@
 <svg class="ae-fig" data-stage="4" viewBox="0 0 760 300" width="980"></svg>
 </div>
 
-<script src="../assets/ae-circle.js?v=3821054928-19334" defer></script>
+<script src="../assets/ae-circle.js?v=24077818-19969" defer></script>
 
 <div class="notes">
 <p><strong>The original amplitude-estimation circuit uses controlled powers of Q and an inverse Fourier transform.</strong> Measurement yields a phase estimate, which determines the payoff probability.</p>

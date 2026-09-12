@@ -1,0 +1,30 @@
+<!-- Lesson 1, slide 2: play Pig from scratch.  You against a player who
+     holds at 20, the policy the later rollouts assume.  Two scores, a die,
+     the turn total, roll and hold.  See assets/pig-play.js. -->
+<style>
+  .pig-play { display: flex; flex-direction: column; align-items: center; gap: 0.5em; margin: 0.3em auto 0; font-variant-numeric: tabular-nums; }
+  .pig-scores { display: flex; gap: 3.2em; font-size: 1.15em; color: #9aa0a8; }
+  .pig-scores b { display: block; font-weight: 400; font-size: 0.5em; letter-spacing: 0.14em; text-transform: uppercase; }
+  .pig-scores .on { color: #2d3140; }
+  .pig-scores .on b { font-weight: 700; }
+  .pig-play svg { width: 5em; height: 5em; }
+  .pig-turn { margin: 0; min-height: 1.6em; font-size: 1.3em; line-height: 1.6; color: #2d3140; }
+  .pig-turn.bust { color: #c0392b; }
+  .pig-buttons { display: flex; gap: 0.7em; font-size: 0.7em; }
+  .pig-buttons button { font: inherit; min-width: 5.5em; color: #456AAD; background: #fffdf8; border: 1px solid #456AAD; border-radius: 6px; padding: 0.45em 1.1em; cursor: pointer; }
+  .pig-buttons button:disabled { opacity: 0.4; cursor: default; }
+  .pig-buttons button:focus-visible { outline: 3px solid #F2BF80; outline-offset: 3px; }
+</style>
+<div class="pig-play no-nav" id="pig-play">
+  <div class="pig-scores">
+    <span id="pig-me-name" class="on"><b>you</b><span id="pig-me">0</span></span>
+    <span id="pig-op-name"><b>them</b><span id="pig-op">0</span></span>
+  </div>
+  <svg id="pig-die" viewBox="0 0 100 100" role="img" aria-label="die"></svg>
+  <p class="pig-turn" id="pig-turn" aria-live="polite"></p>
+  <div class="pig-buttons">
+    <button id="pig-roll" type="button">roll</button>
+    <button id="pig-hold" type="button" disabled>hold</button>
+  </div>
+</div>
+<script src="../assets/pig-play.js" defer></script>

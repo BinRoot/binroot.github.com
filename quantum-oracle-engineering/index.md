@@ -60,7 +60,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 ::: {.lesson data-lesson="qoe-lesson-03" style="--accent: #C35523"}
 ### 3. Ship it
 
-<figure class="art"><img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><a href="building-a-quantum-oracle/" tabindex="-1" aria-hidden="true"><img src="img/myth03.png" alt="An open crate of machine parts sitting on an unread blueprint" width="600" height="600" loading="lazy"></a></figure>
 
 - the contract: board, two moves, randomness tape, **payoff qubit**
 - one round: Black places, White places, **every stone rolls**
@@ -69,22 +69,23 @@ This course teaches the craft of building practical quantum circuits from scratc
 - the d20 as a **5-bit comparison** against a neighbor count
 - 3×3, two rounds: **169 qubits**
 
-<button class="coming" disabled>Coming Sept 15</button>
+<div class="act"><a class="deck" href="building-a-quantum-oracle/">View slides</a></div>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-04" style="--accent: #F03836"}
 ### 4. Reversible by design
 
-<figure class="art"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></figure>
+<figure class="art"><a href="reversible-circuit-design/" tabindex="-1" aria-hidden="true"><img src="img/myth04.png" alt="A cassette tape with its ribbon spooled out in a loop behind it" width="600" height="600" loading="lazy"></a></figure>
 
 - amplitude estimation runs the rollout **forward and backward**
 - decide from the old board, write to a **shadow board**, keep the old one
 - **in-place updates** read a neighbor that already flipped
 - erase **move-selection scratch** before the board changes
-- one **payoff qubit**, everything else inverted
+- **compute, copy, uncompute** the payoff
+- executable tests for **meaning, phases, and the inverse**
 - the **qubit and gate count** as the board grows
 
-<button class="coming" disabled>Coming Sept 22</button>
+<div class="act"><a class="deck" href="reversible-circuit-design/">View slides</a></div>
 :::
 
 ::::

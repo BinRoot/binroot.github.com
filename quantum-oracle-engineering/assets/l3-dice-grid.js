@@ -6,14 +6,14 @@
   if (!svg) return;
   const L = window.L2;
   const root = L.el('g', {}, svg);
-  const rnd = L.prng(2026);
+  const D = window.L3;
   const dice = [];
   for (let r = 0; r < 2; r++) {
     L.text(root, `round ${r + 1}`, 60, 70 + r * 120, { anchor: 'end', size: 13, fill: L.DIM });
     for (let c = 0; c < 9; c++) {
       const g = L.el('g', { opacity: 0 }, root);
       const x = 110 + c * 62, y = 62 + r * 120;
-      L.die(g, x, y, 17, Math.floor(rnd() * 20) + 1, { fill: '#fff', stroke: L.INK, ink: L.INK });
+      L.die(g, x, y, 17, D.rounds[r].dice[c], { fill: '#fff', stroke: L.INK, ink: L.INK });
       for (let b = 0; b < 5; b++) L.el('rect', { x: x - 22 + b * 9, y: y + 26, width: 7, height: 7, rx: 1.5, fill: '#f3e8ff', stroke: L.PURPLE, 'stroke-width': 1 }, g);
       L.text(g, `cell ${c}`, x, y + 46, { size: 9.5, mono: true, fill: L.DIM });
       dice.push(g);
@@ -25,6 +25,6 @@
     let n = 0;
     dice.forEach((g, i) => { const o = L.win(t, 0.2 + i * 0.18, 0.25); g.setAttribute('opacity', o); if (o > 0.5) n++; });
     total.textContent = `${5 * n} qubits`;
-    eq.textContent = '9 cells × 2 rounds × 5 qubits'; eq.setAttribute('opacity', L.win(t, 3.8, 0.4));
+    eq.textContent = '9 cells × 2 rounds × 5 qubits; encoded faces 0–19'; eq.setAttribute('opacity', L.win(t, 3.8, 0.4));
   } });
 })();

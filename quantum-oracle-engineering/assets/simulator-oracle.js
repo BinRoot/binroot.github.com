@@ -1,10 +1,12 @@
 // simulator-oracle.js -- slide 11: the simulator is the oracle.
 //
 // Two rows built from the same box, the Pig simulator.  Top, the classical
-// loop: call the simulator, read a 0 or a 1, call again; dots pile up into an
-// estimate.  Bottom, the coherent loop: the same simulator as a circuit, run
-// forward, then backward, then forward again, nothing read until one
-// measurement at the end.  No equation; Lesson 2 writes it.
+// loop: call the simulator, read a 0 or a 1, call again; each read sits on
+// the wire as the bit it returned, and the bits pile up into an estimate.
+// Bottom, the coherent loop: the same simulator as a circuit, run forward,
+// then backward, then forward again, with a one-gate sign flip between runs
+// and nothing read until one measurement at the end.  No equation; Lesson 2
+// writes it.
 (function () {
   if (window.__simOracleInit) return; window.__simOracleInit = true;
   const L = window.L2;
@@ -26,7 +28,12 @@
       const x = 90 + i * 120;
       topBoxes.push(box(x, Y1, 78, 'simulate', false));
       L.el('line', { x1: x + 78, y1: Y1, x2: x + 120, y2: Y1, stroke: L.WIRE, 'stroke-width': 1.5 }, root);
-      dots.push(L.el('circle', { cx: x + 99, cy: Y1, r: 6, fill: i % 3 === 1 ? '#fff' : L.INK, stroke: L.INK, 'stroke-width': 1.5, opacity: 0 }, root));
+      // the draw each call returns, written as the bit it is: 1 a win, 0 a loss
+      const bit = i % 3 === 1 ? 0 : 1;
+      const dot = L.el('g', { opacity: 0 }, root);
+      L.el('circle', { cx: x + 99, cy: Y1, r: 8, fill: bit ? L.INK : '#fff', stroke: L.INK, 'stroke-width': 1.5 }, dot);
+      L.text(dot, String(bit), x + 99, Y1 + 0.5, { size: 10, mono: true, weight: 700, fill: bit ? '#fff' : L.INK });
+      dots.push(dot);
     }
     L.text(root, '…', 578, Y1, { size: 18, fill: L.DIM });
     const est1 = L.text(root, 'M samples → estimate', 660, Y1, { size: 12.5, fill: L.DIM, opacity: 0 });
@@ -38,6 +45,11 @@
       lowBoxes.push(box(x, Y2, 78, 'simulate', i % 2 === 1, L.BLUE));
       L.el('line', { x1: x + 78, y1: Y2, x2: x + 120, y2: Y2, stroke: L.WIRE, 'stroke-width': 1.5 }, root);
       L.text(root, i % 2 ? 'backward' : 'forward', x + 39, Y2 + 36, { size: 11, fill: L.BLUE });
+      // Between runs, the two one-gate sign flips that make the reversal
+      // interfere: on the winning branches after a forward run, on the
+      // start state after a backward one.  A tick on the wire, named above.
+      L.el('line', { x1: x + 99, y1: Y2 - 7, x2: x + 99, y2: Y2 + 7, stroke: L.BLUE, 'stroke-width': 2 }, root);
+      L.text(root, i % 2 ? 'flip sign of start' : 'flip sign of wins', x + 99, Y2 - 34, { size: 9, fill: L.BLUE });
     }
     L.text(root, '…', 578, Y2, { size: 18, fill: L.DIM });
     const meas = L.el('g', { opacity: 0 }, root);

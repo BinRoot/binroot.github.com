@@ -20,8 +20,8 @@
     // the rules, as three icons
     const rules = L.el('g', {}, root);
     const rule = (x, draw, label, col) => { const g = L.el('g', {}, rules); draw(g, x); L.text(g, label, x, 172, { size: 12, fill: col || L.DIM, weight: 700 }); };
-    rule(230, (g, x) => { L.die(g, x - 18, 140, 15, 4, { fill: '#fff', stroke: L.INK }); L.text(g, '+4', x + 16, 140, { size: 14, mono: true, weight: 700, fill: L.GREEN }); }, 'a roll adds');
-    rule(380, (g, x) => { L.die(g, x - 18, 140, 15, 1, { fill: L.RED, stroke: L.INK, ink: '#fff' }); L.text(g, '×', x + 14, 140, { size: 18, weight: 700, fill: L.RED }); }, 'a 1 wipes', L.RED);
+    rule(230, (g, x) => { L.d6(g, x - 18, 140, 15, 4, { fill: '#fff', stroke: L.INK }); L.text(g, '+4', x + 16, 140, { size: 14, mono: true, weight: 700, fill: L.GREEN }); }, 'a roll adds');
+    rule(380, (g, x) => { L.d6(g, x - 18, 140, 15, 1, { fill: L.RED, stroke: L.INK, ink: '#fff' }); L.text(g, '×', x + 14, 140, { size: 18, weight: 700, fill: L.RED }); }, 'a 1 wipes', L.RED);
     rule(530, (g, x) => { L.el('rect', { x: x - 30, y: 128, width: 60, height: 24, rx: 5, fill: '#fff', stroke: L.INK, 'stroke-width': 1.5 }, g); L.text(g, '+12', x, 140, { size: 13, mono: true, weight: 700, fill: L.ORANGE }); }, 'a hold keeps it');
     L.el('line', { x1: 150, y1: 196, x2: 610, y2: 196, stroke: L.FAINT, 'stroke-width': 1 }, root);
     // the two options
@@ -32,7 +32,7 @@
       glyph(g, x + 56, 248);
       return g;
     };
-    const A = card(250, 'roll again', (g, x, y) => L.die(g, x, y, 17, 6, { fill: '#fff', stroke: L.INK }));
+    const A = card(250, 'roll again', (g, x, y) => L.d6(g, x, y, 17, 6, { fill: '#fff', stroke: L.INK }));
     const B = card(510, 'hold', (g, x, y) => { L.el('rect', { x: x - 24, y: y - 12, width: 48, height: 24, rx: 5, fill: '#fff', stroke: L.INK, 'stroke-width': 1.5 }, g); L.text(g, '+12', x, y, { size: 13, mono: true, weight: 700, fill: L.ORANGE }); });
     const qm = L.text(root, '?', 380, 252, { size: 40, weight: 700, fill: L.ORANGE, opacity: 0 });
     L.timeline(svg, { T: 2.4, setState: (t) => { A.setAttribute('opacity', L.win(t, 0.4, 0.5)); B.setAttribute('opacity', L.win(t, 0.8, 0.5)); qm.setAttribute('opacity', L.win(t, 1.6, 0.5)); } });

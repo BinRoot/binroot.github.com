@@ -20,17 +20,81 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="canonical" href="https://shukla.io/quantum-oracle-engineering/reversible-circuit-design/">
-  <meta name="description" content="Running the finished circuit backward is one line of code. The design that makes it mean something is not: the in-place update that changes the game, the counter that must unwind before the stone lands, records against scratch, and the qubit count as the board grows. Lesson 4 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta name="description" content="Design and test a reversible quantum oracle: preserve the inputs cleanup needs, return borrowed scratch to zero, distinguish semantic correctness from invertibility, and build the full amplitude-estimation iterate. Includes executable Qiskit examples.">
   <meta name="author" content="Nishant Shukla">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Nishant Shukla">
   <meta property="og:url" content="https://shukla.io/quantum-oracle-engineering/reversible-circuit-design/">
   <meta property="og:title" content="Lesson 4: Reversible by design">
   <meta name="twitter:title" content="Lesson 4: Reversible by design">
-  <meta property="og:description" content="Running the finished circuit backward is one line of code. The design that makes it mean something is not: the in-place update that changes the game, the counter that must unwind before the stone lands, records against scratch, and the qubit count as the board grows. Lesson 4 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
-  <meta name="twitter:description" content="Running the finished circuit backward is one line of code. The design that makes it mean something is not: the in-place update that changes the game, the counter that must unwind before the stone lands, records against scratch, and the qubit count as the board grows. Lesson 4 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.">
+  <meta property="og:description" content="Design and test a reversible quantum oracle: preserve the inputs cleanup needs, return borrowed scratch to zero, distinguish semantic correctness from invertibility, and build the full amplitude-estimation iterate. Includes executable Qiskit examples.">
+  <meta name="twitter:description" content="Design and test a reversible quantum oracle: preserve the inputs cleanup needs, return borrowed scratch to zero, distinguish semantic correctness from invertibility, and build the full amplitude-estimation iterate. Includes executable Qiskit examples.">
   <meta name="twitter:card" content="summary">
   <meta property="og:image" content="https://shukla.io/quantum-oracle-engineering/img/myth04.png">
   <meta property="og:image:width" content="600">
@@ -38,11 +102,11 @@
   <meta name="twitter:image" content="https://shukla.io/quantum-oracle-engineering/img/myth04.png">
   <meta name="twitter:image:alt" content="A cassette tape with its ribbon spooled out in a loop behind it">
   <meta property="og:image:alt" content="A cassette tape with its ribbon spooled out in a loop behind it">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 4: Reversible by design","description":"Running the finished circuit backward is one line of code. The design that makes it mean something is not: the in-place update that changes the game, the counter that must unwind before the stone lands, records against scratch, and the qubit count as the board grows. Lesson 4 of Quantum Oracle Engineering, taught live at IEEE Quantum Week 2026.","image":"https://shukla.io/quantum-oracle-engineering/img/myth04.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/reversible-circuit-design/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Lesson 4: Reversible by design","description":"Design and test a reversible quantum oracle: preserve the inputs cleanup needs, return borrowed scratch to zero, distinguish semantic correctness from invertibility, and build the full amplitude-estimation iterate. Includes executable Qiskit examples.","image":"https://shukla.io/quantum-oracle-engineering/img/myth04.png","learningResourceType":"Slide deck","inLanguage":"en","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io"},"isPartOf":{"@type":"Course","name":"Quantum Oracle Engineering","url":"https://shukla.io/quantum-oracle-engineering/"},"url":"https://shukla.io/quantum-oracle-engineering/reversible-circuit-design/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quantum Oracle Engineering","item":"https://shukla.io/quantum-oracle-engineering/"},{"@type":"ListItem","position":2,"name":"Lesson 4: Reversible by design","item":"https://shukla.io/quantum-oracle-engineering/reversible-circuit-design/"}]}</script>
   <script>window.MathJax={options:{enableMenu:false}};</script>
-  <link rel="stylesheet" href="../slides.css?v=1413355062">
-  <script src="../slides.js?v=1413355062" defer></script>
+  <link rel="stylesheet" href="../slides.css?v=2538285854">
+  <script src="../slides.js?v=2538285854" defer></script>
   <script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
 </head>
 <body>
@@ -145,250 +209,380 @@
   }
 </style>
 <script src="../assets/sway-data.js?v=2283849795-2321" defer></script>
-<script src="../assets/l2.js?v=3738266183-29337" defer></script>
+<script src="../assets/l2.js?v=3814641028-30292" defer></script>
+
+<script src="../assets/l3-data.js?v=2295731919-1392" defer></script>
+<script src="../assets/l4-evidence.js?v=1915549642-942" defer></script>
+<script src="../assets/l4-lesson.js?v=1240697102-8176" defer></script>
+<style>
+  .l4-code { max-width: 42em; margin: .6em auto; font-size: 1em; text-align: left; }
+  .slide .l4-code pre { background: #fffdf8; border: 1px solid #dedbd2; border-radius: 8px; padding: .6em .8em; font-size: 1em; }
+  .slide .l4-code code { white-space: pre-wrap; font-size: 1em; }
+  .slide .l4-table { font-size: 1.2em; margin: .5em auto; border-collapse: collapse; }
+  .l4-table th, .l4-table td { padding: .4em .65em; text-align: right; border-bottom: 1px solid #dedbd2; }
+  .l4-table th:first-child, .l4-table td:first-child { text-align: left; }
+  .l4-table .focus { background: #e9edf5; }
+  .l4-links { text-align: center; font-size: 1.15em; line-height: 1.8; }
+  @media (max-width: 600px) {
+    .l4-table th, .l4-table td { padding: .4em .25em; }
+  }
+</style>
 
 <div class="notes">
-<p>Lesson 3 built the rollout and ran it forward. Today we run it backward, and find out why that is the easy part.</p>
-<p>Press once for the myth: “Reversibility is just bookkeeping.” <strong>Half of it is. The wrong half.</strong></p>
-<p>Same controls: arrows, arrow keys, or scroll.</p>
+<p>Last time we built the rollout circuit. <strong>Today we’ll run it backward and see why we kept all that extra data.</strong></p>
+<p><strong>The inverse is one line of code. Getting the forward computation right takes more work.</strong></p>
 </div>
 </section>
 <section id="one-line" class="slide" data-segment="Rewind" data-segment-id="seg-open">
 <h1>One line of code</h1>
-<!-- Lesson 4, slide 2: one line of code.  The call that inverts the rollout,
-     then the block strip of Lesson 3's circuit mirrored into its inverse.
-     See assets/l4-mirror.js. -->
-<div class="l2-fig"><svg class="l4-mirror" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-mirror.js?v=2304289590-3291" defer></script>
-
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="mirror" viewBox="0 0 760 260" width="1000">
+</svg>
+</div>
+<div class="l4-code">
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A_dagger <span class="op">=</span> A.inverse()</span></code></pre></div>
+</div>
 <div class="notes">
-<p>Here is the bookkeeping. <strong>One call, and the whole rollout runs backward:</strong> the gate list reversed, every gate replaced by its inverse. Qiskit does it for any unitary and never complains.</p>
-<p>So if backward is one line, what fills a lesson? Two forward habits that backward cannot fix.</p>
+<p><strong>A.inverse() reverses the gate order and replaces each gate with its inverse.</strong> Qiskit handles that part for us.</p>
+<p><strong>It will also happily undo the wrong computation.</strong> It has no idea what the Sway rules are, or whether we cleared our scratch at the right time.</p>
+<p>A includes preparation, the rollout, and the payoff. This assumes a unitary circuit; measurements and resets stay outside it.</p>
 </div>
 </section>
 <section id="two-habits" class="slide" data-segment="Rewind" data-segment-id="seg-open">
-<h1>Two habits left</h1>
-<!-- Lesson 4, slide 3: Lesson 3's five-point checklist at three of five.  See assets/l4-checklist.js. -->
-<div class="l2-fig"><svg class="l4-checklist" data-mode="three" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-checklist.js?v=3032528301-2185" defer></script>
-
+<h1>Three questions to answer</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="objectives" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>Lesson 3’s checklist, three of five. Peeking and rolling as you go are dead.</p>
-<p><strong>Overwriting and leaving notes behind are still standing.</strong> Both fall today, and the second item, old and new apart, gets the reason Lesson 3 owed you.</p>
+<p>Lesson 3 made three choices: keep the old colors, clear the selector before placing a stone, put randomness in registers. Today each becomes a question about that circuit.</p>
+<p><strong>What must the inverse still read? When can scratch return to zero? How do we check the circuit plays the right game?</strong> The checks are small Qiskit circuits that run, on tiny boards.</p>
 </div>
 </section>
-<section id="turn-of-q" class="slide" data-segment="Why backward" data-segment-id="seg-backward">
-<h1>Forward once, backward once</h1>
-<!-- Lesson 4, slide 4: one turn of Q, with the rollout inside A and its inverse.  See assets/l4-turn.js. -->
-<div class="l2-fig"><svg class="l4-turn" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-turn.js?v=2051756158-3051" defer></script>
-
+<section id="one-board" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Why three color registers?</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="boards" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>Why backward at all. Lesson 2’s rotation, one turn: <strong>A forward, a reflection, A backward, a reflection.</strong></p>
-<p>Every turn of Q plays the rollout once forward and once in reverse. Hundreds of turns, and every one needs the reverse to be exact.</p>
+<p>Same moves and dice as Lesson 3. These pictures show the board at the round boundaries. Later placements can still write to the current color register.</p>
+<p><strong>Two rounds use three color registers: 27 qubits.</strong> Occupancy has its own nine qubits.</p>
+<p><strong>Could we save 18 qubits by changing the colors in place?</strong> Let’s try it.</p>
 </div>
 </section>
-<section id="one-board" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Why three boards?</h1>
-<!-- Lesson 4, slide 5: three colour boards against one flipped in place.  See assets/l4-one-board.js. -->
-<div class="l2-fig"><svg class="l4-one-board" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-one-board.js?v=3460667363-2358" defer></script>
-
+<section id="find-bug" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Predict the second stone</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="predict" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>A tempting shortcut. Lesson 3 kept a fresh color board for every round: twenty-seven qubits for three boards.</p>
-<p><strong>Why not one board, flipped in place?</strong> Eighteen qubits back, and a shorter circuit. Let’s build it.</p>
+<p>Let’s use just two stones: Black at cell 0, White at cell 1. Their dice are 0 and 3. Both have zero friendly neighbors.</p>
+<p><strong>A stone flips when its die is less than 4 minus its friendly neighbors.</strong> We’re numbering cells and die faces from zero; the die has faces 0–19.</p>
+<p><strong>Cell 0 flips to White. What should cell 1 do?</strong> And what happens if it reads that neighbor after the flip?</p>
+<p>Give everyone about 30 seconds before advancing.</p>
 </div>
 </section>
-<section id="find-bug" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Find the bug</h1>
-<!-- Lesson 4, slide 6: find the bug.  The in-place event and Lesson 3's event on the same board and dice.  See assets/l4-inplace.js. -->
-<div class="l2-fig"><svg class="l4-inplace" data-mode="run" viewBox="0 0 760 320" width="1000"></svg></div>
-<script src="../assets/l4-inplace.js?v=1250173319-7140" defer></script>
-
+<section id="read-flipped" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Cell 1 read a flipped neighbor</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="inplace" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>Same board, same dice, two circuits. Left, the shortcut: each stone flips the moment it decides. Right, Lesson 3’s version.</p>
-<p><strong>The boards come out different.</strong> Thirty seconds: where is the bug? Hands up for the die, the neighbor read, the flag, or nothing at all.</p>
+<p><strong>Reading the old board, cell 1 should flip to Black.</strong> White sees Black, so it has zero friends and 3 &lt; 4.</p>
+<p><strong>Update cell 0 first, and the same dice leave cell 1 White.</strong> It now sees a White neighbor. One friend, so 3 &lt; 3 is false.</p>
+<p><strong>Every decision needs to read the old colors.</strong> We can run the gates one after another and still follow that rule.</p>
 </div>
 </section>
-<section id="read-flipped" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Cell two read a flipped neighbor</h1>
-<!-- Lesson 4, slide 7: the diagnosis, frozen at cell two.  See assets/l4-inplace.js. -->
-<div class="l2-fig"><svg class="l4-inplace" data-mode="diagnose" viewBox="0 0 760 320" width="1000"></svg></div>
-<script src="../assets/l4-inplace.js?v=1250173319-7140" defer></script>
-
+<section id="stranded" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Cleanup can read a changed input too</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="stranded" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>The neighbor read. <strong>Cell two counted its friends after cell one had already flipped.</strong> Later stones see a board the rules never defined.</p>
-<p>Exact enumeration: the two games differ by four thousandths of win rate. Below the noise of a classical estimate, and larger than the gaps Lesson 2 set out to resolve.</p>
+<p>Here’s another problem with changing the input. Start with two Black stones and a work bit at zero.</p>
+<p><strong>The equality check writes 1 because the colors match.</strong> Now flip the first stone and run the check again. The colors differ, so we XOR zero into the work bit.</p>
+<p><strong>Changing the input before cleanup leaves the work bit at 1.</strong> The second comparison is answering a different question.</p>
+<p>Writing the new color somewhere else keeps the original comparison available to undo.</p>
 </div>
 </section>
-<section id="life" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>You already know this bug</h1>
-<!-- Lesson 4, slide 8: Conway's Life with two buffers and in place.  See assets/l4-life.js. -->
-<div class="l2-fig"><svg class="l4-life" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-life.js?v=4199481367-3402" defer></script>
-
-<div class="notes">
-<p>You have met this bug. Conway’s Life, updated in place, reads cells that already changed, and the toad on the right stops being a toad.</p>
-<p><strong>Every cellular automaton needs two buffers.</strong> The quantum version adds one clause: the old buffer cannot be freed.</p>
-</div>
-</section>
-<section id="stranded" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>The comparison is stranded</h1>
-<!-- Lesson 4, slide 9: the in-place cell block, and the comparison bits it strands.  See assets/l4-stranded.js. -->
-<div class="l2-fig"><svg class="l4-stranded" viewBox="0 0 760 320" width="1000"></svg></div>
-<script src="../assets/l4-stranded.js?v=3838790452-3560" defer></script>
-
-<div class="notes">
-<p>The second failure hides in the scratch. The bits that count friends compare each neighbor against the cell’s own color.</p>
-<p><strong>Flip the color, then uncompute them, and they compare against a different color.</strong> They do not return to zero. The next cell borrows dirty qubits.</p>
-</div>
-</section>
-<section id="occ-in-place" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Occupancy updates in place, and that is fine</h1>
+<section id="occ-in-place" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Occupancy can update in place</h1>
 <!-- Lesson 4, slide 10: occupancy updated in place, with the move index as its record, run forward and back.  See assets/l4-occ.js. -->
 <div class="l2-fig"><svg class="l4-occ" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-occ.js?v=3356858359-2510" defer></script>
+<script src="../assets/l4-occ.js?v=444671787-2253" defer></script>
 
 <div class="notes">
-<p>Not every in-place update is a sin. Occupancy is one register for the whole rollout, and it only ever gains stones.</p>
-<p><strong>The move index says where, so the step can be undone.</strong> In place is fine when a record of the change is kept.</p>
+<p>Occupancy is simpler. These are the same four moves from Lesson 3: 4, 1, 3, 6. A color flip doesn’t change whether a cell is occupied.</p>
+<p><strong>Keep the move index, and we can undo the placement.</strong> XOR the occupancy bit at that index again. The sentinel index does nothing.</p>
+<p><strong>Going backward, remove the stone before clearing its move index.</strong> Later operations have to be undone first, of course.</p>
 </div>
 </section>
-<section id="merge" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Two boards, one result</h1>
+<section id="merge" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Two inputs, one visible result</h1>
 <!-- Lesson 4, slide 11: two boards, the same rank, one result.  See assets/l4-merge.js. -->
 <div class="l2-fig"><svg class="l4-merge" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-merge.js?v=2263360927-3006" defer></script>
+<script src="../assets/l4-merge.js?v=368852783-2571" defer></script>
 
 <div class="notes">
-<p>Why the move index must stay. Two boards, the same rank, the same result.</p>
-<p><strong>From the result alone you cannot tell which move was made</strong>, so a circuit that forgot the index could not run backward. Two paths into one state is the shape of every irreversible step.</p>
+<p>Both boards ask for rank zero, the first empty cell. That’s cell 0 on the top board and cell 1 on the bottom.</p>
+<p><strong>Both placements give the same visible board.</strong> From that board alone, how would we know which input to go back to?</p>
+<p><strong>The saved move index keeps the two cases distinct.</strong> A unitary needs that distinction somewhere. It doesn’t mean this is the only way to store it.</p>
 </div>
 </section>
-<section id="keep-rule" class="slide" data-segment="Rule one: keep what the outcome does not determine" data-segment-id="seg-keep">
-<h1>Keep what the outcome does not determine</h1>
+<section id="keep-rule" class="slide" data-segment="Keep the inputs that undo needs" data-segment-id="seg-keep">
+<h1>Records persist; scratch is borrowed</h1>
 <!-- Lesson 4, slide 12: the rule, and the two columns it sorts the 169 into.  See assets/l4-records.js. -->
 <div class="l2-fig"><svg class="l4-records" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-records.js?v=876857859-2362" defer></script>
+<script src="../assets/l4-records.js?v=1070239656-2274" defer></script>
 
 <div class="notes">
-<p>The rule under both bugs. <strong>Keep what the outcome does not determine</strong>: old colors, move indices, dice, ranks.</p>
-<p>Everything the kept data determines is scratch, and scratch must return to zero before anyone borrows it. Records against scratch. The rest of the lesson is the second column.</p>
+<p><strong>Records stay around until the inverse has finished using them.</strong> That’s our dice, boards, move indices, and ranks.</p>
+<p><strong>Scratch goes back to zero before the next block borrows it.</strong> We can clear it while the inputs that produced it are still available.</p>
+<p>The selector borrows four bits each for its prefix, equality check, and temporary index, plus one match flag.</p>
+<p>We copy the temporary index into a move record, then clear the temporary copy. This is our chosen storage layout; other designs could recompute some records.</p>
 </div>
 </section>
-<section id="pool" class="slide" data-segment="Rule two: scratch returns to zero before it is borrowed" data-segment-id="seg-zero">
-<h1>Thirteen qubits, borrowed by every block</h1>
+<section id="pool" class="slide" data-segment="Return scratch before the next borrower" data-segment-id="seg-zero">
+<h1>Thirteen qubits, borrowed repeatedly</h1>
 <!-- Lesson 4, slide 13: the thirteen-qubit scratch pool over one rollout.  See assets/l4-pool.js. -->
 <div class="l2-fig"><svg class="l4-pool" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-pool.js?v=1732610457-3603" defer></script>
+<script src="../assets/l4-pool.js?v=2293716273-2086" defer></script>
 
 <div class="notes">
-<p>Thirteen qubits of scratch, shared. <strong>Rank-select borrows all thirteen; the event borrows eight for each cell; the payoff count borrows them too.</strong></p>
-<p>Every block returns them at zero. The pool is why the count is 169 and not several hundred.</p>
+<p>The selector needs 13 work qubits. One event cell needs eight. The payoff needs nine.</p>
+<p><strong>The selector, event, and payoff can share the same 13 qubits.</strong> The picture shows one borrower of each kind. Each dip to zero is a cleanup boundary.</p>
+<p>The rollout repeats this pattern. Even neighboring event cells take turns borrowing the pool.</p>
+<p><strong>The next block expects those qubits to be zero.</strong> A circuit can still be reversible with dirty work, but the next borrower may compute the wrong result.</p>
 </div>
 </section>
-<section id="order-vote" class="slide" data-segment="Rule two: scratch returns to zero before it is borrowed" data-segment-id="seg-zero">
-<h1>Place first, or unwind first?</h1>
+<section id="order-vote" class="slide" data-segment="Return scratch before the next borrower" data-segment-id="seg-zero">
+<h1>Place first, or clear the counter first?</h1>
 <!-- Lesson 4, slide 14: the vote, two orders for scan, unwind and place.  See assets/l4-order.js. -->
 <div class="l2-fig"><svg class="l4-order" data-mode="ask" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-order.js?v=2597347346-4785" defer></script>
+<script src="../assets/l4-order.js?v=1199299693-5923" defer></script>
 
 <div class="notes">
-<p>Second vote. The scan fills the counter, the move register takes the index, and a stone has to land.</p>
-<p><strong>Unwind the counter before the stone, or after?</strong> Left or right. Hands up.</p>
+<p>Back to round 2. Seven empty cells, rank two, and we’ve already saved cell 3 as the move.</p>
+<p><strong>The scan leaves the counter at seven. Do we place the stone first, or clear the counter first?</strong></p>
+<p><strong>What will the counter hold in each case?</strong> Take a moment before advancing.</p>
+<p>We’re following just the counter here; the full selector clears its other work bits too.</p>
 </div>
 </section>
-<section id="undo-reads" class="slide" data-segment="Rule two: scratch returns to zero before it is borrowed" data-segment-id="seg-zero">
+<section id="undo-reads" class="slide" data-segment="Return scratch before the next borrower" data-segment-id="seg-zero">
 <h1>Undo must see what do saw</h1>
 <!-- Lesson 4, slide 15: the two orders run, and one counter ends dirty.  See assets/l4-order.js. -->
 <div class="l2-fig"><svg class="l4-order" data-mode="answer" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-order.js?v=2597347346-4785" defer></script>
+<script src="../assets/l4-order.js?v=1199299693-5923" defer></script>
 
 <div class="notes">
-<p>After loses. The scan counted five empties; after the stone landed the unwind finds four, and the counter ends at one.</p>
-<p><strong>Undo must see what do saw.</strong> Lesson 3 unwound first without saying why. Now you know why.</p>
+<p><strong>Place first, and the counter ends at one.</strong> There are only six empty cells left: seven increments, six decrements.</p>
+<p><strong>Clear the counter first, and it returns to zero. Then place using the saved index.</strong> All seven empties were still there for the seven decrements. Clearing undoes only the scratch; the stone is the result, and the global inverse undoes it later.</p>
+<p><strong>Undo has to see what do saw.</strong> The downloadable demo runs both orders on this board with a real four-bit counter.</p>
 </div>
 </section>
-<section id="dirty-game" class="slide" data-segment="Rule two: scratch returns to zero before it is borrowed" data-segment-id="seg-zero">
-<h1>Dirty scratch, wrong game</h1>
-<!-- Lesson 4, slide 16: the four placements with a counter that never returned to zero.  See assets/l4-dirty.js. -->
-<div class="l2-fig"><svg class="l4-dirty" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-dirty.js?v=3022111971-2589" defer></script>
-
+<section id="dirty-game" class="slide" data-segment="Return scratch before the next borrower" data-segment-id="seg-zero">
+<h1>The next borrower assumes zero</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="dirty" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>What one leftover does. The next placement starts its count at one, picks the cell before the one it meant, and rank zero places nothing. Then two. Then three.</p>
-<p><strong>Exact enumeration: Black wins .439 instead of .271.</strong> The circuit runs. Nothing raises.</p>
+<p>Try a new rank-two query on the same board, but start the counter at one.</p>
+<p><strong>The clean counter picks cell 3. The dirty counter picks cell 2.</strong> Every comparison is shifted by one.</p>
+<p><strong>Rank zero doesn’t find a match at all.</strong> On this board the dirty counter never reaches zero or wraps around.</p>
+<p>That’s one leftover bit changing the next move. We’re looking at the decoder here, not estimating a whole game’s win rate.</p>
 </div>
 </section>
-<section id="every-branch" class="slide" data-segment="Rule two: scratch returns to zero before it is borrowed" data-segment-id="seg-zero">
-<h1>Every branch is a classical run</h1>
-<!-- Lesson 4, slide 17: every branch is a classical run; the seed test with the scratch check.  See assets/l4-branch.js. -->
-<div class="l2-fig"><svg class="l4-branch" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-branch.js?v=168501329-2482" defer></script>
-
+<section id="payoff-cleanup" class="slide" data-segment="Return scratch before the next borrower" data-segment-id="seg-zero">
+<h1>Compute, copy the bit, uncompute</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="payoff" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>How you catch both. <strong>Every branch of the rollout is a classical run</strong>: a basis state in, a basis state out.</p>
-<p>Fix a seed, run the circuit as a permutation, compare the board, and check every scratch bit is zero. Linearity carries what the seeds show to the superposition.</p>
+<p>W counts Black, counts White, and checks whether Black has more stones.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>circuit.compose(W, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>circuit.cx(win_flag, payoff)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>circuit.compose(W.inverse(), inplace<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<p><strong>Compute the win flag, copy it into the payoff, then undo W.</strong> The payoff starts at zero, so a CNOT does the copy.</p>
+<p><strong>All nine work bits return to zero. The board and payoff stay.</strong> Keep the board unchanged until cleanup finishes.</p>
+<p>On a superposition, that CNOT can entangle the payoff with the board. We’re copying a Boolean result, not cloning an arbitrary quantum state.</p>
 </div>
 </section>
-<section id="backward-forward" class="slide" data-segment="The myth" data-segment-id="seg-reveal">
-<h1>Backward cannot catch a forward bug</h1>
-<!-- Lesson 4, slide 18: the shortcut circuit round-trips to zero and still answers wrong.  See assets/l4-roundtrip.js. -->
-<div class="l2-fig"><svg class="l4-roundtrip" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-roundtrip.js?v=2916551738-2843" defer></script>
-
+<section id="every-branch" class="slide" data-segment="Test the meaning as well as the inverse" data-segment-id="seg-reveal">
+<h1>Three checks, three different claims</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="tests" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
 <div class="notes">
-<p>The myth, settled. Run the shortcut forward and backward: every register returns to zero, as it must, because the inverse of a unitary is exact.</p>
-<p><strong>The round trip passes and the answer is wrong.</strong> Reversibility is a discipline for the forward pass. The backward pass is bookkeeping.</p>
+<p><strong>First, does the circuit agree with the classical rules?</strong> Check the output, the inputs we promised to keep, and every scratch bit. Our tiny event has only four color inputs, so we check all four.</p>
+<p><strong>Then check amplitudes, including phases.</strong> Probabilities alone can hide a phase error. The demo also checks a superposition of those four inputs.</p>
+<p><strong>Finally, does forward followed by backward restore the input?</strong></p>
+<p>demo.py checks these little circuits, not the full 169-qubit statevector. A few sampled full rollouts wouldn’t prove the whole oracle correct.</p>
 </div>
 </section>
-<section id="map" class="slide" data-segment="The count" data-segment-id="seg-count">
-<h1>Records and scratch, 169</h1>
+<section id="backward-forward" class="slide" data-segment="Test the meaning as well as the inverse" data-segment-id="seg-reveal">
+<h1>A round trip can pass the wrong game</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="roundtrip" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
+<div class="notes">
+<p>Start Black, White. <strong>The in-place circuit gives White, White. The game required White, Black.</strong> Even the scratch comes out clean on this branch.</p>
+<p>Now run its inverse. <strong>We get the original input back perfectly.</strong> Both the correct and wrong circuits pass that check.</p>
+<p><strong>A passing round trip doesn’t tell us we played the right game.</strong> We still need the comparison against the rules.</p>
+</div>
+</section>
+<section id="turn-of-q" class="slide" data-segment="Put the complete oracle into Q" data-segment-id="seg-backward">
+<h1>One preparation, then repeated turns</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="iterate" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
+<div class="notes">
+<p><strong>Prepare A once. Then each turn goes: mark the payoff, run A backward, reflect about all zero, run A forward.</strong> Read the boxes left to right.</p>
+<p>The payoff mark is Z on the payoff qubit. The zero reflection includes every input register, including work and payoff. The usual overall minus sign only changes a global phase here.</p>
+<p><strong>A includes the randomness preparation, rollout, and payoff.</strong> We need the inverse of all of it. That’s the Q rotation from Lesson 2.</p>
+</div>
+</section>
+<section id="phase-mark" class="slide" data-segment="Put the complete oracle into Q" data-segment-id="seg-backward">
+<h1>After the phase mark, zero is not the goal</h1>
+<div class="l2-fig">
+<svg class="l4-demo" data-scene="phase" viewBox="0 0 760 300" width="1000">
+</svg>
+</div>
+<div class="notes">
+<p>Here we use two uniform data bits. We win only when both are zero, so a = 1/4.</p>
+<p><strong>After marking the payoff, should A backward give us all zero again?</strong> Pause, then advance for the answer.</p>
+<p><strong>Without the mark, yes. With the mark, this example gives all zero only a quarter of the time.</strong> Here a = 1/4, so that probability is (1 − 2a)².</p>
+<p><strong>The phase mark changed the state we’re trying to undo.</strong> The inverse still works.</p>
+<p>Finish the turn with the zero reflection and A. The good probability goes from 1/4 to 1, just like Lesson 2.</p>
+</div>
+</section>
+<section id="map" class="slide" data-segment="Count the cost and review a design" data-segment-id="seg-count">
+<h1>Records and scratch: 169 qubits</h1>
 <!-- Lesson 4, slide 19: the 169 as records and scratch.  See assets/l4-map.js. -->
 <div class="l2-fig"><svg class="l4-map" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-map.js?v=1996612947-2359" defer></script>
+<script src="../assets/l4-map.js?v=3885012532-1025" defer></script>
 
 <div class="notes">
-<p>The 169, relabeled. Dice, boards, move indices, ranks: 155 records the inverse will read. Thirteen scratch, borrowed and returned. One payoff.</p>
-<p><strong>Everything but fourteen qubits is the memory of a decision.</strong></p>
+<p><strong>169 qubits: 155 records, 13 scratch, one payoff.</strong> This is the paper’s 3×3, two-round layout. We haven’t shown that it’s the smallest possible allocation.</p>
+<p>The records are 90 dice qubits, 36 for state, 16 for move indices, and 13 for ranks. State includes occupancy and all three color registers.</p>
+<p><strong>Most of the storage is the history we’re keeping.</strong> Clearing scratch helps, but saving much more means finding a way to release or recompute some of those records.</p>
 </div>
 </section>
-<section id="growth" class="slide" data-segment="The count" data-segment-id="seg-count">
-<h1>Grow the board</h1>
-<!-- Lesson 4, slide 20: qubits as the board grows, from real builds, and one projected full game.  See assets/l4-growth.js. -->
-<div class="l2-fig"><svg class="l4-growth" viewBox="0 0 760 320" width="1000"></svg></div>
-<script src="../assets/l4-growth.js?v=1167297882-3118" defer></script>
-
+<section id="growth" class="slide" data-segment="Count the cost and review a design" data-segment-id="seg-count">
+<h1>Larger boards and longer rollouts</h1>
+<table class="l4-table">
+<thead>
+<tr>
+<th>
+Board · rounds
+</th>
+<th>
+Qubits
+</th>
+<th>
+Gates
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+3×3 · 2
+</td>
+<td>
+169
+</td>
+<td>
+9,768
+</td>
+</tr>
+<tr>
+<td>
+5×5 · 5
+</td>
+<td>
+916
+</td>
+<td>
+76,720
+</td>
+</tr>
+<tr class="focus">
+<td>
+10×10 · 5
+</td>
+<td>
+3,363
+</td>
+<td>
+481,201
+</td>
+</tr>
+<tr class="focus">
+<td>
+10×10 · 10
+</td>
+<td>
+6,503
+</td>
+<td>
+793,901
+</td>
+</tr>
+<tr>
+<td>
+20×20 · 10
+</td>
+<td>
+25,189
+</td>
+<td>
+6,072,641
+</td>
+</tr>
+</tbody>
+</table>
 <div class="notes">
-<p>Grow the board and the records grow with it: cells times rounds. Scratch grows with the logarithm.</p>
-<p><strong>A full 19 by 19 game is about four hundred thousand qubits, and twenty-eight of them are scratch.</strong> The records are the cost, and Lesson 5 asks whether any can be returned early.</p>
+<p>These are counts for one forward call, from the paper’s resource and scaling tables.</p>
+<p>They’re before native-gate decomposition and fault-tolerance overhead, so they aren’t hardware timings.</p>
+<p><strong>Look at the two 10×10 rows. Twice as many rounds nearly doubles the qubits.</strong> The gate count grows too, though setup and payoff work don’t double.</p>
+<p><strong>We pay for those gates again when we run backward.</strong> Q also needs its reflections.</p>
+<p>Back to Lesson 1: <strong>What does each oracle call cost?</strong></p>
 </div>
 </section>
-<section id="five-of-five" class="slide" data-segment="Hand to Lesson 5" data-segment-id="seg-handoff">
-<h1>Five of five</h1>
-<!-- Lesson 4, slide 21: the checklist complete.  See assets/l4-checklist.js. -->
-<div class="l2-fig"><svg class="l4-checklist" data-mode="five" viewBox="0 0 760 300" width="1000"></svg></div>
-<script src="../assets/l4-checklist.js?v=3032528301-2185" defer></script>
-
-<div class="notes">
-<p>Five of five. Round semantics, old and new apart, scratch erased before the board changes, read-only randomness, runs backward after the payoff is marked.</p>
-<p><strong>The last two were today’s</strong>, and the second is now justified rather than decreed.</p>
-</div>
-</section>
-<section id="next" class="bare slide" data-segment="Hand to Lesson 5" data-segment-id="seg-handoff">
-<h1>Continue to Lesson 5</h1>
-<!-- Lesson 4, slide 22: continue to Lesson 5.  Card art, cliffhanger, QR and URL in one
-     link; the QR matrix is the one Lesson 1 ships (see assets/qr.html for how
-     it was generated).  See assets/l4-qr.js. -->
-<style> #qr-l4-fig a { cursor: pointer; text-decoration: none; } </style>
+<section id="five-of-five" class="slide" data-segment="Count the cost and review a design" data-segment-id="seg-count">
+<h1>Review the order, not just the gate list</h1>
 <div class="l2-fig">
-<svg id="qr-l4-fig" viewBox="0 0 760 350" width="1000"></svg>
+<svg class="l4-demo" data-scene="checklist" viewBox="0 0 760 300" width="1000">
+</svg>
 </div>
-<script>window.qr_data = { n: 33, d: "M0 0h7v1h-7zM8 0h5v1h-5zM16 0h1v1h-1zM18 0h3v1h-3zM23 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM16 1h2v1h-2zM21 1h3v1h-3zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM10 2h2v1h-2zM13 2h2v1h-2zM16 2h1v1h-1zM18 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM18 3h1v1h-1zM21 3h1v1h-1zM23 3h2v1h-2zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM9 4h3v1h-3zM16 4h1v1h-1zM18 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM11 5h2v1h-2zM15 5h4v1h-4zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h3v1h-3zM12 7h1v1h-1zM15 7h3v1h-3zM19 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h3v1h-3zM9 8h1v1h-1zM14 8h5v1h-5zM21 8h2v1h-2zM26 8h1v1h-1zM29 8h1v1h-1zM31 8h2v1h-2zM0 9h1v1h-1zM2 9h1v1h-1zM7 9h2v1h-2zM10 9h2v1h-2zM13 9h1v1h-1zM16 9h2v1h-2zM19 9h2v1h-2zM23 9h1v1h-1zM26 9h2v1h-2zM29 9h2v1h-2zM32 9h1v1h-1zM1 10h6v1h-6zM9 10h2v1h-2zM12 10h2v1h-2zM18 10h1v1h-1zM21 10h9v1h-9zM31 10h2v1h-2zM0 11h1v1h-1zM5 11h1v1h-1zM8 11h1v1h-1zM11 11h2v1h-2zM15 11h3v1h-3zM19 11h5v1h-5zM27 11h1v1h-1zM29 11h1v1h-1zM1 12h1v1h-1zM4 12h3v1h-3zM8 12h2v1h-2zM14 12h3v1h-3zM20 12h6v1h-6zM27 12h3v1h-3zM31 12h2v1h-2zM0 13h1v1h-1zM2 13h1v1h-1zM5 13h1v1h-1zM11 13h4v1h-4zM17 13h1v1h-1zM20 13h2v1h-2zM24 13h1v1h-1zM27 13h1v1h-1zM31 13h1v1h-1zM0 14h1v1h-1zM3 14h5v1h-5zM9 14h3v1h-3zM14 14h1v1h-1zM18 14h4v1h-4zM26 14h1v1h-1zM29 14h1v1h-1zM2 15h1v1h-1zM4 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h2v1h-2zM28 15h3v1h-3zM1 16h1v1h-1zM4 16h1v1h-1zM6 16h3v1h-3zM11 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM21 16h2v1h-2zM25 16h2v1h-2zM28 16h3v1h-3zM1 17h1v1h-1zM3 17h2v1h-2zM9 17h1v1h-1zM14 17h2v1h-2zM18 17h1v1h-1zM20 17h1v1h-1zM22 17h3v1h-3zM26 17h1v1h-1zM28 17h2v1h-2zM31 17h2v1h-2zM5 18h2v1h-2zM8 18h2v1h-2zM11 18h1v1h-1zM15 18h2v1h-2zM18 18h1v1h-1zM20 18h2v1h-2zM25 18h1v1h-1zM27 18h2v1h-2zM30 18h1v1h-1zM0 19h2v1h-2zM3 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM11 19h1v1h-1zM14 19h5v1h-5zM20 19h1v1h-1zM22 19h5v1h-5zM28 19h1v1h-1zM31 19h2v1h-2zM0 20h1v1h-1zM2 20h1v1h-1zM6 20h5v1h-5zM14 20h3v1h-3zM19 20h1v1h-1zM22 20h1v1h-1zM29 20h2v1h-2zM0 21h1v1h-1zM2 21h2v1h-2zM7 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM15 21h2v1h-2zM20 21h1v1h-1zM22 21h2v1h-2zM25 21h2v1h-2zM29 21h1v1h-1zM32 21h1v1h-1zM4 22h3v1h-3zM10 22h1v1h-1zM12 22h4v1h-4zM17 22h4v1h-4zM23 22h2v1h-2zM26 22h2v1h-2zM29 22h4v1h-4zM1 23h2v1h-2zM7 23h1v1h-1zM10 23h1v1h-1zM13 23h3v1h-3zM18 23h1v1h-1zM20 23h1v1h-1zM26 23h1v1h-1zM29 23h1v1h-1zM0 24h1v1h-1zM5 24h2v1h-2zM12 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM19 24h2v1h-2zM22 24h7v1h-7zM31 24h2v1h-2zM8 25h2v1h-2zM11 25h1v1h-1zM14 25h3v1h-3zM19 25h1v1h-1zM21 25h1v1h-1zM24 25h1v1h-1zM28 25h2v1h-2zM0 26h7v1h-7zM8 26h2v1h-2zM13 26h2v1h-2zM17 26h5v1h-5zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM11 27h2v1h-2zM14 27h7v1h-7zM23 27h2v1h-2zM28 27h3v1h-3zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM9 28h1v1h-1zM12 28h1v1h-1zM15 28h5v1h-5zM22 28h7v1h-7zM30 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h2v1h-2zM11 29h4v1h-4zM16 29h2v1h-2zM19 29h1v1h-1zM21 29h2v1h-2zM27 29h1v1h-1zM29 29h1v1h-1zM31 29h2v1h-2zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h2v1h-2zM15 30h2v1h-2zM20 30h1v1h-1zM22 30h1v1h-1zM26 30h2v1h-2zM29 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM13 31h2v1h-2zM17 31h2v1h-2zM20 31h1v1h-1zM22 31h3v1h-3zM26 31h3v1h-3zM32 31h1v1h-1zM0 32h7v1h-7zM8 32h5v1h-5zM14 32h1v1h-1zM16 32h2v1h-2zM19 32h1v1h-1zM21 32h3v1h-3zM25 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1z" };</script>
-<script src="../assets/l4-qr.js?v=460857953-1880" defer></script>
-
 <div class="notes">
-<p>Pre-reads: the playable Sway game, and Section III of the QCE26 paper for the register layout. Click the link to open Lesson 5.</p>
+<p>One last check. <strong>We compute a win flag, change the board, then undo the comparison. What goes wrong?</strong></p>
+<p>Give everyone about 45 seconds to suggest a fix.</p>
+<p><strong>Cleanup needs the original board. Copy the flag to payoff and undo the comparison before changing the board.</strong> Or keep the old board until cleanup is done.</p>
+<p><strong>Calling inverse() won’t fix the order for us.</strong></p>
+</div>
+</section>
+<section id="next" class="slide" data-segment="Try it, then reduce the history" data-segment-id="seg-handoff">
+<h1>Run the examples</h1>
+<div class="l4-code">
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run demo.py</span></code></pre></div>
+</div>
+<div class="l4-links">
+<p><a href="demo.py" download>Download demo.py</a><br> <a href="../building-a-quantum-oracle/">Lesson 3</a> · <a href="../">Course</a></p>
+</div>
+<div class="notes">
+<p><strong>Download demo.py and run it with uv.</strong> It’ll install Qiskit and check the examples we’ve just used.</p>
+<p>These are small circuits we can inspect, including the two bugs and one full turn of Q. The code doesn’t simulate all 169 qubits.</p>
+<p><strong>Next we’ll look at garbage collection: which records can we release early, and what would we have to recompute?</strong></p>
 </div>
 </section>
 </div>

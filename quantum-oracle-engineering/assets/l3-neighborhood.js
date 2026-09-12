@@ -11,12 +11,11 @@
   const nb = L.sway.neighbors(N);
   const VISITS = [{ cell: 0, name: 'corner' }, { cell: 1, name: 'edge' }, { cell: 4, name: 'centre' }];
   const hl = L.el('rect', { width: SIZE / N - 6, height: SIZE / N - 6, rx: 6, fill: 'none', stroke: L.ORANGE, 'stroke-width': 3 }, root);
-  const nbs = nb.flat().length ? [] : [];
   const marks = [];
   for (let i = 0; i < N * N; i++) marks.push(L.el('circle', { cx: X + B.cx(i), cy: Y + B.cy(i), r: 12, fill: L.BLUE, opacity: 0 }, root));
   // count register
   const RX = 440, RY = 120;
-  L.text(root, 'friendly-neighbour count', RX + 90, RY - 40, { size: 13, fill: L.DIM });
+  L.text(root, 'maximum possible friend count', RX + 90, RY - 40, { size: 13, fill: L.DIM });
   const bits = [2, 1, 0].map((b, k) => {
     const g = L.el('g', {}, root);
     L.el('rect', { x: RX + k * 60, y: RY - 22, width: 44, height: 44, rx: 6, fill: '#fff', stroke: L.INK, 'stroke-width': 1.5 }, g);

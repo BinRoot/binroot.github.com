@@ -332,6 +332,23 @@
     return g;
   };
 
+  // A d6 as a pipped cube, for Pig in Lesson 1 (the hexagon above is Sway's
+  // d20).  Same signature and options: s is the half-side, and the stroke
+  // grows with it so a large die is not drawn with a hairline.
+  L2.d6 = (parent, x, y, s, face, o) => {
+    o = o || {};
+    const g = L2.el('g', { transform: `translate(${x},${y})` }, parent);
+    L2.el('rect', { x: -s, y: -s, width: 2 * s, height: 2 * s, rx: s * 0.3, fill: o.fill || '#fff',
+      stroke: o.stroke || L2.INK, 'stroke-width': o.width || Math.max(1.4, s * 0.055) }, g);
+    const u = s * 0.45, PIPS = {
+      1: [[0, 0]], 2: [[-u, -u], [u, u]], 3: [[-u, -u], [0, 0], [u, u]],
+      4: [[-u, -u], [u, -u], [-u, u], [u, u]], 5: [[-u, -u], [u, -u], [0, 0], [-u, u], [u, u]],
+      6: [[-u, -u], [u, -u], [-u, 0], [u, 0], [-u, u], [u, u]]
+    };
+    (PIPS[face] || []).forEach(([px, py]) => L2.el('circle', { cx: px, cy: py, r: s * 0.17, fill: o.ink || L2.INK }, g));
+    return g;
+  };
+
   // ── Replay glyph: an open circular arrow, head tangent to the arc ────
   // Drawn from geometry rather than hand-placed points, so the head sits on
   // the arc's end and points along it.  Gap at the top, arc runs clockwise.

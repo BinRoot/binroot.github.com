@@ -27,7 +27,8 @@
   // scratch1: a filled control (must be 1).  occupied: an open control (must be 0, the cell is empty).
   L.el('circle', { cx: mx, cy: circ.wireY(5), r: 4.5, fill: L.ORANGE, transform: 'translate(90,28)' }, root);
   L.el('circle', { cx: mx, cy: circ.wireY(6), r: 4.5, fill: '#fff', stroke: L.ORANGE, 'stroke-width': 1.8, transform: 'translate(90,28)' }, root);
-  L.text(root, 'open control: occupied = 0', 90 + mx, 28 + circ.wireY(6) + 14, { size: 10, fill: L.ORANGE, italic: true });
+  // named beside the open control, above its wire, clear of the control line
+  L.text(root, 'open control: occupied = 0', 90 + mx + 12, 28 + circ.wireY(6) - 9, { anchor: 'start', size: 10, fill: L.ORANGE, italic: true });
   L.el('line', { x1: mx, y1: circ.wireY(4), x2: mx, y2: circ.wireY(7), stroke: L.ORANGE, 'stroke-width': 1.8, transform: 'translate(90,28)' }, root);
   // phase captions under the strip
   const caps = [['compute', 0, 5], ['mark', 7, 7], ['uncompute', 9, 14]].map(([s, a, b]) => {

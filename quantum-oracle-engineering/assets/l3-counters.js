@@ -6,7 +6,7 @@
   const L = window.L2;
   const root = L.el('g', {}, svg);
   const N = 3, X = 60, Y = 45, SIZE = 210;
-  const BOARD = [1, 2, 1, 2, 1, 1, 0, 2, 1];
+  const BOARD = window.L3.final;
   const B = L.board(root, { N, size: SIZE, x: X, y: Y, board: BOARD });
   const ptr = L.el('rect', { width: SIZE / N - 6, height: SIZE / N - 6, rx: 6, fill: 'none', stroke: L.ORANGE, 'stroke-width': 3 }, root);
   const counter = (x, y, name, col) => { L.text(root, name, x + 86, y - 18, { size: 13, fill: col, weight: 700 });
@@ -14,6 +14,7 @@
     const dec = L.text(root, '= 0', x + 190, y + 19, { anchor: 'start', size: 15, mono: true, fill: L.DIM });
     return (v) => { bits.forEach((t, k) => t.textContent = String((v >> (3 - k)) & 1)); dec.textContent = `= ${v}`; }; };
   const setB = counter(400, 70, 'black', L.INK), setW = counter(400, 180, 'white', L.GRAY);
+  L.text(root, 'Our trace: four occupied cells after two rounds', 380, 285, { size: 13, fill: L.DIM });
   const STEP = 0.5;
   L.timeline(svg, { T: STEP * 9 + 0.6, setState: (t) => {
     const k = Math.min(8, Math.floor(t / STEP));

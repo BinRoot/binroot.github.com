@@ -282,13 +282,11 @@ For a worked example, a = 1/4 gives θ = 30°. One Q takes the state to 90°. We
 <!--
 The first advance changes the previous example's angle to θ = 10°. 
 
-Each Q adds 20°, so one, two, and four applications take the state to 30°, 50°, and 90°.
+Each Q adds 20°: one, two, and four applications reach 30°, 50°, and 90°. Eight overshoot to 170°, where a win is read only 3% of the time.
 
-**A slightly different starting angle would accumulate a different rotation. That growing difference helps us estimate an unknown probability.**
+**The state never settles on the winning axis. The odds rise and fall, and the rate of that wave is what we estimate.**
 
-Each row starts with a fresh preparation. 
-
-**Each Q costs a rollout forward and backward; measuring the payoff gives one result.** Repeated results help us estimate the original angle.
+Each row starts with a fresh preparation. **Each Q costs a rollout forward and backward; measuring the payoff gives one result.**
 -->
 
 ## Nearby probabilities become easier to distinguish {#noise-vs-phase}

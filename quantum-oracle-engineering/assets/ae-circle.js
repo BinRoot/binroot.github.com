@@ -11,8 +11,9 @@
 //                   then about the prepared state, land at 3 theta; beside
 //                   it the same thing as gates, Q = -A S0 A-dagger S_good,
 //                   with the worked case a = 1/4 one press away
-//   data-stage="3"  Q, Q^2, Q^4 as longer and longer arcs, each from a fresh
-//                   preparation, followed by a payoff measurement
+//   data-stage="3"  Q, Q^2, Q^4, Q^8 as longer and longer arcs, each from a
+//                   fresh preparation, followed by a payoff measurement; the
+//                   last overshoots |good>, so the arrow visibly never settles
 //   data-stage="4"  the register continues into an inverse QFT and meters;
 //                   interference piles the phase into one peak on a ruler
 //
@@ -24,7 +25,8 @@
   const TH = Math.PI / 6;
   // Slides 10 and 12 shrink to a small angle first: at 30 degrees every turn
   // adds 60 and the arcs wrap the circle, which is the opposite of the point.
-  // At 10 degrees (a about 0.03) one, two and four turns land on 30, 50 and 90.
+  // At 10 degrees (a about 0.03) one, two and four turns land on 30, 50 and 90,
+  // and eight overshoot to 170, where a win reads about 3% of the time again.
   const TH3 = Math.PI / 18;
   const C = { cx: 190, cy: 166, R: 118 };   // a full circle fits (slide 11), and so does a reflection below the axis (slide 9)
 
@@ -196,13 +198,17 @@
 
   // ── 9. Let the phase accumulate ─────────────────────────────────────
   const stage3 = (svg, root, q, vec, arc, lab) => {
-    const POW = [1, 2, 4];
+    const POW = [1, 2, 4, 8];
     const small = L.text(root, 'θ = 10°, a ≈ 0.03', C.cx + 6, C.cy + 24, { anchor: 'start', size: 16, fill: L.INK, opacity: 0 });
+    // the overshoot, named: past |good> the odds fall again, which is what
+    // stops a reader from taking the earlier landings as convergence
+    const over = L.text(root, 'Q⁸: 170°, wins read 3% again', C.cx + 6, C.cy + 46, { anchor: 'start', size: 13, fill: L.RED, opacity: 0 });
     const full = L.el('circle', { cx: C.cx, cy: C.cy, r: C.R, fill: 'none', stroke: L.FAINT, 'stroke-width': 1.2, 'stroke-dasharray': '3 4' }, root);
     root.insertBefore(full, q.g);
-    const arcs = POW.map((p, i) => q.arc(TH, TH, 66 + i * 18, { color: [L.GOLD, L.ORANGE, L.BLUE][i], width: 7, opacity: 0.85 }));
-    const COLS = [L.GOLD, L.ORANGE, L.BLUE];
-    const labs = POW.map((p, i) => L.mathText(root, 0, 0, { base: 'Q', sup: i === 0 ? '' : String(p) }, { size: 18, fill: [L.ORANGE, L.ORANGE, L.BLUE][i] }));
+    const COLS = [L.GOLD, L.ORANGE, L.BLUE, L.RED];
+    const RAD = (i) => 60 + i * 16;   // four arcs inside the unit circle
+    const arcs = POW.map((p, i) => q.arc(TH, TH, RAD(i), { color: COLS[i], width: 7, opacity: 0.85 }));
+    const labs = POW.map((p, i) => L.mathText(root, 0, 0, { base: 'Q', sup: i === 0 ? '' : String(p) }, { size: 18, fill: [L.ORANGE, L.ORANGE, L.BLUE, L.RED][i] }));
     labs.forEach((t) => t.setAttribute('opacity', 0));
     const lands = POW.map((p, i) => L.el('circle', { r: 5, fill: COLS[i], stroke: '#fff', 'stroke-width': 1.5, opacity: 0 }, root));
     // odometer
@@ -215,7 +221,7 @@
     const qops = POW.map((p, i) => {
       const row = L.el('g', {}, root);
       L.circuit(row, {
-        x: 396, y: 62 + i * 48, colW: 64, rowH: 36, labelW: 46, fontSize: 13, serif: true,
+        x: 396, y: 54 + i * 40, colW: 64, rowH: 36, labelW: 46, fontSize: 13, serif: true,
         wires: [{ label: '|0⟩', bundle: true }],
         ops: [
           { t: 'box', w: [0], math: { base: 'A' }, bw: 38 },
@@ -240,7 +246,7 @@
         const u = L.win(t, t0, 0.9, L.outQuart);
         const b = TH3 + 2 * TH3 * p * u;
         arcs[i].setArc(TH3, b);
-        const r = 66 + i * 18, mid = (TH + b) / 2 + 0.12;
+        const r = RAD(i), mid = (TH + b) / 2 + 0.12;
         labs[i].setAttribute('x', C.cx + (r - 16) * Math.cos(mid));
         labs[i].setAttribute('y', C.cy - (r - 16) * Math.sin(mid));
         labs[i].setAttribute('opacity', t > t0 + 0.3 ? 1 : 0);
@@ -250,14 +256,15 @@
         total += Math.round(p * u);
       });
       odo.textContent = String(total);
-      odoSub.textContent = total === 7 ? '1 + 2 + 4' : '';
+      odoSub.textContent = total === 15 ? '1 + 2 + 4 + 8' : '';
+      over.setAttribute('opacity', L.win(t, 1.2 + 3 * 1.1 + 0.9, 0.3));
     };
     if (L.beats) L.beats(svg, {
-      stops: [0, 1, 2.2, 3.3, 5],
-      labels: ['Start with the previous angle', 'Switch to θ = 10°', 'Apply Q: reach 30°', 'Apply Q²: reach 50°', 'Apply Q⁴: reach 90°'],
+      stops: [0, 1, 2.2, 3.3, 4.4, 5.6],
+      labels: ['Start with the previous angle', 'Switch to θ = 10°', 'Apply Q: reach 30°', 'Apply Q²: reach 50°', 'Apply Q⁴: reach 90°', 'Apply Q⁸: overshoot to 170°'],
       draw: setState, duration: 1100
     });
-    else L.timeline(svg, { T: 5.0, setState });
+    else L.timeline(svg, { T: 5.6, setState });
   };
 
   // ── 10. Interference turns phase into bits ──────────────────────────

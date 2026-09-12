@@ -1,0 +1,19 @@
+<script src="../assets/l3-data.js" defer></script>
+<script>
+// Preserve bookmarks to material merged into another slide.
+(function () {
+  const aliases = { rules: 'contract', roll: 'd20', 'board-copies': 'old-new', return: 'counters' };
+  const redirect = () => {
+    const target = aliases[location.hash.slice(1)];
+    if (target) location.replace('#' + target);
+  };
+  window.addEventListener('hashchange', redirect);
+  redirect();
+})();
+</script>
+<style>
+  .l3-code { max-width: 44em; margin: .5em auto; font-size: .72em; text-align: left; }
+  .slide .l3-code pre { background: #fffdf8; border: 1px solid #dedbd2; border-radius: 8px; padding: .6em .8em; font-size: 1em; }
+  .slide .l3-code code { white-space: pre-wrap; font-size: 1em; }
+  .l3-caption { text-align: center; font-size: .52em; color: #55534e; margin: .4em auto; max-width: 50em; }
+</style>

@@ -25,7 +25,7 @@
   });
   const total = L.text(root, '', 380, 216, { size: 26, mono: true, weight: 700, opacity: 0 });
   const gates = L.text(root, '9,768 gates · depth 3,079', 380, 252, { size: 16, mono: true, opacity: 0 });
-  const note = L.text(root, 'counted before decomposition to a native gate set', 380, 276, { size: 12, fill: L.DIM, italic: true, opacity: 0 });
+  const note = L.text(root, 'paper benchmark; before native-gate decomposition', 380, 276, { size: 12, fill: L.DIM, italic: true, opacity: 0 });
   L.timeline(svg, { T: 4.2, setState: (t) => {
     segs.forEach((s, i) => { const u = L.win(t, 0.3 + i * 0.45, 0.5, L.outQuart); s.r.setAttribute('width', s.w * u); s.lab.setAttribute('opacity', u >= 1 ? 1 : 0); });
     total.textContent = `${TOTAL} qubits`; total.setAttribute('opacity', L.win(t, 2.7, 0.4));

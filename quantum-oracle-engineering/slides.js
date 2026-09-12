@@ -7,6 +7,9 @@
   var deck, slides, index = 0, timerStart = 0, timerHandle = 0, wheelLock = 0;
   var segments = [];
   var gridOpen = false, gridCols = 1, gridSpacer = null, gridHidDrawer = false;
+  /* presenter: the notes window this slides window opened (or adopted).
+     presenterMode: this window is that notes window. */
+  var presenter = null, presenterMode = false;
 
   var KEYS = [
     ['→ ↓ space', 'next step or slide'],
@@ -68,7 +71,11 @@
     deck.tabIndex = -1;
     refocus();
     fromHash();
-    if (/[?&]notes(=|&|$)/.test(window.location.search) || drawerOpensOnLoad()) {
+    window.addEventListener('message', onMessage);
+    presenterMode = /[?&]presenter(=|&|$)/.test(window.location.search);
+    if (presenterMode) {
+      enterPresenter();
+    } else if (/[?&]notes(=|&|$)/.test(window.location.search) || drawerOpensOnLoad()) {
       toggleDrawer();
     }
     render();
@@ -250,20 +257,24 @@
   }
 
   function next() {
+    if (relay('ArrowRight')) return;
     var steps = stepsOf(slides[index]);
     var shown = shownCount(steps);
     if (shown < steps.length) {
       steps[shown].classList.add('shown');
+      syncPresenter();
       return;
     }
     if (index < slides.length - 1) go(index + 1);
   }
 
   function prev() {
+    if (relay('ArrowLeft')) return;
     var steps = stepsOf(slides[index]);
     var shown = shownCount(steps);
     if (shown > 0) {
       steps[shown - 1].classList.remove('shown');
+      syncPresenter();
       return;
     }
     if (index > 0) go(index - 1, true);
@@ -318,11 +329,11 @@
         next(); break;
       case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'k':
         prev(); break;
-      case 'Home': go(0, false); break;
-      case 'End': go(slides.length - 1, true); break;
-      case 'o': overlay('outline-on'); break;
-      case 'g': toggleGrid(); break;
-      case 'n': toggleDrawer(); break;
+      case 'Home': if (!relay('Home')) go(0, false); break;
+      case 'End': if (!relay('End')) go(slides.length - 1, true); break;
+      case 'o': if (presenterMode) return; overlay('outline-on'); break;
+      case 'g': if (presenterMode) return; toggleGrid(); break;
+      case 'n': if (presenterMode) return; toggleDrawer(); break;
       case 't': toggleTimer(); break;
       case 'f': fullscreen(); break;
       case '?': overlay('help-on'); break;
@@ -373,7 +384,104 @@
     var title = slides[index].querySelector('h1, h2');
     var head = '<p class="drawer-title">' + (index + 1) + ' / ' + slides.length +
       (title ? ' &middot; <b>' + title.textContent + '</b>' : '') + '</p>';
-    body.innerHTML = head + (note ? note.innerHTML : '<p>No notes for this slide.</p>');
+    var tail = '';
+    if (presenterMode && index + 1 < slides.length) {
+      var up = slides[index + 1].querySelector('h1, h2');
+      tail = '<p class="drawer-next">next &middot; <b>' +
+        (up ? up.textContent : 'Slide ' + (index + 2)) + '</b></p>';
+    }
+    body.innerHTML = head +
+      (note ? note.innerHTML : '<p>No notes for this slide.</p>') + tail;
+  }
+
+  /* ── Presenter window ───────────────────────────────────────────────
+     The drawer's pop-out button opens this same page again with ?presenter,
+     in a window of its own.  That copy hides its slides and shows only the
+     notes, the slide number and a timer, so a screen share of the slides
+     window never carries the notes.  The two windows talk over postMessage:
+     the slides window posts its position after every change, the presenter
+     window jumps to match, and a move made in the presenter window (a key,
+     a sideways swipe) crosses back as a request, so the talk can be driven
+     from either.  The wheel there scrolls the notes, as in the drawer.  postMessage rather than a BroadcastChannel because
+     it also works between two file: URLs, which is how the tutorial runs
+     with networking off.  Only same-origin messages are honoured; 'null' is
+     what a file: page reports. */
+  var RELAY_KEYS = ['ArrowRight', 'ArrowLeft', 'Home', 'End'];
+
+  function openPresenter() {
+    var url = window.location.pathname + '?presenter' +
+      (slides[index].id ? '#' + slides[index].id : '');
+    var win = window.open(url, 'qoe-presenter', 'popup,width=760,height=600');
+    if (!win) return;
+    presenter = win;
+    /* The notes' job moved to the other window.  Closing the drawer here
+       also records it closed, so a reload of the slides window comes up
+       clean rather than with the notes back on the shared screen. */
+    if (document.body.classList.contains('drawer-on')) toggleDrawer();
+    win.focus();
+  }
+
+  function syncPresenter() {
+    if (presenterMode || !presenter || presenter.closed) return;
+    presenter.postMessage({
+      type: 'qoe-state',
+      index: index,
+      shown: shownCount(stepsOf(slides[index]))
+    }, '*');
+  }
+
+  function hasOpener() {
+    return !!(window.opener && !window.opener.closed);
+  }
+
+  /* In the presenter window a move is a request to the slides window, which
+     answers with its new position.  Nothing moves locally unless the slides
+     window is gone, when this window is simply a notes reader. */
+  function relay(key) {
+    if (!presenterMode || !hasOpener()) return false;
+    window.opener.postMessage({ type: 'qoe-key', key: key }, '*');
+    return true;
+  }
+
+  function enterPresenter() {
+    document.body.classList.add('presenter', 'drawer-on');
+    paintDrawer();
+    if (!document.body.classList.contains('timer-on')) toggleTimer();
+    var hello = function () {
+      if (hasOpener()) window.opener.postMessage({ type: 'qoe-ready' }, '*');
+    };
+    hello();
+    /* A reloaded slides window has forgotten this one.  Saying hello again
+       whenever this window is looked at lets it be adopted. */
+    window.addEventListener('focus', hello);
+  }
+
+  function onMessage(event) {
+    var msg = event.data;
+    if (!msg || typeof msg !== 'object') return;
+    if (event.origin !== window.location.origin && event.origin !== 'null') return;
+    if (presenterMode) {
+      if (msg.type === 'qoe-state' && event.source === window.opener) {
+        follow(msg.index, msg.shown);
+      }
+      return;
+    }
+    if (msg.type === 'qoe-ready') {
+      presenter = event.source;
+      syncPresenter();
+    } else if (msg.type === 'qoe-key' && event.source === presenter &&
+               RELAY_KEYS.indexOf(msg.key) >= 0) {
+      onKey({ key: msg.key, preventDefault: function () {} });
+    }
+  }
+
+  function follow(target, shown) {
+    if (typeof target !== 'number' || !slides[target]) return;
+    if (target !== index) go(target, false);
+    stepsOf(slides[index]).forEach(function (el, i) {
+      el.classList.toggle('shown', i < shown);
+    });
+    paintDrawer();
   }
 
   function overlay(name) {
@@ -660,6 +768,7 @@
   }
 
   function fitSlide() {
+    if (presenterMode) return;
     var slide = slides[index];
     ['transform', 'transformOrigin', 'width', 'height', 'right', 'bottom']
       .forEach(function (prop) { slide.style[prop] = ''; });
@@ -748,6 +857,7 @@
     }
     if (document.body.classList.contains('outline-on')) paintOutline();
     if (document.body.classList.contains('drawer-on')) paintDrawer();
+    syncPresenter();
   }
 
   function buildChrome() {
@@ -832,10 +942,14 @@
     var drawer = document.createElement('aside');
     drawer.id = 'notes-drawer';
     drawer.className = 'no-nav';
-    drawer.innerHTML = '<button id="notes-close" type="button" ' +
+    drawer.innerHTML = '<button id="notes-popout" type="button" ' +
+      'aria-label="open the notes in their own window">pop out</button>' +
+      '<button id="notes-close" type="button" ' +
       'aria-label="close notes">×</button><div class="drawer-body"></div>';
     drawer.querySelector('#notes-close')
       .addEventListener('click', toggleDrawer);
+    drawer.querySelector('#notes-popout')
+      .addEventListener('click', openPresenter);
     document.body.appendChild(drawer);
 
     document.addEventListener('fullscreenchange', function () {

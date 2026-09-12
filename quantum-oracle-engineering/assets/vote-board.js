@@ -25,9 +25,12 @@
     const hw = 1.96 * Math.sqrt(m.mean * (1 - m.mean) / m.n);
     return { mean: m.mean, lo: m.mean - hw, hi: m.mean + hw, n: m.n };
   };
+  // Each candidate is an empty cell marked with a ring and a letter, no
+  // fill: a white disc would read as one of White's stones and a dark one
+  // as a Black stone already placed.
   D.candidates.forEach((c) => {
     const i = c.r * N + c.c;
-    L.el('circle', { cx: B.cx(i) + 40, cy: B.cy(i) + 20, r: B.r, fill: '#fff', stroke: COL[c.label], 'stroke-width': 2.5, opacity: 0.9 }, root);
+    L.el('circle', { cx: B.cx(i) + 40, cy: B.cy(i) + 20, r: B.r, fill: 'none', stroke: COL[c.label], 'stroke-width': 2.5 }, root);
     L.text(root, c.label, B.cx(i) + 40, B.cy(i) + 20, { size: 18, weight: 700, fill: COL[c.label] });
   });
   // right column: one row per candidate; the room votes by hands, nothing is
@@ -41,7 +44,7 @@
   const rows = D.candidates.map((c, k) => {
     const y = 60 + k * 82;
     const g = L.el('g', {}, root);
-    L.el('circle', { cx: RX, cy: y, r: 18, fill: '#fff', stroke: COL[c.label], 'stroke-width': 2.5 }, g);
+    L.el('circle', { cx: RX, cy: y, r: 18, fill: 'none', stroke: COL[c.label], 'stroke-width': 2.5 }, g);
     L.text(g, c.label, RX, y, { size: 18, weight: 700, fill: COL[c.label] });
     // support (step 1)
     const s1 = L.el('g', {}, supportG);

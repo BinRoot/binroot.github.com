@@ -2,8 +2,10 @@
 //
 // Slide 5's four-part pipeline returns with Sway inside it: the fixed first
 // move (candidate A from the data), H rounds of the paper's policy on a small
-// live board, the horizon counter, and a payoff bit that lands in a running
-// average.  Each pass uses a fresh seed; the caption names the policy.
+// live board with the round's three steps named beside it and lit in turn,
+// the horizon counter, and a payoff bit that lands in a running average.
+// Each pass uses a fresh seed; the caption names the policy.  The boards are
+// sized to clear the box title above and the caption below.
 (function () {
   const svg = document.getElementById('rollout-sway-fig');
   if (!svg) return;
@@ -26,10 +28,14 @@
   const cand = D.candidates[0];
   const first = cand.r * N + cand.c;
   // small board in box 1 (arm) and live board in box 2
-  const B1 = L.board(root, { N, size: 70, x: 55, y: Y - 34, board: D.board });
+  const B1 = L.board(root, { N, size: 52, x: 64, y: Y - 30, board: D.board });
   L.stone(B1.stones, B1.cx(first), B1.cy(first), B1.r, 1, { stroke: L.ORANGE, 'stroke-width': 2 });
-  L.text(root, `move ${cand.label}`, 90, Y + 44 - 8, { size: 11, fill: L.ORANGE, weight: 700 });
-  const B2 = L.board(root, { N, size: 84, x: 200, y: Y - 40, board: D.board });
+  L.text(root, `move ${cand.label}`, 90, Y + 32, { size: 11, fill: L.ORANGE, weight: 700 });
+  const B2 = L.board(root, { N, size: 66, x: 200, y: Y - 30, board: D.board });
+  // the three steps of one round, beside the live board, lit as the frames
+  // pass through them (frames come in triples in that order)
+  const STEP = ['Black places a stone', 'White places a stone', 'every stone rolls a d20'];
+  const steps = STEP.map((s, i) => L.text(root, s, 290, Y - 14 + i * 22, { anchor: 'start', size: 12, fill: L.DIM }));
   const hLab = L.text(root, 'h = 0', 505, Y, { size: 20, mono: true, weight: 700 });
   const bit = L.text(root, '', 655, Y + 4, { size: 30, mono: true, weight: 700 });
   const avg = L.text(root, 'running average: —', 380, 262, { size: 14, mono: true, fill: L.DIM });
@@ -63,6 +69,11 @@
     const nf = traj.frames.length;
     const fi = u < 0.15 ? -1 : u < 0.7 ? Math.min(nf - 1, Math.floor((u - 0.15) / 0.55 * nf)) : nf - 1;
     B2.redraw(fi < 0 ? D.board : traj.frames[fi]);
+    steps.forEach((s, i) => {
+      const on = fi >= 0 && u < 0.7 && fi % 3 === i;
+      s.setAttribute('fill', on ? L.INK : L.DIM);
+      s.setAttribute('font-weight', on ? 700 : 400);
+    });
     hLab.textContent = `h = ${fi < 0 ? 0 : Math.min(H, Math.floor(fi / 3) + (fi % 3 === 2 ? 1 : 0))}`;
     bit.textContent = u > 0.78 ? String(traj.payoff) : '';
     bit.setAttribute('fill', traj.payoff ? L.BLUE : L.GRAY);
