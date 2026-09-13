@@ -225,9 +225,9 @@ This course teaches the craft of building practical quantum circuits from scratc
 ::: {.agenda}
 ### Live Tutorial Agenda
 
-Session 1 (90 minutes): Lessons 1 and 2, identifying a problem worth accelerating.
+Session 1 (90 minutes): Lessons 1 and 2, identifying a problem worth accelerating. [Slides (PDF)](pdf/tut149_0913_shukla_part1.pdf)
 
-Session 2 (90 minutes): Lessons 3 and 4, building the rollout oracle.
+Session 2 (90 minutes): Lessons 3 and 4, building the rollout oracle. [Slides (PDF)](pdf/tut149_0913_shukla_part2.pdf)
 
 For practitioners and researchers comfortable with qubits, controlled gates,
 and circuit diagrams.

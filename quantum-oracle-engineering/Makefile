@@ -67,7 +67,25 @@ sway-data:
 l4-evidence:
 	uv run reversible-circuit-design/demo.py --javascript > assets/l4-evidence.js
 
+# The decks as PDF, for the conference's slide archive: one page per slide,
+# every step revealed, animated figures on their finished frame.  The file
+# name is the organisers' convention, <session code>_<date>_<last name>, and
+# both halves carry the same pair because the tutorial is one block: TUT-149,
+# Sunday 13 September.  Not part of `all`: it drives a browser for a few
+# minutes, and the result is committed.
+PDF_NAME  := tut149_0913_shukla
+PDF_PART1 := pdf/$(PDF_NAME)_part1.pdf
+PDF_PART2 := pdf/$(PDF_NAME)_part2.pdf
+
+pdf: $(PDF_PART1) $(PDF_PART2)
+
+$(PDF_PART1): gen/pdf.mjs a-different-computer/index.html the-monte-carlo-speedup/index.html
+	node gen/pdf.mjs $@ a-different-computer the-monte-carlo-speedup
+
+$(PDF_PART2): gen/pdf.mjs building-a-quantum-oracle/index.html reversible-circuit-design/index.html
+	node gen/pdf.mjs $@ building-a-quantum-oracle reversible-circuit-design
+
 clean:
 	rm -f $(PAGES) header.gen.html $(EQ_SVG)
 
-.PHONY: all clean sway-data l4-evidence
+.PHONY: all clean sway-data l4-evidence pdf
