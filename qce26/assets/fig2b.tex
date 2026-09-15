@@ -1,0 +1,27 @@
+% Figure 2, bottom (fig:rank-selector): one RankSelect cell, applied at
+% position i.  The quantikz block and its two styles are verbatim from
+% main.tex in ~/src/qcaai/qce26/paper; the Makefile renders it to an SVG.
+\documentclass[dvisvgm]{standalone}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{quantikz}
+\usetikzlibrary{backgrounds}
+\providecommand{\ket}[1]{\lvert #1\rangle}
+\begin{document}
+\tikzset{cellbox/.style={rounded corners=6pt,draw,thin,
+  append after command={
+    \pgfextra{\begin{pgfonlayer}{background}
+      \fill[gray!10,rounded corners=6pt]
+        (\tikzlastnode.south west) rectangle (\tikzlastnode.north east);
+    \end{pgfonlayer}}
+  }
+}}
+\tikzset{celllbl/.style={label position=above,anchor=south,yshift=-0.15cm,font=\footnotesize\bfseries}}
+\begin{quantikz}[font=\footnotesize, row sep={0.4cm,between origins}, column sep=0.2cm, thin lines]
+  \lstick{$\text{valid}_i$}          & \qw & \qw \gategroup[5,steps=5,style=cellbox,label style=celllbl]{RankSelect Cell} & \qw & \ctrl{4} & \qw & \ctrl{1} & \qw & \qw \rstick{\phantom{$\text{valid}_i$}} \\
+  \lstick{$\ket{0}$ rank}            & \qw & \qw & \gate[3,style={minimum width=0.7cm},label style={yshift=0.2cm}]{=\vphantom{\ensuremath{^\dag}}}   & \qw      & \gate[3,style={minimum width=0.7cm},label style={yshift=0.2cm}]{=^\dag} & \gate[1]{\text{+1}} & \qw & \qw \rstick{\phantom{$\ket{0}$ rank}} \\
+  \lstick{nth}                       & \qw & \qw &                                          & \qw      &                                             & \qw & \qw & \qw \rstick{\phantom{nth}} \\
+  \lstick{$\ket{0}$ match}           & \qw & \qw &                                          & \ctrl{1} &                                             & \qw & \qw & \qw \rstick{\phantom{$\ket{0}$ match}} \\
+  \lstick{$\ket{N}$ out} & \qw & \qw & \qw                                      & \gate{\oplus (i \oplus N)} & \qw                                  & \qw & \qw & \qw \rstick{\phantom{$\ket{N}$ out}}
+\end{quantikz}
+\end{document}

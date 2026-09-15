@@ -1,0 +1,88 @@
+<!-- The hard instance behind the classical lower bound, drawn still.  Two
+     panels share one value axis: the base world, arm 0 at 1/2 + 4eps and
+     every other arm at 1/2, and the alternative for arm j, identical except
+     that arm j is boosted to 1/2 + 6eps.  The band of width eps hangs from
+     the best arm in each world, and holds a different arm in each.  Same
+     palette as eps-band.html. -->
+<svg viewBox="0 0 900 290" width="1000" role="img"
+     aria-label="Two panels, base and alternative. Each lists arms a0, a1, aj, more arms, and a k minus 1 on a value axis with ticks at one half, one half plus 4 epsilon and one half plus 6 epsilon. In the base, arm 0 sits at one half plus 4 epsilon and the rest at one half. In the alternative, arm j alone has moved to one half plus 6 epsilon. An epsilon band from the best arm holds arm 0 in the base and arm j in the alternative.">
+  <g font-size="17" fill="#7a7f88" text-anchor="middle">
+    <text x="240" y="26">base</text>
+    <text x="680" y="26">alternative</text>
+  </g>
+
+  <!-- epsilon bands: best value down to best minus epsilon -->
+  <rect x="220" y="46" width="48" height="182" rx="5" fill="#4D8C55" opacity="0.16"/>
+  <rect x="740" y="46" width="48" height="182" rx="5" fill="#4D8C55" opacity="0.16"/>
+  <g font-size="15" font-style="italic" font-weight="700" fill="#4D8C55" text-anchor="middle">
+    <text x="244" y="42">ε</text>
+    <text x="764" y="42">ε</text>
+  </g>
+
+  <!-- row guides -->
+  <g stroke="#d8d5cd" stroke-width="1">
+    <line x1="100" y1="62"  x2="360" y2="62"/>
+    <line x1="100" y1="98"  x2="360" y2="98"/>
+    <line x1="100" y1="134" x2="360" y2="134"/>
+    <line x1="100" y1="206" x2="360" y2="206"/>
+    <line x1="540" y1="62"  x2="800" y2="62"/>
+    <line x1="540" y1="98"  x2="800" y2="98"/>
+    <line x1="540" y1="134" x2="800" y2="134"/>
+    <line x1="540" y1="206" x2="800" y2="206"/>
+  </g>
+
+  <!-- row labels -->
+  <g font-size="15" fill="#2d3140" text-anchor="end">
+    <text x="84" y="67"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">0</tspan></text>
+    <text x="84" y="103"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">1</tspan></text>
+    <text x="84" y="139"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4" font-style="italic">j</tspan></text>
+    <text x="84" y="176">⋮</text>
+    <text x="84" y="211"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4"><tspan font-style="italic">k</tspan>−1</tspan></text>
+    <text x="524" y="67"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">0</tspan></text>
+    <text x="524" y="103"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">1</tspan></text>
+    <text x="524" y="139"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4" font-style="italic">j</tspan></text>
+    <text x="524" y="176">⋮</text>
+    <text x="524" y="211"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4"><tspan font-style="italic">k</tspan>−1</tspan></text>
+  </g>
+
+  <!-- base: arm 0 at 1/2 + 4eps, the rest at 1/2 -->
+  <g fill="#2d3140">
+    <circle cx="260" cy="62"  r="7" fill="#4D8C55"/>
+    <circle cx="100" cy="98"  r="7"/>
+    <circle cx="100" cy="134" r="7"/>
+    <circle cx="100" cy="206" r="7"/>
+  </g>
+
+  <!-- alternative: identical, except arm j boosted to 1/2 + 6eps -->
+  <g fill="#2d3140">
+    <circle cx="700" cy="62"  r="7"/>
+    <circle cx="540" cy="98"  r="7"/>
+    <circle cx="540" cy="206" r="7"/>
+  </g>
+  <circle cx="540" cy="134" r="7" fill="none" stroke="#7a7f88" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="550" y1="134" x2="768" y2="134" stroke="#4D8C55" stroke-width="2.5"/>
+  <path d="M768,127 L782,134 L768,141 z" fill="#4D8C55"/>
+  <circle cx="780" cy="134" r="7" fill="#4D8C55"/>
+
+  <!-- value axis, shared scale -->
+  <g stroke="#2d3140" stroke-width="1.5">
+    <line x1="90"  y1="236" x2="370" y2="236"/>
+    <line x1="530" y1="236" x2="810" y2="236"/>
+  </g>
+  <g stroke="#2d3140" stroke-width="1">
+    <line x1="100" y1="231" x2="100" y2="241"/>
+    <line x1="260" y1="231" x2="260" y2="241"/>
+    <line x1="340" y1="231" x2="340" y2="241"/>
+    <line x1="540" y1="231" x2="540" y2="241"/>
+    <line x1="700" y1="231" x2="700" y2="241"/>
+    <line x1="780" y1="231" x2="780" y2="241"/>
+  </g>
+  <g font-size="14" fill="#7a7f88" text-anchor="middle">
+    <text x="100" y="262">½</text>
+    <text x="260" y="262">½ + 4ε</text>
+    <text x="340" y="262">½ + 6ε</text>
+    <text x="540" y="262">½</text>
+    <text x="700" y="262">½ + 4ε</text>
+    <text x="780" y="262">½ + 6ε</text>
+  </g>
+</svg>

@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-09-15" />
+  <title>Coherent Rollout Oracles for Finite-Horizon Sequential Decision Problems</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="canonical" href="https://shukla.io/qce26/slides.html">
+  <meta name="description" content="Slides for the IEEE Quantum Week 2026 talk on the paper: totalized coherent rank-select over an entangled validity mask, its reversible-circuit gate bounds, and the polynomial-size coherent rollout oracle it yields for finite-horizon planning.">
+  <meta name="author" content="Nishant Shukla">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Nishant Shukla">
+  <meta property="og:url" content="https://shukla.io/qce26/slides.html">
+  <meta property="og:title" content="Coherent Rollout Oracles for Finite-Horizon Sequential Decision Problems">
+  <meta name="twitter:title" content="Coherent Rollout Oracles for Finite-Horizon Sequential Decision Problems">
+  <meta property="og:description" content="Slides for the IEEE Quantum Week 2026 talk on the paper: totalized coherent rank-select over an entangled validity mask, its reversible-circuit gate bounds, and the polynomial-size coherent rollout oracle it yields for finite-horizon planning.">
+  <meta name="twitter:description" content="Slides for the IEEE Quantum Week 2026 talk on the paper: totalized coherent rank-select over an entangled validity mask, its reversible-circuit gate bounds, and the polynomial-size coherent rollout oracle it yields for finite-horizon planning.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"PresentationDigitalDocument","name":"Coherent Rollout Oracles for Finite-Horizon Sequential Decision Problems","description":"Slides for the IEEE Quantum Week 2026 talk on the paper: totalized coherent rank-select over an entangled validity mask, its reversible-circuit gate bounds, and the polynomial-size coherent rollout oracle it yields for finite-horizon planning.","inLanguage":"en","datePublished":"2026-09-15","author":{"@type":"Person","name":"Nishant Shukla","url":"https://shukla.io/"},"about":{"@type":"ScholarlyArticle","url":"https://arxiv.org/abs/2604.25962"},"url":"https://shukla.io/qce26/slides.html"}</script>
+  <script>window.MathJax={options:{enableMenu:false}};</script>
+  <link rel="stylesheet" href="../quantum-oracle-engineering/slides.css?v=3302136168">
+  <script src="../quantum-oracle-engineering/slides.js?v=3302136168" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+</head>
+<body>
+<nav id="deck-crumb" class="chrome" aria-label="deck"><a href="https://shukla.io/">Nishant Shukla</a><span class="crumb-sep" aria-hidden="true">/</span>QCE26</nav>
+<div id="deck">
+<section id="title" class="center slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Coherent Rollout Oracles for Finite-Horizon Sequential Decision Problems</h1>
+<h2>Nishant Shukla</h2>
+<p>nxs@ucla.edu</p>
+<p>IEEE Quantum Week 2026 (QCE26), Toronto</p>
+<!-- The course's Lesson 2 drawing helper (l2.js) and its seeded Sway data,
+     loaded once from the course on the title slide, the way the course's own
+     l2-style fragment does.  Every Sway figure in this deck draws with them;
+     deferred scripts run in document order, so this must precede the figures.
+     l2-beats.js is the presenter-paced step mechanism the model figures use.
+     The styles are the course's, verbatim: the figure wrapper, the notes
+     under a figure, and the rule that lets a figure's own groups step in. -->
+<style>
+  .l2-fig { display: flex; justify-content: center; margin: 4px 0; }
+  .l2-fig svg { max-width: 100%; font-family: 'Ubuntu Web', 'Ubuntu', sans-serif; }
+  .l2-note { text-align: center; color: #7a7f88; font-size: 0.5em; margin: 0.3em auto 0; }
+  .slide .l2-visual-note { width: 100%; max-width: none; text-align: center; color: #55534e; font-size: 0.65em; margin: 0.5em auto; }
+  svg .step { opacity: 0; }
+  svg .step.shown { opacity: 1; }
+</style>
+<script src="../quantum-oracle-engineering/assets/sway-data.js" defer></script>
+<script src="../quantum-oracle-engineering/assets/l2.js" defer></script>
+<script src="../quantum-oracle-engineering/assets/l2-beats.js" defer></script>
+
+<div class="notes">
+<p>Paper: <a href="https://arxiv.org/abs/2604.25962v1" target="_blank" rel="noopener">arxiv.org/abs/2604.25962v1</a></p>
+</div>
+</section>
+<section id="selection-problem" class="center slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>The Selection Problem</h1>
+<!-- The selection problem, drawn still: the course's eps-band figure
+     (quantum-oracle-engineering/assets/eps-band.js) at its grown state, with
+     the same seven arm means, axis and palette, and no script.  Seven action
+     cards stand on a value axis at their means; a band of width epsilon
+     reaches left from the best card, and the two cards inside it are the
+     acceptable answers. -->
+<svg viewBox="0 0 760 285" width="980" role="img"
+     aria-label="Seven action cards on a value axis. A band of width epsilon extends left from the best card, and the two cards inside it are acceptable answers.">
+  <!-- k actions -->
+  <text x="80" y="104" font-size="14" fill="#7a7f88">k actions</text>
+
+  <!-- the epsilon band, from the best value down to best minus epsilon -->
+  <rect x="458.2" y="90" width="70" height="110" rx="6" fill="#4D8C55" opacity="0.16"/>
+  <line x1="458.2" y1="88" x2="458.2" y2="202" stroke="#4D8C55" stroke-width="2.5"/>
+  <line x1="528.2" y1="88" x2="528.2" y2="202" stroke="#4D8C55" stroke-width="2.5"/>
+  <text x="493.2" y="78" font-size="16" font-style="italic" font-weight="700" fill="#4D8C55" text-anchor="middle">ε</text>
+
+  <!-- the value axis -->
+  <line x1="70" y1="200" x2="710" y2="200" stroke="#2d3140" stroke-width="1.5"/>
+  <line x1="80" y1="195" x2="80" y2="205" stroke="#2d3140"/>
+  <line x1="390" y1="195" x2="390" y2="205" stroke="#2d3140"/>
+  <line x1="700" y1="195" x2="700" y2="205" stroke="#2d3140"/>
+  <text x="80" y="220" font-size="12" fill="#7a7f88" text-anchor="middle">0</text>
+  <text x="390" y="220" font-size="12" fill="#7a7f88" text-anchor="middle">0.5</text>
+  <text x="700" y="220" font-size="12" fill="#7a7f88" text-anchor="middle">1</text>
+  <text x="390" y="244" font-size="14" fill="#7a7f88" text-anchor="middle"><tspan font-style="italic">v</tspan><tspan font-size="10" dy="4">i</tspan></text>
+
+  <!-- the cards, each at its mean; the two inside the band drawn in full -->
+  <g transform="translate(390,150)" opacity="0.35">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+    <text y="-10" font-size="11" text-anchor="middle">a1</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(520.2,150)">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#4D8C55" stroke-width="2.2"/>
+    <text y="-10" font-size="11" text-anchor="middle">a2</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(303.2,150)" opacity="0.35">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+    <text y="-10" font-size="11" text-anchor="middle">a3</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(492.3,150)">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#4D8C55" stroke-width="2.2"/>
+    <text y="-10" font-size="11" text-anchor="middle">a4</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(346.6,150)" opacity="0.35">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+    <text y="-10" font-size="11" text-anchor="middle">a5</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(228.8,150)" opacity="0.35">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+    <text y="-10" font-size="11" text-anchor="middle">a6</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(439.6,150)" opacity="0.35">
+    <rect x="-8" y="-40" width="16" height="74" rx="4" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+    <text y="-10" font-size="11" text-anchor="middle">a7</text>
+    <line y1="34" y2="50" stroke="#2d3140" stroke-width="1.2"/>
+  </g>
+</svg>
+
+<p><span class="math display">\[\Pr\bigl[\,v_{\hat{a}} \geq \max_j v_j - \varepsilon\,\bigr] \geq \frac{2}{3}\]</span></p>
+<div class="notes">
+<p>aka multi-arm bandit</p>
+</div>
+</section>
+<section id="speedup" class="center slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Speedup</h1>
+<div class="columns">
+<div class="column">
+<p>Quantum</p>
+<p><span class="math display">\[\widetilde{O}(\sqrt{k}/\varepsilon)\]</span></p>
+</div><div class="column">
+<p>Classical</p>
+<p><span class="math display">\[\Omega(k/\varepsilon^2)\]</span></p>
+</div>
+</div>
+<p><a href="https://doi.org/10.1609/aaai.v35i11.17212" target="_blank" rel="noopener">Wang et al.</a></p>
+<div class="notes">
+<p>Wang et al. prove the bound for any k arms, conditional on the access model: given each arm as a unitary with its inverse, whose amplitude encodes the arm’s mean, <span class="math inline">\(\widetilde{O}(\sqrt{k}/\varepsilon)\)</span> queries find an ε-best arm. Whether a problem fits that form, and at what cost, is outside the theorem.</p>
+</div>
+</section>
+<section id="assume-oracle-access" class="center slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>“Assume oracle access.”</h1>
+<!-- The oracle collage from the course's Lesson 1 slide "Assume oracle
+     access.": paper cutouts, 2008-2025, each red-inked where it grants
+     itself an oracle.  The course's collage.js mounts on the div and finds
+     its crops next to itself, so this deck loads the script from the course
+     rather than copying the images.  The slide-scoped fit is the course
+     fragment's, verbatim. -->
+<style>
+  .slide .oracle-collage { margin: 0 auto; max-width: 72vw; }
+  .slide .oc-wide { flex: 1 1 46%; max-width: 48%; }
+  .slide .oc-half { flex: 1 1 21%; min-width: 0; max-width: 23%; }
+</style>
+<div class="oracle-collage"></div>
+<script src="../quantum-oracle-engineering/assets/collage.js" defer></script>
+
+</section>
+<section id="obstacle" class="slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Obstacle</h1>
+<ul>
+<li>Randomness in explicit registers</li>
+<li>Unitary, invertible rollout step</li>
+<li>Selector to valid action, without measurement or rejection</li>
+<li>Branch-dependent valid actions</li>
+<li>Sentinel when the rank is out of range</li>
+</ul>
+</section>
+<section id="rank-select-decoder" class="slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Contribution 1</h1>
+<h2>A coherent rank-select decoder for branch-dependent valid actions</h2>
+<ul>
+<li>We give two coherent rank-select constructions, both using <span class="math inline">\(O(w)\)</span> clean ancillae: a sequential scan with <span class="math inline">\(O(Nw)\)</span> gates that is optimal in the bounded-span model, and a blocked construction with <span class="math inline">\(O(N \log w)\)</span> gates that exploits long-range connectivity.</li>
+<li>The unconditional gate lower bound across all layouts is <span class="math inline">\(\Omega(N)\)</span>.</li>
+<li>To our knowledge, this is the first reversible-circuit complexity analysis of coherent rank-select under branch-dependent validity.</li>
+</ul>
+<div class="notes">
+<p><span class="math inline">\(N\)</span> is the number of positions per round, so the validity mask is <span class="math inline">\(N\)</span> bits.</p>
+<p><span class="math inline">\(w = \lceil\log_2(N{+}1)\rceil\)</span> is the selector width: enough bits for any position, or the sentinel <span class="math inline">\(N\)</span>.</p>
+</div>
+</section>
+<section id="rollout-oracle" class="slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Contribution 2</h1>
+<h2>An explicit polynomial-size coherent rollout oracle for implicit-state finite-horizon planning</h2>
+<ul>
+<li>We decompose the oracle into three reversible phases (rank-select indexing, stochastic transition, terminal evaluation) that compose into a polynomial-size unitary, with gate-count and qubit-count formulas per call.</li>
+<li>Plugged into the pipeline of Wang et al., the oracle yields an explicit rollout algorithm using <span class="math inline">\(\widetilde{O}(\sqrt{k}/\varepsilon)\)</span> coherent calls.</li>
+<li>It is implemented in Qiskit with branchwise agreement against classical rollouts on all tested instances.</li>
+</ul>
+<div class="notes">
+<p>The oracle simulates one trajectory, so its cost scales with the length of a state, <span class="math inline">\(N\)</span> cells for <span class="math inline">\(H\)</span> rounds, never with the number of states, which is <span class="math inline">\(3^N\)</span>.</p>
+<p>Explicit methods carry a value for every state and pay for all <span class="math inline">\(3^N\)</span>.</p>
+</div>
+</section>
+<section id="lower-bound-robustness" class="slide" data-segment="Introduction" data-segment-id="seg-opening">
+<h1>Contribution 3</h1>
+<h2>Lower-bound robustness across exponentially many configurations</h2>
+<ul>
+<li>A bounded-influence lifting theorem and a per-configuration transfer theorem carry the classical <span class="math inline">\(\Omega(k/\varepsilon^2)\)</span> hard construction from a base configuration to every member of an exponential family of locally coupled configurations.</li>
+</ul>
+</section>
+<section id="preliminaries" class="center slide" data-segment="Preliminaries" data-segment-id="seg-preliminaries">
+<h1>Preliminaries</h1>
+<p><img src="assets/fig1.svg"
+     alt="The quantum move-selection algorithm as three nested levels: max-finding, amplitude estimation, and the rollout oracle."
+     style="display:block; margin:0.8em auto 0; width:min(76vw, 940px); max-height:50vh; object-fit:contain;"></p>
+</section>
+<section id="notation" class="slide" data-segment="Preliminaries" data-segment-id="seg-preliminaries">
+<h1>Recurring notation</h1>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 30%" />
+<col style="width: 17%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(k\)</span></td>
+<td>arms (first actions)</td>
+<td><span class="math inline">\(v_i\)</span></td>
+<td>value of action <span class="math inline">\(i\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\varepsilon\)</span></td>
+<td>accuracy target</td>
+<td><span class="math inline">\(H\)</span></td>
+<td>rollout horizon</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(N\)</span></td>
+<td>positions per round</td>
+<td><span class="math inline">\(w\)</span></td>
+<td><span class="math inline">\(\lceil\log_2(N{+}1)\rceil\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(M_s\)</span></td>
+<td>validity mask in state <span class="math inline">\(s\)</span></td>
+<td><span class="math inline">\(r\)</span></td>
+<td>rank into <span class="math inline">\(M_s\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(C^*\!,\, a^*\)</span></td>
+<td>witness config., action</td>
+<td><span class="math inline">\(\mathcal{F}\)</span></td>
+<td>peripheral family</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Q\)</span>, <span class="math inline">\(\delta_u\)</span></td>
+<td>peripheral set; influence</td>
+<td><span class="math inline">\(\beta\)</span></td>
+<td><span class="math inline">\(\sum_{u\in Q}\delta_u\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="normal-form" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>A Normal Form for Coherent Rollout Oracles</h1>
+</section>
+<section id="three-phases" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Three reversible phases</h1>
+<p><img src="assets/fig1-unfold.svg"
+     alt="Figure 1 with the Rollout Oracle box highlighted and opened out beneath into a row of factors: U index and U trans for round 1, round 2, through round H, then U eval, labeled Phase 1, Phase 2 and Phase 3."
+     style="display:block; margin:0.4em auto 0; width:min(70vw, 860px); max-height:50vh; object-fit:contain;"></p>
+<p><span class="math display">\[U \;=\; U_{\mathrm{eval}} \cdot \prod_{h=H}^{1}\bigl(U_{\mathrm{trans}}^{(h)} \cdot U_{\mathrm{index}}^{(h)}\bigr)\]</span></p>
+<div class="notes">
+<p>To provide the innermost level used by amplitude estimation in Figure 1, we need an explicit unitary circuit that simulates a complete rollout. This section constructs one by decomposing it into three reversible phases that compose into a single oracle.</p>
+</div>
+</section>
+<section id="rank-select" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Phase 1: Coherent Rank-Select Indexing</h1>
+<p><span class="math display">\[\lvert s\rangle\lvert r\rangle\lvert 0\rangle^{\otimes w} \;\mapsto\; \lvert s\rangle\lvert r\rangle\lvert j_s(r)\rangle\]</span></p>
+<!-- The paper's worked rank-select example, drawn still: N = 8, mask
+     M_s = 01101000, valid positions {1, 2, 4}.  Each 1-bit carries the
+     rank r that selects it; the equation under the figure gives j_s(r).
+     Same palette as eps-band.html. -->
+<svg viewBox="0 0 760 190" width="900" role="img"
+     aria-label="Eight bit boxes reading 0 1 1 0 1 0 0 0 at positions 0 to 7. The three 1-bits, at positions 1, 2 and 4, are marked with ranks r = 0, r = 1 and r = 2.">
+  <text x="44" y="103" font-size="18" fill="#7a7f88" text-anchor="middle"><tspan font-style="italic">M</tspan><tspan font-size="12" dy="5" font-style="italic">s</tspan></text>
+  <text x="44" y="158" font-size="18" fill="#7a7f88" text-anchor="middle" font-style="italic">i</text>
+
+  <rect x="70"  y="65" width="60" height="60" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <rect x="150" y="65" width="60" height="60" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <rect x="230" y="65" width="60" height="60" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <rect x="310" y="65" width="60" height="60" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <rect x="390" y="65" width="60" height="60" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <rect x="470" y="65" width="60" height="60" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <rect x="550" y="65" width="60" height="60" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <rect x="630" y="65" width="60" height="60" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+
+  <g font-size="26" fill="#2d3140" text-anchor="middle">
+    <text x="100" y="104">0</text>
+    <text x="180" y="104">1</text>
+    <text x="260" y="104">1</text>
+    <text x="340" y="104">0</text>
+    <text x="420" y="104">1</text>
+    <text x="500" y="104">0</text>
+    <text x="580" y="104">0</text>
+    <text x="660" y="104">0</text>
+  </g>
+
+  <g font-size="15" fill="#7a7f88" text-anchor="middle">
+    <text x="100" y="158">0</text>
+    <text x="180" y="158">1</text>
+    <text x="260" y="158">2</text>
+    <text x="340" y="158">3</text>
+    <text x="420" y="158">4</text>
+    <text x="500" y="158">5</text>
+    <text x="580" y="158">6</text>
+    <text x="660" y="158">7</text>
+  </g>
+
+  <g font-size="15" fill="#4D8C55" font-weight="700" text-anchor="middle">
+    <text x="180" y="44"><tspan font-style="italic">r</tspan> = 0</text>
+    <text x="260" y="44"><tspan font-style="italic">r</tspan> = 1</text>
+    <text x="420" y="44"><tspan font-style="italic">r</tspan> = 2</text>
+  </g>
+  <g stroke="#4D8C55" stroke-width="1.5">
+    <line x1="180" y1="50" x2="180" y2="62"/>
+    <line x1="260" y1="50" x2="260" y2="62"/>
+    <line x1="420" y1="50" x2="420" y2="62"/>
+  </g>
+</svg>
+
+<p><span class="math display">\[j_s(0) = 1,\quad j_s(1) = 2,\quad j_s(2) = 4,\quad j_s(r) = 8 \text{ for } r \geq 3\]</span></p>
+</section>
+<section id="rankselect" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>RankSelect</h1>
+<p><img src="assets/fig2a.svg"
+     alt="The RankSelect circuit chains N per-position cells, taking the validity bits and nth as inputs and producing a binary-encoded position index in a shared w-qubit output register."
+     style="display:block; margin:0.8em auto 0; width:min(70vw, 900px); max-height:52vh; object-fit:contain;"></p>
+</section>
+<section id="rankselect-cell" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>RankSelect Cell</h1>
+<p><img src="assets/fig2b.svg"
+     alt="One RankSelect cell at position i. On a match, rank equal to nth with the position valid, the circuit XORs the constant i xor N into the output register preloaded with the sentinel N. Rank increments on each valid position."
+     style="display:block; margin:0.8em auto 0; width:min(76vw, 960px); max-height:52vh; object-fit:contain;"></p>
+</section>
+<section id="gate-bounds" class="slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Gate bounds</h1>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 22%" />
+<col style="width: 14%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Gates</th>
+<th>Ancillae</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sequential scan</td>
+<td><span class="math inline">\(O(Nw)\)</span></td>
+<td><span class="math inline">\(O(w)\)</span></td>
+<td>bounded-span, gate-optimal</td>
+</tr>
+<tr class="even">
+<td>Blocked</td>
+<td><span class="math inline">\(O(N \log w)\)</span></td>
+<td><span class="math inline">\(O(w)\)</span></td>
+<td>long-range gates</td>
+</tr>
+<tr class="odd">
+<td>Any circuit</td>
+<td><span class="math inline">\(\Omega(N)\)</span></td>
+<td></td>
+<td>bounded fan-in</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cut-lower-bound" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Rank-select cut lower bound</h1>
+<!-- The rank-select cut lower bound as a protocol, drawn still.  Alice holds
+     the prefix of the mask, Bob the suffix and the rank.  With Bob's side
+     all ones and the rank t-1, the answer lands at j = t + (t-1-a), so its
+     position is Alice's count a: at least log2 min(t, N-t) bits cross the
+     cut.  N = 12, t = 6, a = 3, j = 8.  Same palette as eps-band.html. -->
+<svg viewBox="0 0 760 232" width="900" role="img"
+     aria-label="A 12-bit mask cut after position 5. Alice holds the left six bits, three of them ones. Bob holds the right six bits, all ones, and asks for the rank 5 valid bit. The answer lands at position 8, two past the cut, which is 5 minus the three ones on the left.">
+  <g font-size="16" fill="#7a7f88" text-anchor="middle"><text x="227.0" y="30">Alice</text><text x="527.0" y="30">Bob</text></g>
+  <g font-size="14" fill="#4D8C55" font-weight="700" text-anchor="middle"><text x="227.0" y="62"><tspan font-style="italic">a</tspan> = 3 ones</text><text x="527.0" y="62">all ones</text></g>
+  <rect x="80" y="78" width="44" height="44" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <text x="102.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="102.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">0</text>
+  <rect x="130" y="78" width="44" height="44" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="152.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">0</text>
+  <text x="152.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">1</text>
+  <rect x="180" y="78" width="44" height="44" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <text x="202.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="202.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">2</text>
+  <rect x="230" y="78" width="44" height="44" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="252.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">0</text>
+  <text x="252.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">3</text>
+  <rect x="280" y="78" width="44" height="44" rx="6" fill="#fff" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="302.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">0</text>
+  <text x="302.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">4</text>
+  <rect x="330" y="78" width="44" height="44" rx="6" fill="#4D8C55" fill-opacity="0.16" stroke="#4D8C55" stroke-width="2.2"/>
+  <text x="352.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="352.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">5</text>
+  <rect x="380" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="402.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="402.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">6</text>
+  <rect x="430" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="452.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="452.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">7</text>
+  <rect x="480" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#4D8C55" stroke-width="3"/>
+  <text x="502.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="502.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">8</text>
+  <rect x="530" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="552.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="552.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">9</text>
+  <rect x="580" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="602.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="602.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">10</text>
+  <rect x="630" y="78" width="44" height="44" rx="6" fill="#f4f2ec" stroke="#2d3140" stroke-width="1.3"/>
+  <text x="652.0" y="108.0" font-size="22" fill="#2d3140" text-anchor="middle">1</text>
+  <text x="652.0" y="142" font-size="12" fill="#7a7f88" text-anchor="middle">11</text>
+  <line x1="377.0" y1="48" x2="377.0" y2="152" stroke="#2d3140" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="377.0" y="168" font-size="14" fill="#2d3140" text-anchor="middle"><tspan font-style="italic">t</tspan> = 6</text>
+  <line x1="502.0" y1="194" x2="502.0" y2="158" stroke="#4D8C55" stroke-width="2"/>
+  <path d="M496.0,164 L502.0,152 L508.0,164 z" fill="#4D8C55"/>
+  <text x="502.0" y="212" font-size="14" fill="#4D8C55" font-weight="700" text-anchor="middle">rank <tspan font-style="italic">t</tspan>−1 = 5 lands at <tspan font-style="italic">j</tspan> = 8</text>
+  <path d="M380,70 v-6 H524 v6" fill="none" stroke="#7a7f88" stroke-width="1.2"/>
+  <text x="452.0" y="58" font-size="13" fill="#7a7f88" text-anchor="middle" font-style="italic">t−1−a = 2</text>
+</svg>
+
+<p><span class="math display">\[j = t + (t{-}1{-}a) \quad\Rightarrow\quad \lceil \log_2 \min(t, N-t) \rceil \text{ bits across cut } t\]</span></p>
+<div class="notes">
+<p>Alice holds the prefix, Bob the suffix and the rank. With Bob’s side all ones and rank <span class="math inline">\(t-1\)</span>, the answer lands at <span class="math inline">\(j = t + (t-1-a)\)</span>: its position is <span class="math inline">\(a\)</span>.</p>
+<p>Naming <span class="math inline">\(a\)</span> takes <span class="math inline">\(\lceil \log_2 \min(t, N-t) \rceil\)</span> bits; every left-to-right scan carries that past each cut.</p>
+<p>A bounded-span gate moves <span class="math inline">\(O(1)\)</span> bits across <span class="math inline">\(O(1)\)</span> cuts: <span class="math inline">\(N\)</span> cuts times <span class="math inline">\(\log N\)</span> bits is <span class="math inline">\(\Omega(Nw)\)</span>, the scan’s cost. A long-range gate spans many cuts at once: the blocked construction’s escape.</p>
+</div>
+</section>
+<section id="transition" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Phase 2: Reversible Stochastic Transition</h1>
+<!-- Phase 2 as a strip: one cell's update, in the order the paper gives it.
+     Read the neighbors, compute a local threshold, compare against the
+     explicit dice register, conditionally update, uncompute. -->
+<svg viewBox="0 0 900 150" width="1000" role="img"
+     aria-label="Five boxes in a row joined by arrows: neighbors, threshold, compare, update, uncompute. A dice register feeds the compare box from below.">
+  <defs>
+    <marker id="ts-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2d3140"/>
+    </marker>
+  </defs>
+  <g fill="#fff" stroke="#2d3140" stroke-width="1.3">
+    <rect x="20"  y="30" width="150" height="60" rx="8"/>
+    <rect x="200" y="30" width="150" height="60" rx="8"/>
+    <rect x="380" y="30" width="150" height="60" rx="8"/>
+    <rect x="560" y="30" width="150" height="60" rx="8"/>
+    <rect x="740" y="30" width="150" height="60" rx="8"/>
+  </g>
+  <g font-size="18" fill="#2d3140" text-anchor="middle">
+    <text x="95"  y="66">neighbors</text>
+    <text x="275" y="66">threshold</text>
+    <text x="455" y="66">compare</text>
+    <text x="635" y="66">update</text>
+    <text x="815" y="66">uncompute</text>
+  </g>
+  <g stroke="#2d3140" stroke-width="1.5" marker-end="url(#ts-arrow)">
+    <line x1="170" y1="60" x2="198" y2="60"/>
+    <line x1="350" y1="60" x2="378" y2="60"/>
+    <line x1="530" y1="60" x2="558" y2="60"/>
+    <line x1="710" y1="60" x2="738" y2="60"/>
+    <line x1="455" y1="128" x2="455" y2="93"/>
+  </g>
+  <text x="482" y="140" font-size="15" fill="#7a7f88" text-anchor="middle">dice</text>
+</svg>
+
+<p><span class="math inline">\(O(1)\)</span> per cell, <span class="math inline">\(O(N)\)</span> per round</p>
+</section>
+<section id="terminal-evaluation" class="slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Phase 3: Coherent Terminal Evaluation</h1>
+<p><span class="math display">\[\Pr[\text{payoff} = 1] = v_i\]</span></p>
+<ul>
+<li>Local predicates: <span class="math inline">\(O(N)\)</span></li>
+<li>Comparing two <span class="math inline">\(w\)</span>-bit counts: <span class="math inline">\(O(N^2 w)\)</span></li>
+</ul>
+</section>
+<section id="per-call-gates" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Per-Call Gates</h1>
+<p><img src="assets/gates-strip.svg"
+     alt="The unfolded oracle call: U index and U trans boxes for round 1, round 2, through round H, then U eval, each with its gate cost beneath: G index, G trans, and G eval."
+     style="display:block; margin:0.8em auto 0; width:min(76vw, 960px); max-height:30vh; object-fit:contain;"></p>
+<p><span class="math display">\[G_{\mathrm{call}} = H\,(G_{\mathrm{index}} + G_{\mathrm{trans}}) + G_{\mathrm{eval}}\]</span></p>
+<p>Bounded-span <span class="math inline">\(O(HNw + N^2 w)\)</span>, long-range <span class="math inline">\(O(HN \log w + N^2 w)\)</span></p>
+</section>
+<section id="per-call-qubits" class="center slide" data-segment="A Normal Form for Coherent Rollout Oracles" data-segment-id="seg-normal-form">
+<h1>Per-Call Qubits</h1>
+<!-- The oracle's five register groups with their widths, from the Registers
+     paragraph and Theorem 3's qubit count: configuration (H+1)Ns, selector
+     Hw, dice HNd, ancillae O(w), payoff flag 1.  The dice band is drawn
+     darker because it dominates the per-round count. -->
+<svg viewBox="0 0 760 250" width="900" role="img"
+     aria-label="Five horizontal register bands labeled configuration, selector, dice, ancillae and payoff, with widths (H+1)Ns, Hw, HNd, O(w) and 1.">
+  <g stroke="#2d3140" stroke-width="1.2">
+    <rect x="150" y="14"  width="590" height="36" rx="5" fill="#f4f2ec"/>
+    <rect x="150" y="60"  width="590" height="36" rx="5" fill="#f4f2ec"/>
+    <rect x="150" y="106" width="590" height="36" rx="5" fill="#e6e2d8"/>
+    <rect x="150" y="152" width="590" height="36" rx="5" fill="#f4f2ec"/>
+    <rect x="150" y="198" width="590" height="36" rx="5" fill="#f4f2ec"/>
+  </g>
+  <g font-size="17" fill="#2d3140" text-anchor="end">
+    <text x="136" y="38">configuration</text>
+    <text x="136" y="84">selector</text>
+    <text x="136" y="130">dice</text>
+    <text x="136" y="176">ancillae</text>
+    <text x="136" y="222">payoff</text>
+  </g>
+  <g font-size="17" fill="#2d3140" text-anchor="end" font-style="italic">
+    <text x="724" y="38">(H+1)Ns</text>
+    <text x="724" y="84">Hw</text>
+    <text x="724" y="130">HNd</text>
+    <text x="724" y="176">O(w)</text>
+    <text x="724" y="222">1</text>
+  </g>
+</svg>
+
+<p><span class="math display">\[Q_{\mathrm{call}} = (H{+}1)Ns + Hw + HNd + q_{\mathrm{anc}}\]</span></p>
+<p><span class="math inline">\(s\)</span> configuration state width, <span class="math inline">\(d\)</span> dice width</p>
+</section>
+<section id="classical-lower-bound" class="center slide" data-segment="Classical Lower Bound" data-segment-id="seg-classical-lower-bound">
+<h1>Classical Lower Bound</h1>
+</section>
+<section id="base-alternative" class="center slide" data-segment="Classical Lower Bound" data-segment-id="seg-classical-lower-bound">
+<h1>Base and alternative</h1>
+<!-- The hard instance behind the classical lower bound, drawn still.  Two
+     panels share one value axis: the base world, arm 0 at 1/2 + 4eps and
+     every other arm at 1/2, and the alternative for arm j, identical except
+     that arm j is boosted to 1/2 + 6eps.  The band of width eps hangs from
+     the best arm in each world, and holds a different arm in each.  Same
+     palette as eps-band.html. -->
+<svg viewBox="0 0 900 290" width="1000" role="img"
+     aria-label="Two panels, base and alternative. Each lists arms a0, a1, aj, more arms, and a k minus 1 on a value axis with ticks at one half, one half plus 4 epsilon and one half plus 6 epsilon. In the base, arm 0 sits at one half plus 4 epsilon and the rest at one half. In the alternative, arm j alone has moved to one half plus 6 epsilon. An epsilon band from the best arm holds arm 0 in the base and arm j in the alternative.">
+  <g font-size="17" fill="#7a7f88" text-anchor="middle">
+    <text x="240" y="26">base</text>
+    <text x="680" y="26">alternative</text>
+  </g>
+
+  <!-- epsilon bands: best value down to best minus epsilon -->
+  <rect x="220" y="46" width="48" height="182" rx="5" fill="#4D8C55" opacity="0.16"/>
+  <rect x="740" y="46" width="48" height="182" rx="5" fill="#4D8C55" opacity="0.16"/>
+  <g font-size="15" font-style="italic" font-weight="700" fill="#4D8C55" text-anchor="middle">
+    <text x="244" y="42">ε</text>
+    <text x="764" y="42">ε</text>
+  </g>
+
+  <!-- row guides -->
+  <g stroke="#d8d5cd" stroke-width="1">
+    <line x1="100" y1="62"  x2="360" y2="62"/>
+    <line x1="100" y1="98"  x2="360" y2="98"/>
+    <line x1="100" y1="134" x2="360" y2="134"/>
+    <line x1="100" y1="206" x2="360" y2="206"/>
+    <line x1="540" y1="62"  x2="800" y2="62"/>
+    <line x1="540" y1="98"  x2="800" y2="98"/>
+    <line x1="540" y1="134" x2="800" y2="134"/>
+    <line x1="540" y1="206" x2="800" y2="206"/>
+  </g>
+
+  <!-- row labels -->
+  <g font-size="15" fill="#2d3140" text-anchor="end">
+    <text x="84" y="67"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">0</tspan></text>
+    <text x="84" y="103"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">1</tspan></text>
+    <text x="84" y="139"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4" font-style="italic">j</tspan></text>
+    <text x="84" y="176">⋮</text>
+    <text x="84" y="211"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4"><tspan font-style="italic">k</tspan>−1</tspan></text>
+    <text x="524" y="67"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">0</tspan></text>
+    <text x="524" y="103"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4">1</tspan></text>
+    <text x="524" y="139"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4" font-style="italic">j</tspan></text>
+    <text x="524" y="176">⋮</text>
+    <text x="524" y="211"><tspan font-style="italic">a</tspan><tspan font-size="11" dy="4"><tspan font-style="italic">k</tspan>−1</tspan></text>
+  </g>
+
+  <!-- base: arm 0 at 1/2 + 4eps, the rest at 1/2 -->
+  <g fill="#2d3140">
+    <circle cx="260" cy="62"  r="7" fill="#4D8C55"/>
+    <circle cx="100" cy="98"  r="7"/>
+    <circle cx="100" cy="134" r="7"/>
+    <circle cx="100" cy="206" r="7"/>
+  </g>
+
+  <!-- alternative: identical, except arm j boosted to 1/2 + 6eps -->
+  <g fill="#2d3140">
+    <circle cx="700" cy="62"  r="7"/>
+    <circle cx="540" cy="98"  r="7"/>
+    <circle cx="540" cy="206" r="7"/>
+  </g>
+  <circle cx="540" cy="134" r="7" fill="none" stroke="#7a7f88" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="550" y1="134" x2="768" y2="134" stroke="#4D8C55" stroke-width="2.5"/>
+  <path d="M768,127 L782,134 L768,141 z" fill="#4D8C55"/>
+  <circle cx="780" cy="134" r="7" fill="#4D8C55"/>
+
+  <!-- value axis, shared scale -->
+  <g stroke="#2d3140" stroke-width="1.5">
+    <line x1="90"  y1="236" x2="370" y2="236"/>
+    <line x1="530" y1="236" x2="810" y2="236"/>
+  </g>
+  <g stroke="#2d3140" stroke-width="1">
+    <line x1="100" y1="231" x2="100" y2="241"/>
+    <line x1="260" y1="231" x2="260" y2="241"/>
+    <line x1="340" y1="231" x2="340" y2="241"/>
+    <line x1="540" y1="231" x2="540" y2="241"/>
+    <line x1="700" y1="231" x2="700" y2="241"/>
+    <line x1="780" y1="231" x2="780" y2="241"/>
+  </g>
+  <g font-size="14" fill="#7a7f88" text-anchor="middle">
+    <text x="100" y="262">½</text>
+    <text x="260" y="262">½ + 4ε</text>
+    <text x="340" y="262">½ + 6ε</text>
+    <text x="540" y="262">½</text>
+    <text x="700" y="262">½ + 4ε</text>
+    <text x="780" y="262">½ + 6ε</text>
+  </g>
+</svg>
+
+<div class="notes">
+<p>The two worlds are identical except for arm <span class="math inline">\(j\)</span>, boosted from <span class="math inline">\(\tfrac{1}{2}\)</span> to <span class="math inline">\(\tfrac{1}{2} + 6\varepsilon\)</span>, just past arm 0 at <span class="math inline">\(\tfrac{1}{2} + 4\varepsilon\)</span>, so arm <span class="math inline">\(j\)</span> is the only ε-good answer there.</p>
+<p>One alternative per contender: <span class="math inline">\(k-1\)</span> of them.</p>
+</div>
+</section>
+<section id="change-of-measure" class="center slide" data-segment="Classical Lower Bound" data-segment-id="seg-classical-lower-bound">
+<h1>Change of measure</h1>
+<div class="columns">
+<div class="column">
+<p>Information needed</p>
+<p><span class="math display">\[\mathrm{kl}\bigl(\tfrac{1}{3}, \tfrac{2}{3}\bigr) = \frac{\ln 2}{3}\]</span></p>
+</div><div class="column">
+<p>Information per rollout</p>
+<p><span class="math display">\[\mathrm{kl}\bigl(\tfrac{1}{2}, \tfrac{1}{2} + 6\varepsilon\bigr) \leq 96\,\varepsilon^2\]</span></p>
+</div>
+</div>
+<p><span class="math display">\[\mathbb{E}_0[N_j] \;\geq\; \frac{\ln 2 / 3}{96\,\varepsilon^2} \;=\; \frac{\ln 2}{288\,\varepsilon^2}
+\qquad\qquad
+\mathbb{E}_0[\tau] \;\geq\; \frac{(k-1)\ln 2}{288\,\varepsilon^2} \;=\; \Omega\!\left(\frac{k}{\varepsilon^2}\right)\]</span></p>
+<p><a href="https://jmlr.org/papers/v17/kaufman16a.html" target="_blank" rel="noopener">Kaufmann, Cappé, Garivier 2016</a> · <a href="https://doi.org/10.1017/9781108571401" target="_blank" rel="noopener">Lattimore, Szepesvári 2020</a></p>
+<div class="notes">
+<p>kl is the divergence between two coins.</p>
+<p>A correct algorithm outputs arm 0 two thirds of the time in the base world and one third in the alternative; telling those coins apart takes <span class="math inline">\(\ln 2 / 3\)</span> nats.</p>
+<p>One rollout of arm <span class="math inline">\(j\)</span> is a one-half coin against a one-half-plus-<span class="math inline">\(6\varepsilon\)</span> coin, at most <span class="math inline">\(96\varepsilon^2\)</span> apart.</p>
+<p>Divide: at least <span class="math inline">\(\ln 2 / 288\varepsilon^2\)</span> pulls of arm <span class="math inline">\(j\)</span>.</p>
+<p>Times <span class="math inline">\(k-1\)</span> contenders, <span class="math inline">\(\Omega(k/\varepsilon^2)\)</span>.</p>
+</div>
+</section>
+<section id="lifting" class="center slide" data-segment="Classical Lower Bound" data-segment-id="seg-classical-lower-bound">
+<h1>Bounded-influence lifting</h1>
+<!-- The lifting on the board: three copies of one grid.  The boxed cells
+     are the radius-H rollout regions of three first moves, spaced so they
+     do not overlap, and identical in every copy.  Every cell outside the
+     boxes is the peripheral set, drawn in a different assignment of the
+     three-state alphabet in each copy.  Hand-generated once (seeded, so the
+     patterns are stable); edit the SVG directly. -->
+<svg viewBox="0 0 688 168" width="1000" role="img"
+     aria-label="Three copies of the same grid. In each, three boxed regions around three first moves hold identical cells; the cells outside the boxes take different states in each copy.">
+  <g transform="translate(20,20)">
+    <rect x="0" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="40.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="80" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="104.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="144" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="168.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+  </g>
+  <g transform="translate(248,20)">
+    <rect x="0" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="40.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="80" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="104.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="144" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="168.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+  </g>
+  <g transform="translate(476,20)">
+    <rect x="0" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="0" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="0" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="0" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="16" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="16" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="16" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="32" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="32" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="32" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="48" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="48" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="48" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="64" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="64" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="64" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="80" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="80" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="80" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="96" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="96" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="96" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="0" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="32" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="48" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="64" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="80" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="96" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="112" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="128" y="112" width="16" height="16" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="144" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="160" y="112" width="16" height="16" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="176" y="112" width="16" height="16" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+    <rect x="16" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="40.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="80" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="104.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+    <rect x="144" y="48" width="48" height="48" rx="6" fill="none" stroke="#4D8C55" stroke-width="2.2"/>
+    <circle cx="168.0" cy="72.0" r="4.5" fill="#4D8C55"/>
+  </g>
+</svg>
+
+<p><span class="math display">\[\mathbb{E}_{C}[\tau] \;\geq\; \frac{(k-1)\,\ln 2}{288\,\varepsilon^{2}} \;=\; \Omega\!\left(\frac{k}{\varepsilon^{2}}\right) \qquad \text{for every } C \in \mathcal{F}\]</span></p>
+<div class="notes">
+<p>Arm values depend only on their support regions <span class="math inline">\(R_i\)</span>, the boxed cells; <span class="math inline">\(Q\)</span> is every other cell.</p>
+<p>With modularity, every member of <span class="math inline">\(\mathcal{F}\)</span> has the base value profile: the two worlds and the count recur at all <span class="math inline">\(|\Sigma|^{|Q|}\)</span> configurations.</p>
+<p>The theorem has <span class="math inline">\(3c\,\varepsilon^2\)</span> in place of 288; <span class="math inline">\(c\,\varepsilon^2\)</span> bounds what one rollout of a boosted arm leaks, and here <span class="math inline">\(c = 96\)</span>.</p>
+<p>With stability alone, values move at most <span class="math inline">\(\beta \leq \varepsilon\)</span> and the gap survives at <span class="math inline">\(\varepsilon\)</span>.</p>
+</div>
+</section>
+<section id="influence-decay" class="center slide" data-segment="Classical Lower Bound" data-segment-id="seg-classical-lower-bound">
+<h1>Subcritical influence decay</h1>
+<!-- Subcritical influence decay, drawn on the lifting board with a large
+     horizon.  Around each arm a dashed ring of radius H, where H rounds
+     could reach, and a halo fading out by about H*kappa*p, where H rounds
+     matter.  The peripheral set is everything the halos miss.  Radii are
+     schematic.  Hand-generated once (seeded); edit the SVG directly. -->
+<svg viewBox="-30 -44 480 284" width="1000" role="img"
+     aria-label="A shaded grid with three arms. Around each arm, a large dashed ring labeled H covers most of the board, and a small green halo fading with distance, labeled H kappa p, covers only nearby cells.">
+  <defs><radialGradient id="sid-halo"><stop offset="0" stop-color="#4D8C55" stop-opacity="0.62"/><stop offset="1" stop-color="#4D8C55" stop-opacity="0"/></radialGradient></defs>
+  <rect x="0" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="0" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="0" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="0" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="14" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="14" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="14" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="28" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="28" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="28" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="42" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="42" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="42" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="56" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="56" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="56" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="70" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="70" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="70" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="84" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="84" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="84" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="98" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="98" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="98" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="112" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="112" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="112" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="126" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="126" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="126" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="140" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="140" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="140" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="154" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="154" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="154" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="154" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="154" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="154" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="154" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="168" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="168" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="168" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="0" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="14" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="28" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="42" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="56" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="70" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="84" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="98" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="112" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="126" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="140" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="154" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="168" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="182" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="196" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="210" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="224" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="238" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="252" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="266" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="280" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="294" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="308" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="322" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="336" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="350" y="182" width="14" height="14" fill="#cfcabe" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="364" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="378" y="182" width="14" height="14" fill="#9d978a" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="392" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <rect x="406" y="182" width="14" height="14" fill="#f4f2ec" stroke="#faf8f4" stroke-width="1"/>
+  <circle cx="91.0" cy="105.0" r="42" fill="url(#sid-halo)"/>
+  <circle cx="217.0" cy="105.0" r="42" fill="url(#sid-halo)"/>
+  <circle cx="343.0" cy="105.0" r="42" fill="url(#sid-halo)"/>
+  <circle cx="91.0" cy="105.0" r="126" fill="none" stroke="#7a7f88" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <circle cx="91.0" cy="105.0" r="4.5" fill="#4D8C55"/>
+  <circle cx="217.0" cy="105.0" r="126" fill="none" stroke="#7a7f88" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <circle cx="217.0" cy="105.0" r="4.5" fill="#4D8C55"/>
+  <circle cx="343.0" cy="105.0" r="126" fill="none" stroke="#7a7f88" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <circle cx="343.0" cy="105.0" r="4.5" fill="#4D8C55"/>
+  <line x1="217.0" y1="105.0" x2="259.0" y2="105.0" stroke="#2d3140" stroke-width="1.2"/>
+  <text x="238.0" y="99.0" font-size="12" fill="#2d3140" text-anchor="middle" font-style="italic">Hκp</text>
+  <line x1="217.0" y1="105.0" x2="298.0" y2="8.5" stroke="#2d3140" stroke-width="1.2"/>
+  <text x="267.5" y="54.7" font-size="13" fill="#2d3140" font-style="italic">H</text>
+</svg>
+
+<p><span class="math display">\[\delta(d) \;\leq\; \frac{\kappa}{\kappa-1}\,\bigl((\kappa-1)\,p\bigr)^{d} \qquad \kappa p &lt; 1\]</span></p>
+<div class="notes">
+<p>Couple two runs that differ at one cell. The disagreement reaches an arm only along a non-backtracking walk, each step with probability <span class="math inline">\(p\)</span>.</p>
+<p>At most <span class="math inline">\(\kappa(\kappa-1)^{d-1}\)</span> walks of length <span class="math inline">\(d\)</span>, so length-<span class="math inline">\(d\)</span> paths contribute <span class="math inline">\(\kappa(\kappa-1)^{d-1}p^d\)</span>; over <span class="math inline">\(H\)</span> rounds the sum is a binomial tail, small once <span class="math inline">\(d &gt; H\kappa p\)</span>.</p>
+<p>Sway: <span class="math inline">\(\kappa = 4\)</span>, <span class="math inline">\(p = 1/20\)</span>, ratio <span class="math inline">\(3/20\)</span>.</p>
+<p>The halo still has to fit on the board; at <span class="math inline">\(H = 30\)</span> on <span class="math inline">\(20 \times 20\)</span> it does not.</p>
+</div>
+</section>
+<section id="quantum-upper-bound" class="center slide" data-segment="Quantum Upper Bound" data-segment-id="seg-quantum-upper-bound">
+<h1>Quantum Upper Bound</h1>
+</section>
+<section id="instantiation" class="center slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>Instantiation</h1>
+</section>
+<section id="sway" class="center slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>Sway benchmark</h1>
+<!-- Sway's three ingredients as line icons: a d20, a 4x4 grid, and the two
+     stone colours.  Drawn still, after the icon strip the author supplied. -->
+<svg viewBox="0 0 573 203" width="760" role="img"
+     aria-label="A twenty-sided die showing 20, an empty four by four grid, and a white stone beside a black stone.">
+  <g stroke="#4a4a4a" stroke-width="1.6" stroke-linejoin="round" fill="#f1efea">
+    <!-- d20: outer hexagon, central face, and the spokes to the outer vertices -->
+    <polygon points="75,43 120,69 120,121 75,147 30,121 30,69"/>
+    <polygon points="75,62 104,112 46,112" fill="#e6e3dc"/>
+    <line x1="75" y1="62" x2="75" y2="43"/>
+    <line x1="75" y1="62" x2="30" y2="69"/>
+    <line x1="75" y1="62" x2="120" y2="69"/>
+    <line x1="46" y1="112" x2="30" y2="69"/>
+    <line x1="46" y1="112" x2="30" y2="121"/>
+    <line x1="46" y1="112" x2="75" y2="147"/>
+    <line x1="104" y1="112" x2="120" y2="69"/>
+    <line x1="104" y1="112" x2="120" y2="121"/>
+    <line x1="104" y1="112" x2="75" y2="147"/>
+  </g>
+  <text x="75" y="102" font-size="15" font-weight="700" fill="#4a4a4a" text-anchor="middle">20</text>
+
+  <!-- the grid -->
+  <g stroke="#4a4a4a" stroke-width="1.6" fill="#faf8f4">
+    <rect x="215" y="28" width="142" height="142" rx="5"/>
+    <line x1="250.5" y1="28" x2="250.5" y2="170"/>
+    <line x1="286"   y1="28" x2="286"   y2="170"/>
+    <line x1="321.5" y1="28" x2="321.5" y2="170"/>
+    <line x1="215" y1="63.5"  x2="357" y2="63.5"/>
+    <line x1="215" y1="99"    x2="357" y2="99"/>
+    <line x1="215" y1="134.5" x2="357" y2="134.5"/>
+  </g>
+
+  <!-- the two stone colours -->
+  <circle cx="474" cy="93"  r="19" fill="#ffffff" stroke="#4a4a4a" stroke-width="2"/>
+  <circle cx="516" cy="113" r="19" fill="#3a3a3a" stroke="#3a3a3a" stroke-width="2"/>
+</svg>
+
+<div class="notes">
+<p>Sway is a two-player stochastic game on an <span class="math inline">\(m \times m\)</span> grid with three cell states (black, white, empty).</p>
+<p>Each round, players place pieces on empty cells (branch-dependent validity), then each occupied cell flips with probability <span class="math inline">\((4-c)/20\)</span> via a per-cell <span class="math inline">\(d_{20}\)</span> roll, where <span class="math inline">\(c\)</span> is the count of same-color orthogonal neighbors, with binary terminal payoff (black outnumbers white).</p>
+</div>
+</section>
+<section id="rollout-sway" class="slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>Follow one Sway rollout</h1>
+<!-- Lesson 2's "Follow one Sway rollout" figure, drawn by the course's
+     script: the fixed first move, H rounds of the paper's policy on a small
+     live board, the payoff bit landing in a running average.  Needs the
+     helper and data that l2-shared.html loads on the title slide. -->
+<div class="l2-fig">
+<svg id="rollout-sway-fig" viewBox="0 0 760 280" width="980"></svg>
+</div>
+<div class="slide-equation compact">
+  <img src="../quantum-oracle-engineering/assets/arm-eq.svg" alt="v_i is the probability that Black outnumbers White at horizon H given first move i under the fixed policy">
+</div>
+<script src="../quantum-oracle-engineering/assets/rollout-sway.js" defer></script>
+
+<div class="notes">
+<p>Fix the first move, then simulate the remaining rounds.</p>
+<p>At the end, record the payoff bit.</p>
+<p>Reset the board and repeat with fresh random choices.</p>
+<p><strong>The average estimates Black’s win probability under this policy.</strong></p>
+<p><strong>Each possible first move is one candidate action, also called an arm.</strong></p>
+</div>
+</section>
+<section id="transfer" class="slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>What carries over to the epidemic model?</h1>
+<!-- Lesson 2's transfer figure, drawn by the course's model-map script in
+     its transfer mode: Sway's action selection, transition and score replaced
+     one at a time by the epidemic operations inside the same circuit
+     structure.  The course loads the script on an earlier slide; here the
+     fragment loads it itself.  Needs l2-shared.html. -->
+<div class="l2-fig">
+  <svg class="l2-model-fig" data-mode="transfer" viewBox="0 0 900 365" width="1100" role="img" aria-label="Replace Sway's action selection, transition, and score with epidemic operations inside the same reversible circuit structure."></svg>
+</div>
+<p class="l2-visual-note">The structure carries over. State encoding and gate costs depend on the model.</p>
+<script src="../quantum-oracle-engineering/assets/l2-model-map.js" defer></script>
+
+<div class="notes">
+<p><strong>The model supplies three operations: identify valid actions, update the state, and evaluate the outcome.</strong> Advance to replace those three pieces one at a time. <strong>The outer circuit structure stays visible while the model-specific operations change.</strong></p>
+<p>The epidemic model has a different transition rule and payoff, so its resource counts differ too.</p>
+</div>
+</section>
+<section id="correctness" class="slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>Oracle correctness check</h1>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 28%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 22%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Domain</th>
+<th>Instance</th>
+<th style="text-align: right;">Qubits</th>
+<th style="text-align: right;">Depth</th>
+<th style="text-align: right;">Gates</th>
+<th style="text-align: center;">MC Payoff</th>
+<th style="text-align: center;">Exact</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sway</td>
+<td><span class="math inline">\(3{\times}3, H{=}2\)</span></td>
+<td style="text-align: right;">169</td>
+<td style="text-align: right;">3 079</td>
+<td style="text-align: right;">9 768</td>
+<td style="text-align: center;"><span class="math inline">\(.281 \pm .028\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(.271\)</span></td>
+</tr>
+<tr class="even">
+<td>Sway</td>
+<td><span class="math inline">\(5{\times}5, H{=}3\)</span></td>
+<td style="text-align: right;">667</td>
+<td style="text-align: right;">18 258</td>
+<td style="text-align: right;">55 597</td>
+<td style="text-align: center;"><span class="math inline">\(.337 \pm .021\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(.325\)</span></td>
+</tr>
+<tr class="odd">
+<td>Epi.</td>
+<td><span class="math inline">\(3{\times}3, H{=}2, T{=}2\)</span></td>
+<td style="text-align: right;">146</td>
+<td style="text-align: right;">2 383</td>
+<td style="text-align: right;">6 472</td>
+<td style="text-align: center;"><span class="math inline">\(.883 \pm .020\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(.891\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="scaling" class="slide" data-segment="Instantiation" data-segment-id="seg-instantiation">
+<h1>Direct compiled resource counts</h1>
+<table>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\(m\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(H\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(N\)</span></th>
+<th style="text-align: right;">Qubits, Sway</th>
+<th style="text-align: right;">Qubits, Epi.</th>
+<th style="text-align: right;">Gates, Sway</th>
+<th style="text-align: right;">Gates, Epi.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">916</td>
+<td style="text-align: right;">767</td>
+<td style="text-align: right;">76 720</td>
+<td style="text-align: right;">56 602</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">1 708</td>
+<td style="text-align: right;">1 452</td>
+<td style="text-align: right;">180 615</td>
+<td style="text-align: right;">124 735</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">3 363</td>
+<td style="text-align: right;">2 893</td>
+<td style="text-align: right;">481 201</td>
+<td style="text-align: right;">280 230</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">6 503</td>
+<td style="text-align: right;">5 463</td>
+<td style="text-align: right;">793 901</td>
+<td style="text-align: right;">558 995</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">25 189</td>
+<td style="text-align: right;">21 409</td>
+<td style="text-align: right;">6 072 641</td>
+<td style="text-align: right;">2 592 183</td>
+</tr>
+</tbody>
+</table>
+<p>Pre-decomposition, before fault-tolerant overhead</p>
+</section>
+<section id="conclusion" class="slide" data-segment="Conclusion" data-segment-id="seg-conclusion">
+<h1>Conclusion</h1>
+<ul>
+<li>Reversible rollout oracle: <span class="math inline">\(\widetilde{O}(\sqrt{k}/\varepsilon)\)</span> calls, <span class="math inline">\(O(w)\)</span> clean ancillae</li>
+<li>Classical floor <span class="math inline">\(\Omega(k/\varepsilon^2)\)</span>, at every member of an exponential family</li>
+<li>Coherent rank-select: scan <span class="math inline">\(O(Nw)\)</span>, gate-optimal under bounded span; blocked <span class="math inline">\(O(N \log w)\)</span></li>
+<li>Open: <span class="math inline">\(\Omega(N)\)</span> vs <span class="math inline">\(O(N \log w)\)</span>; lifting beyond <span class="math inline">\(\kappa p &lt; 1\)</span>; closed-loop policies</li>
+</ul>
+</section>
+</div>
+</body>
+</html>

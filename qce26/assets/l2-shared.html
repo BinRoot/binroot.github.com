@@ -1,0 +1,18 @@
+<!-- The course's Lesson 2 drawing helper (l2.js) and its seeded Sway data,
+     loaded once from the course on the title slide, the way the course's own
+     l2-style fragment does.  Every Sway figure in this deck draws with them;
+     deferred scripts run in document order, so this must precede the figures.
+     l2-beats.js is the presenter-paced step mechanism the model figures use.
+     The styles are the course's, verbatim: the figure wrapper, the notes
+     under a figure, and the rule that lets a figure's own groups step in. -->
+<style>
+  .l2-fig { display: flex; justify-content: center; margin: 4px 0; }
+  .l2-fig svg { max-width: 100%; font-family: 'Ubuntu Web', 'Ubuntu', sans-serif; }
+  .l2-note { text-align: center; color: #7a7f88; font-size: 0.5em; margin: 0.3em auto 0; }
+  .slide .l2-visual-note { width: 100%; max-width: none; text-align: center; color: #55534e; font-size: 0.65em; margin: 0.5em auto; }
+  svg .step { opacity: 0; }
+  svg .step.shown { opacity: 1; }
+</style>
+<script src="../quantum-oracle-engineering/assets/sway-data.js" defer></script>
+<script src="../quantum-oracle-engineering/assets/l2.js" defer></script>
+<script src="../quantum-oracle-engineering/assets/l2-beats.js" defer></script>
