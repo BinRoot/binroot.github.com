@@ -7,6 +7,12 @@
   const mount = document.querySelector('div.oracle-collage');
   if (!mount) return;
 
+  // The crops live in img/ beside this script.  Resolved from the script's
+  // own URL rather than the page's, so a deck outside the course directory
+  // (the talk in ../qce26) can load the collage without copying the images.
+  const IMG = document.currentScript
+    ? new URL('img/', document.currentScript.src).href : '../assets/img/';
+
   // seeded prng so the torn edges and pen wobble are stable across loads
   const hash = (s) => {
     let h = 2166136261;
@@ -23,7 +29,7 @@
   const SCRAPS = [
     {
       key: 'hhl', wide: true, rot: -1.3, annot: 'circle',
-      img: '../assets/img/hhl.webp', w: 1400, h: 249,
+      img: 'hhl.webp', w: 1400, h: 249,
       rects: [{ x: 14.94, y: 44.76, w: 29.6, h: 10.49 }],
       title: 'Quantum algorithm for solving linear systems of equations',
       authors: 'Harrow, Hassidim, Lloyd', year: 2008, id: '0811.3171',
@@ -31,7 +37,7 @@
     },
     {
       key: 'qsvm', wide: false, rot: 1.8, annot: 'highlight',
-      img: '../assets/img/qsvm.webp', w: 900, h: 316,
+      img: 'qsvm.webp', w: 900, h: 316,
       rects: [
         { x: 29.77, y: 45.1, w: 66.52, h: 9.79 },
         { x: 3.8, y: 57.99, w: 92.4, h: 9.54 },
@@ -43,7 +49,7 @@
     },
     {
       key: 'qrl', wide: false, rot: -2.1, annot: 'underline',
-      img: '../assets/img/qrl.webp', w: 900, h: 334,
+      img: 'qrl.webp', w: 900, h: 334,
       rects: [
         { x: 23.82, y: 39.15, w: 72.78, h: 8.95 },
         { x: 10.79, y: 51.9, w: 12.61, h: 8.95 },
@@ -54,7 +60,7 @@
     },
     {
       key: 'montecarlo', wide: true, rot: 0.9, annot: 'underline',
-      img: '../assets/img/montecarlo.webp', w: 1400, h: 268,
+      img: 'montecarlo.webp', w: 1400, h: 268,
       rects: [
         { x: 22.22, y: 29.74, w: 75.71, h: 11.03 },
         { x: 2.06, y: 44.87, w: 36.6, h: 10.26 },
@@ -65,7 +71,7 @@
     },
     {
       key: 'recsys', wide: true, rot: -0.7, annot: 'highlight',
-      img: '../assets/img/recsys.webp', w: 1400, h: 311,
+      img: 'recsys.webp', w: 1400, h: 311,
       rects: [
         { x: 82.3, y: 38.72, w: 15.63, h: 10.18 },
         { x: 2.06, y: 51.33, w: 95.87, h: 9.96 },
@@ -77,7 +83,7 @@
     },
     {
       key: 'risk', wide: false, rot: 1.5, annot: 'circle',
-      img: '../assets/img/risk.webp', w: 900, h: 353,
+      img: 'risk.webp', w: 900, h: 353,
       rects: [
         { x: 58.91, y: 40.32, w: 37.29, h: 8.29 },
         { x: 3.8, y: 51.38, w: 50, h: 8.29 },
@@ -88,7 +94,7 @@
     },
     {
       key: 'confession', wide: false, rot: -1.8, annot: 'margin',
-      img: '../assets/img/confession.webp', w: 900, h: 354,
+      img: 'confession.webp', w: 900, h: 354,
       rects: [
         { x: 7.51, y: 29.43, w: 88.69, h: 8.28 },
         { x: 3.8, y: 40.23, w: 92.4, h: 8.51 },
@@ -101,7 +107,7 @@
     },
     {
       key: 'sgo', wide: true, rot: 0.6, annot: 'circle',
-      img: '../assets/img/sgo.webp', w: 1400, h: 272,
+      img: 'sgo.webp', w: 1400, h: 272,
       rects: [{ x: 21.5, y: 44.3, w: 62.4, h: 11.39 }],
       title: 'Quantum speedups for stochastic optimization',
       authors: 'Sidford, Zhang', year: 2023, id: '2308.01582',
@@ -109,7 +115,7 @@
     },
     {
       key: 'qnpg', wide: false, rot: 1.1, annot: 'highlight',
-      img: '../assets/img/qnpg.webp', w: 900, h: 369,
+      img: 'qnpg.webp', w: 900, h: 369,
       rects: [
         { x: 60.92, y: 40.05, w: 34.49, h: 8.47 },
         { x: 4.03, y: 51.49, w: 92, h: 8.47 },
@@ -385,7 +391,7 @@
     const frame = document.createElement('span');
     frame.className = 'oc-frame';
     const img = document.createElement('img');
-    img.src = '../assets/img/' + s.key + '-lg.webp';
+    img.src = IMG + s.key + '-lg.webp';
     img.alt = `Cutout from ${s.authors} ${s.year}: "${s.quote}"`;
     frame.appendChild(img);
     frame.appendChild(buildAnnot(s));
@@ -425,7 +431,7 @@
     const a = document.createElement('a');
     a.className = 'oc-scrap ' + (s.wide ? 'oc-wide' : 'oc-half');
     a.style.setProperty('--rot', s.rot + 'deg');
-    a.href = '../assets/img/' + s.key + '-lg.webp'; // no-JS fallback: the full-res crop
+    a.href = IMG + s.key + '-lg.webp'; // no-JS fallback: the full-res crop
     a.setAttribute('aria-label',
       `${s.title}, by ${s.authors}, ${s.year}. Quote: ${s.quote} Click to enlarge.`);
 
@@ -438,7 +444,7 @@
     frame.className = 'oc-frame';
 
     const img = document.createElement('img');
-    img.src = s.img;
+    img.src = IMG + s.img;
     img.width = s.w;
     img.height = s.h;
     img.loading = 'lazy';

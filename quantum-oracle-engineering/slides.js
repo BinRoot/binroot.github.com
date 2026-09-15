@@ -391,7 +391,7 @@
         (up ? up.textContent : 'Slide ' + (index + 2)) + '</b></p>';
     }
     body.innerHTML = head +
-      (note ? note.innerHTML : '<p>No notes for this slide.</p>') + tail;
+      (note ? note.innerHTML : '') + tail;
   }
 
   /* ── Presenter window ───────────────────────────────────────────────

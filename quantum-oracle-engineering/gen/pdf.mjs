@@ -22,7 +22,13 @@
 //   their space either way, so revealing all of them is the slide's finished
 //   state, not a crowded one.
 //
-// Usage: node gen/pdf.mjs <out.pdf> <deck-dir> [deck-dir ...]
+// Usage: node gen/pdf.mjs [--root <dir>] <out.pdf> <page> [page ...]
+//
+// A page is a deck directory (served as <dir>/, so its index.html) or an
+// .html file, named relative to the served root.  The root is this course
+// directory unless --root says otherwise: the talk in ../qce26 is exported
+// from the site root, so that its ../quantum-oracle-engineering/ references
+// resolve the way they do on the site.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -32,7 +38,7 @@ import net from 'node:net';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+let ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // 13.333in x 7.5in is 16:9 at 96dpi, which is also 1280x720 CSS pixels, so
 // the viewport the figures lay themselves out in and the paper they print on
@@ -51,8 +57,12 @@ const HIDE = ['#counter', '#progress', '#chapters', '#timer', '#nav-prev',
   '#notes-popout', '#outline', '#help', '.notes', '.l2-replay'];
 
 const args = process.argv.slice(2);
+if (args[0] === '--root' && args.length > 1) {
+  ROOT = path.resolve(args[1]);
+  args.splice(0, 2);
+}
 if (args.length < 2) {
-  console.error('usage: node gen/pdf.mjs <out.pdf> <deck-dir> [deck-dir ...]');
+  console.error('usage: node gen/pdf.mjs [--root <dir>] <out.pdf> <page> [page ...]');
   process.exit(2);
 }
 const [out, ...decks] = args;
@@ -71,8 +81,9 @@ const MIME = {
   '.txt': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8',
 };
 
-// Serving the course directory, so a deck's ../slides.css resolves the way it
-// does on the site.  Nothing outside it is reachable, and nothing off the
+// Serving the root (this course directory, unless --root said otherwise), so
+// a deck's ../slides.css resolves the way it does on the site.  Nothing
+// outside it is reachable, and nothing off the
 // machine is: the decks are built to run with networking off, and the one
 // request that does leave (the analytics script in every deck's head) is
 // refused here rather than waited on.
@@ -205,13 +216,19 @@ async function main() {
 
     for (const deck of decks) {
       const loaded = client.once('Page.loadEventFired');
-      await call('Page.navigate', { url: `http://127.0.0.1:${port}/${deck}/` });
+      // A directory is asked for with its trailing slash, so the page's
+      // relative URLs resolve inside it; a file is asked for as itself.
+      const page = deck.endsWith('.html') ? deck : `${deck}/`;
+      await call('Page.navigate', { url: `http://127.0.0.1:${port}/${page}` });
       await loaded;
 
       const ids = await evaluate(call, `(async () => {
         await new Promise(r => document.querySelector('.slide.current') ? r()
           : new MutationObserver((_, o) => { if (document.querySelector('.slide.current')) { o.disconnect(); r(); } })
               .observe(document.body, { subtree: true, attributes: true, childList: true }));
+        // Where the deck loads MathJax, typeset first, so every formula and
+        // the fonts it pulls in are on the page before the wait on fonts.
+        if (window.MathJax && window.MathJax.startup) await window.MathJax.startup.promise;
         await document.fonts.ready;
         const style = document.createElement('style');
         style.textContent = ${JSON.stringify(HIDE.join(','))} + '{display:none !important}';
@@ -250,7 +267,8 @@ async function main() {
           if (chunk.eof) break;
         }
         await call('IO.close', { handle: stream });
-        const file = path.join(pages, `${String(files.length + 1).padStart(4, '0')}-${deck}-${id}.pdf`);
+        const file = path.join(pages,
+          `${String(files.length + 1).padStart(4, '0')}-${deck.replace(/\//g, '-')}-${id}.pdf`);
         fs.writeFileSync(file, Buffer.concat(chunks));
         files.push(file);
         process.stderr.write(`\r${deck}: ${i + 1}/${ids.length}   `);
