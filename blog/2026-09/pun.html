@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Nishant Shukla" />
+  <meta name="dcterms.date" content="2026-09-26" />
+  <meta name="keywords" content="tagged template literal, JavaScript
+template literal, tag function, Mustache syntax, object
+shorthand, prompt template, Helicone, hprompt, Shakespeare puns, play on
+words" />
+  <meta name="description" content="JavaScript’s ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone’s prompt tag." />
+  <title>The Greatest Pun: JavaScript’s ${{ }} tagged template
+literal</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="alternate" type="application/rss+xml" title="Nishant Shukla" href="https://shukla.io/blog/rss.xml">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://shukla.io/blog/2026-09/pun.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Nishant Shukla">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="https://shukla.io/blog/2026-09/pun.html">
+  <meta property="og:title" content="The Greatest Pun: JavaScript's ${{ }} tagged template literal">
+  <meta property="og:description" content="JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.">
+  <meta property="og:image" content="https://shukla.io/blog/2026-09/og-pun.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The string ${{ url }} bracketed two ways: as a template hole, and as JavaScript's object literal inside a substitution.">
+  <meta property="article:published_time" content="2026-09-26">
+  <meta property="article:author" content="Nishant Shukla">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Greatest Pun: JavaScript's ${{ }} tagged template literal">
+  <meta name="twitter:description" content="JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.">
+  <meta name="twitter:image" content="https://shukla.io/blog/2026-09/og-pun.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "The Greatest Pun",
+    "alternativeHeadline": "JavaScript's ${{ }} tagged template literal",
+    "description": "JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.",
+    "image": "https://shukla.io/blog/2026-09/og-pun.png",
+    "datePublished": "2026-09-26",
+    "dateModified": "2026-09-26",
+    "inLanguage": "en",
+    "keywords": "tagged template literal, JavaScript template literal, tag function, Mustache syntax, object shorthand, prompt template, Helicone, puns",
+    "author": {
+      "@type": "Person",
+      "name": "Nishant Shukla",
+      "url": "https://shukla.io"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Nishant Shukla",
+      "url": "https://shukla.io"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://shukla.io/blog/2026-09/pun.html"
+    },
+    "about": [
+      "JavaScript tagged template literals",
+      "template languages",
+      "puns and wordplay",
+      "prompt engineering"
+    ]
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Libre+Caslon+Text:wght@400;700&family=La+Belle+Aurore&family=Jacquard+24+Charted&display=swap" rel="stylesheet">
+  <style>
+    /* Base. Ubuntu for the running text, as in the July and August posts.
+       Pandoc's default sets no line-height, which is too tight for a sans. */
+    body {
+      font-family: 'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      /* Pandoc's 36em runs to about 79 characters a line in Ubuntu; 32em
+         brings it to about 70, and leaves the editor grid more gutter. */
+      max-width: 32em;
+    }
+    h1, h2, h3 {
+      font-weight: 500;
+      line-height: 1.25;
+    }
+    /* The title is set in Jacquard 24 Charted: blackletter drawn on the grid
+       of a jacquard loom's punch card, so the one word-shape reads as old
+       English and as loom code. The face is drawn on a 24px pixel grid, so
+       the size is a multiple of 24 to keep the cells crisp. */
+    h1.title {
+      font-family: 'Jacquard 24 Charted', 'Ubuntu', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 72px;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      h1.title { font-size: 48px; }
+    }
+    /* Two grammars. The post opens in Shakespeare and ends in JavaScript, so
+       the page makes the same trip: unbleached manuscript paper at the top,
+       the pale dotted surface of a code editor at the bottom. The crossfade is
+       tied to the hinge paragraph ("...one property in common: grammar") by a
+       view timeline, so it always takes one screen-height of scrolling around
+       that sentence, whatever the device. Browsers without scroll-driven
+       animations, and readers who asked for reduced motion, get the same two
+       tones as a still gradient down the document instead. */
+    html {
+      background-color: #f8f4ea;
+      background-image: linear-gradient(#f8f4ea, #eef1f6);
+    }
+    /* Editor grid: a fixed layer faded in with the crossfade. Opacity is
+       compositor work, so the scroll stays smooth. A horizontal mask keeps the
+       grid out of the reading column: it is clear across the 32em column and
+       a little beyond, then fades in over the next 120px, so no dot ever
+       sits behind a word, a code chip or the figure. On phones there is no
+       gutter, so the lower half is simply the cool tone. The dots are neutral
+       grey rather than slate, so they do not compete with the blue accents. */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgb(30 30 30 / 0.10) 1px, transparent 1.6px);
+      background-size: 24px 24px;
+      -webkit-mask-image: linear-gradient(to right,
+        #000 calc(50% - 388px), transparent calc(50% - 268px),
+        transparent calc(50% + 268px), #000 calc(50% + 388px));
+      mask-image: linear-gradient(to right,
+        #000 calc(50% - 388px), transparent calc(50% - 268px),
+        transparent calc(50% + 268px), #000 calc(50% + 388px));
+      opacity: 0;
+    }
+    @keyframes paper-to-editor {
+      from { background-color: #f8f4ea; }
+      to   { background-color: #eef1f6; }
+    }
+    @keyframes grid-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        html {
+          background-image: none;
+          timeline-scope: --hinge;
+          animation: paper-to-editor linear both;
+          animation-timeline: --hinge;
+          animation-range: cover 0% cover 100%;
+        }
+        body::before {
+          animation: grid-in linear both;
+          animation-timeline: --hinge;
+          animation-range: cover 0% cover 100%;
+        }
+        .hinge {
+          view-timeline-name: --hinge;
+          view-timeline-axis: block;
+        }
+      }
+    }
+    /* :::quote blocks. Convention: the first paragraph is the quotation, the
+       last paragraph is the attribution.
+
+       The quotation is written by hand: La Belle Aurore, an ink-pen cursive,
+       which is what the manuscript half of the page calls for and needs no
+       quotation mark to announce itself. A short hairline and a small muted
+       attribution follow. */
+    .quote {
+      max-width: 30em;
+      margin: 2.6em 0;
+    }
+    .quote > p {
+      margin: 0;
+      text-indent: 0;
+    }
+    .quote > p:first-child {
+      font-family: 'La Belle Aurore', cursive;
+      font-size: 1.75em;
+      line-height: 1.3;
+      color: #1a1a1a;
+      text-wrap: balance;
+    }
+    /* Attribution: a short hairline, then the source, small and muted. Titles
+       are italicised in the markdown, so no extra styling is needed here. */
+    .quote > p:last-child {
+      margin-top: 0.9em;
+      font-size: 0.9em;
+      color: #6b7380;
+    }
+    .quote > p:last-child::before {
+      content: "";
+      display: block;
+      width: 2.5em;
+      height: 1px;
+      margin: 0 0 0.7em;
+      background: #5b8ed4;
+      opacity: 0.55;
+    }
+    /* :::dictionary blocks. Convention: a pandoc definition list whose term is
+       the headword (bold), an optional [pronunciation]{.pron}, and the part of
+       speech in italics; the definition follows, and a final paragraph names
+       and links the source. Set as a quiet card, so it reads as a reference
+       insert rather than more prose. */
+    .dictionary {
+      margin: 2.2em 0;
+      padding: 1.15em 1.5em 1.05em;
+      background: rgb(255 255 255 / 0.7);
+      border: 1px solid rgb(30 30 30 / 0.08);
+      border-radius: 8px;
+    }
+    .dictionary dl,
+    .dictionary dt,
+    .dictionary dd {
+      margin: 0;
+    }
+    .dictionary dt {
+      font-family: 'Libre Caslon Text', Georgia, serif;
+      font-size: 1em;
+      line-height: 1.2;
+      color: #6b7380;
+    }
+    .dictionary dt strong {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-right: 0.15em;
+    }
+    .dictionary dt .pron {
+      /* Stays in the headword's serif; it reads as part of the entry line. */
+      font-size: 0.85em;
+      margin-right: 0.35em;
+    }
+    .dictionary dt em {
+      font-style: italic;
+    }
+    .dictionary dd {
+      margin-top: 0.55em;
+      line-height: 1.55;
+      color: #1a1a1a;
+    }
+    .dictionary dd p {
+      margin: 0;
+    }
+    /* The one word the post hinges on gets a soft highlight rather than plain
+       bold, so the eye lands on it before reading the definition. */
+    .dictionary dd strong {
+      font-weight: 600;
+      background: rgba(91, 142, 212, 0.16);
+      border-radius: 3px;
+      padding: 0 0.22em;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .dictionary > p:last-child {
+      margin: 0.85em 0 0;
+      font-size: 0.82em;
+      color: #6b7380;
+      text-indent: 0;
+    }
+    .dictionary > p:last-child a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid #c5d3e8;
+    }
+    .dictionary > p:last-child a:hover {
+      color: #1a1a1a;
+      border-bottom-color: #5b8ed4;
+    }
+    /* The "correct grammatically" easter egg: a grammar-checker squiggle that,
+       on hover or tap, hops the two words past each other into the right order
+       (scripts.html does the measuring and animating). The squiggle fades once
+       the phrase is fixed, and comes back when the words return. */
+    .swap {
+      white-space: nowrap;
+      cursor: default;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .swap > span {
+      display: inline-block;
+      text-decoration: underline wavy #d0453a;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 0.22em;
+      text-decoration-skip-ink: none;
+      transition: text-decoration-color 0.35s ease 0.25s;
+    }
+    .swap.is-swapped > span {
+      text-decoration-color: transparent;
+    }
+    .swap:focus-visible {
+      outline: 2px solid #5b8ed4;
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+    /* Code blocks sit on a translucent panel, so on the editor half the grid
+       runs behind them rather than through them. Pandoc's own overflow-x
+       scrolling on long lines is unaffected. */
+    pre {
+      padding: 0.8em 1em;
+      background: rgb(255 255 255 / 0.55);
+      border: 1px solid rgb(30 30 30 / 0.06);
+      border-radius: 6px;
+    }
+    /* Inline code in prose. Pandoc only switches the font, so `dedent` and
+       `${...}` read as prose in a different face. A blue tint on the text plus a
+       faint chip gives each one an edge. Blocks are excluded. */
+    :not(pre) > code {
+      color: #2f5fa8;
+      background: rgba(91, 142, 212, 0.10);
+      padding: 0.08em 0.32em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    /* The parse figure: the same string bracketed two ways, and nothing else.
+       Its glyphs are placed one per cell (the x list in the markup), so the
+       brackets land on the right characters whatever monospace face the reader
+       has. Small and centred; it never needs to scroll. */
+    .parse {
+      max-width: 280px;
+      margin: 2.2em auto;
+    }
+    .parse svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      font-family: 'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    .parse .code { font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace; }
+    .parse .hero { font-size: 28px; fill: #1a1a1a; }
+    .parse .lbl  { font-size: 14px; fill: #6b7380; }
+    .parse .brk  { fill: none; stroke: #5b8ed4; stroke-width: 1.5; stroke-linecap: round; }
+    /* Two pens. The human reading is a red pen stroke with its label in the
+       handwriting face; the machine reading keeps the ruled blue brackets,
+       labelled in monospace. */
+    .parse .pen {
+      font-family: 'La Belle Aurore', cursive;
+      font-size: 20px;
+      fill: #c4463b;
+    }
+    .parse .pen-stroke {
+      fill: none;
+      stroke: #d0453a;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .parse .mach {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 12.5px;
+      fill: #2f5fa8;
+    }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The Greatest Pun</h1>
+</header>
+<p>Shakespeare’s chock-full of puns, no doubt as a sign of his mastery
+and love of words.</p>
+<p>Rarely can you swap two words to form a <span class="swap"
+tabindex="0" role="button" aria-pressed="false"><span
+class="w">correct</span> <span class="w">grammatically</span></span>
+sentence, yet he played with words like a magician.</p>
+<div class="quote">
+<p>Better a witty fool than a foolish wit.</p>
+<p><em>Twelfth Night</em></p>
+</div>
+<p>In the example above, the noun “fool” flips to the adjective
+“foolish”, while the adjective “witty” flips to the noun “wit”. The
+simplest puns leverage the rules of grammar to change the meaning of
+words.</p>
+<p>Then there are puns that play with phrases in a way that leverages
+context <em>outside</em> the grammar to change the meaning. Here’s one
+of my favorites:</p>
+<div class="quote">
+<p>Put out the light, and then put out the light.</p>
+<p><em>Othello</em></p>
+</div>
+<p>The first phrase literally means to extinguish a candle, but the
+second is a metaphor for killing someone (in this case, Desdemona).</p>
+<p>The formal dictionary definition of a pun usually talks about the
+“humorous” effect.</p>
+<div class="dictionary">
+<dl>
+<dt><strong>pun</strong> <span class="pron">/pʌn/</span>
+<em>noun</em></dt>
+<dd>
+The use of a word in such a way as to suggest two or more meanings or
+different associations, or of two or more words of the same or nearly
+the same sound with different meanings, so as to produce a
+<strong>humorous</strong> effect; a play on words.
+</dd>
+</dl>
+<p><a
+href="https://www.oed.com/dictionary/pun_n1?tab=meaning_and_use#27873500"
+target="_blank" rel="noopener">Oxford English Dictionary</a></p>
+</div>
+<div class="hinge">
+<p>Now, I very well believe humor is in the eye of the human. What’s
+funny to me isn’t always funny to you. But I’d like to introduce you to
+the greatest pun I’ve ever discovered. It isn’t in English. Natural
+languages and programming languages have one property in common: <a
+href="/blog/2026-02/grammar.html">grammar</a>. You’ve already seen what
+a pun can do with that.</p>
+</div>
+<h2 id="tagged-template-literal">Tagged Template Literal</h2>
+<p>First, a quick background on the grammar. In JavaScript, there’s a
+thing called a <em>tagged template literal</em> that lets you do
+powerful string manipulation like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> systemPrompt <span class="op">=</span> <span class="fu">dedent</span><span class="vs">`</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="vs">    You are a code review agent.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="vs">    </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="vs">    Follow these steps:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="vs">        1. Before reviewing the PR, find recent related PRs.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="vs">        2. ...</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="vs">        3. ...</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="vs">        4. ...</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span><span class="op">;</span></span></code></pre></div>
+<p>In this code, <code>dedent</code> is the <a
+href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates"
+target="_blank" rel="noopener">tag function</a>, which processes the
+template literal to remove excessive indentation. A tag function
+receives the literal’s text pieces and the evaluated <code>${...}</code>
+values as separate arguments, so it can do whatever it likes with
+each.</p>
+<h2 id="templating-languages">Templating Languages</h2>
+<p>Most templating languages let you write the template in the same
+medium as the end product: text with holes where the variables go. Any
+time your controls live in the same system they are controlling, things
+get interesting. There is some Gödel incompleteness side-quest worth
+exploring here. But I digress. Here’s a quick example of a template:</p>
+<pre><code>hi {{ name }}</code></pre>
+<p>The <code>{{ }}</code> syntax is very common. In fact, the following
+templating languages use it:</p>
+<ul>
+<li><a href="https://mustache.github.io/" target="_blank"
+rel="noopener">Mustache</a></li>
+<li><a href="https://handlebarsjs.com/" target="_blank"
+rel="noopener">Handlebars</a></li>
+<li><a href="https://jinja.palletsprojects.com/" target="_blank"
+rel="noopener">Jinja2</a></li>
+<li><a
+href="https://docs.djangoproject.com/en/stable/ref/templates/language/"
+target="_blank" rel="noopener">Django templates</a></li>
+<li><a href="https://shopify.github.io/liquid/" target="_blank"
+rel="noopener">Liquid</a></li>
+<li><a href="https://angular.dev/guide/templates" target="_blank"
+rel="noopener">Angular templates</a></li>
+<li><a href="https://vuejs.org/guide/essentials/template-syntax.html"
+target="_blank" rel="noopener">Vue templates</a></li>
+</ul>
+<h2 id="prompt-template-literal">Prompt Template Literal</h2>
+<p>Check this out. We can define a tag function called
+<code>prompt</code> that looks like it’s accepting <code>{{ }}</code>
+templates.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> userPrompt <span class="op">=</span> <span class="fu">prompt</span><span class="vs">`</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="vs">  Please review my code.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="vs">    - Link to PR: </span><span class="sc">${</span>{ url }<span class="sc">}</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="vs">    - Extra notes: </span><span class="sc">${</span>{ notes }<span class="sc">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="vs">    - Timestamp: </span><span class="sc">${</span>{ time }<span class="sc">}</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span><span class="op">;</span></span></code></pre></div>
+<p>It looks familiar and easy on the eyes, right? Behind the scenes,
+it’s producing a string that will be processed by an observability tool
+(Helicone) to help analyze the prompts.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode xml"><code class="sourceCode xml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Please review my code.</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  - Link to PR: &lt;<span class="kw">prompt</span><span class="ot"> id=</span><span class="st">&quot;url&quot;</span>&gt;https://github.com/etc/etc&lt;/<span class="kw">prompt</span>&gt;</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  - Extra notes: &lt;<span class="kw">prompt</span><span class="ot"> id=</span><span class="st">&quot;notes&quot;</span>&gt;Only review the unit test files&lt;/<span class="kw">prompt</span>&gt;</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  - Timestamp: &lt;<span class="kw">prompt</span><span class="ot"> id=</span><span class="st">&quot;time&quot;</span>&gt;2026-09-26&lt;/<span class="kw">prompt</span>&gt;</span></code></pre></div>
+<p>In my opinion, the cool part is that the apparent <code>{{ }}</code>
+template syntax emerges in our JavaScript code by coincidence:
+<code>${...}</code> evaluates whatever is inside it, and JavaScript’s
+<code>{ name }</code> object shorthand is equivalent to
+<code>{ name: name }</code>. The tag function, <code>prompt</code>, now
+has all it needs to annotate the string properly.</p>
+<figure class="parse">
+<svg viewBox="0 0 260 128" role="img" aria-label="The string ${{ url }} bracketed two ways: you see the double braces as a template hole; JavaScript sees an object literal inside a substitution.">
+  <!-- The human reading is drawn in red ink, by hand; the machine reading in
+       editor blue, by ruler. -->
+  <text class="lbl pen" x="138.5" y="12" text-anchor="middle">you see</text>
+  <path class="pen-stroke" d="M60.6,33.2 C60.1,29.4 59.7,26.1 62.2,24.8 C92,23.5 150,24.5 214.6,24.1 C217.2,24.2 217.5,28.2 216.6,32.6"/>
+  <!-- One glyph per 17-unit cell (the x list), so the brackets land on the
+       right characters in any monospace face. -->
+  <text class="code hero" x="53.5 70.5 87.5 104.5 121.5 138.5 155.5 172.5 189.5 206.5" y="62" text-anchor="middle">${{ url }}</text>
+  <path class="brk" d="M81,76 V81 Q81,84 84,84 H193 Q196,84 196,81 V76"/>
+  <path class="brk" d="M43,92 V97 Q43,100 46,100 H214 Q217,100 217,97 V92"/>
+  <text class="lbl mach" x="130" y="120" text-anchor="middle">JavaScript sees</text>
+</svg>
+</figure>
+<p>JavaScript sees one thing, and you see another. The
+<code>{{ url }}</code> syntax lives in your head.</p>
+<p><em>… crickets …</em></p>
+<p>Alright, maybe I overplayed the pun, but I’m absolutely proud of it.
+I worked with Justin from Helicone on this back in 2024. It was an idea
+I’d been using internally, which Justin then made official in the SDK
+(<a href="https://github.com/Helicone/helicone/pull/1410"
+target="_blank" rel="noopener">Justin’s PR</a>, <a
+href="https://github.com/Helicone/helicone/pull/1427" target="_blank"
+rel="noopener">my PR</a>). I thought the pun was funny. Justin was happy
+to include it.</p>
+<p>A pun is one string with two parses. In <a
+href="/blog/2026-02/grammar.html">Grammar models are back, baby!</a> I
+take that seriously and hand back a probability distribution over them.
+In <a href="/blog/2026-07/cccx.html">Spatial languages</a> I make it
+worse and hand the parser a second dimension.</p>
+<style>
+#post-footer{
+  --pf-ink:#16181c; --pf-mute:#6b7280; --pf-line:#d7dae0;
+  margin:4rem 0 1.5rem; padding-top:1.2rem; border-top:1px solid var(--pf-line);
+  display:flex; align-items:center; gap:14px 22px; flex-wrap:wrap;
+  font-family:'Ubuntu',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:13px; color:var(--pf-mute); color-scheme:light;
+}
+#post-footer *{box-sizing:border-box}
+#post-footer a{color:var(--pf-mute); text-decoration:none; border-bottom:1px solid var(--pf-line)}
+#post-footer a:hover{color:var(--pf-ink); border-bottom-color:var(--pf-mute)}
+#post-footer a:focus-visible{outline:2px dashed var(--pf-ink); outline-offset:3px}
+/* Who and when, as the footer's first row: the author's sign-off folded into
+   the colophon so the page ends under a single rule. The date is written the
+   way a machine writes it, on the editor half where it sits. */
+.pf-who{flex:1 0 100%; margin:0 0 2px; font-size:13.5px}
+.pf-who time{
+  margin-left:.9em; font-family:Menlo,Monaco,Consolas,'Lucida Console',monospace;
+  font-size:12.5px; color:#2f5fa8;
+}
+.pf-links{display:flex; gap:12px}
+.pf-sub{display:flex; gap:6px; margin:0 0 0 auto}
+.pf-sub input[type=email]{
+  font:inherit; font-size:12.5px; padding:5px 9px; width:180px;
+  border:1px solid var(--pf-line); border-radius:6px; background:#fff; color:var(--pf-ink);
+}
+.pf-sub input[type=email]:focus-visible{outline:none; border-color:var(--pf-mute)}
+.pf-sub button{
+  font:inherit; font-size:12.5px; padding:5px 12px; cursor:pointer;
+  border:1px solid var(--pf-ink); border-radius:6px; background:var(--pf-ink); color:#fff;
+}
+.pf-sub button:hover{opacity:.85}
+.pf-sub button:disabled{opacity:.4; cursor:default}
+.pf-sub button:focus-visible{outline:2px dashed var(--pf-ink); outline-offset:3px}
+/* honeypot: off-screen rather than display:none, so bots still fill it */
+.pf-sub .pf-trap{position:absolute; left:-9999px; width:1px; height:1px; opacity:0}
+.pf-note{flex:1 0 100%; margin:4px 0 0; font-size:12px; color:var(--pf-mute)}
+.pf-done{margin-left:auto; font-size:12.5px; color:var(--pf-ink)}
+@media (max-width:520px){
+  .pf-sub{margin-left:0; flex:1 0 100%}
+  .pf-sub input[type=email]{flex:1; width:auto}
+}
+</style>
+
+<footer id="post-footer">
+  <p class="pf-who"><a href="/">Nishant Shukla</a> <time datetime="2026-09-26">2026-09-26</time></p>
+  <span class="pf-links">
+    <a href="mailto:nishant@shukla.io">email</a>
+    <a href="https://github.com/binroot" target="_blank" rel="noopener">github</a>
+    <a href="https://www.linkedin.com/in/shuklanx/" target="_blank" rel="noopener">linkedin</a>
+    <a href="/blog/rss.xml">rss</a>
+  </span>
+  <form class="pf-sub">
+    <input type="email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+    <button type="submit">subscribe</button>
+  </form>
+</footer>
+
+<script>
+/* Same capture as quantum-oracle-engineering/signup.js: the body stays a plain
+   string with no Content-Type header, so the browser skips the CORS preflight.
+   Setting application/json makes it send OPTIONS first, which Apps Script does
+   not answer, and the failure reads like a permissions bug. */
+(function(){
+  'use strict';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxr2yhqaUXG8XAyJwCDnCvGAdkFMxskuEkavIIYyUj5VRSMLpk_2IkcqNAEXn5OKn0DPQ/exec';
+  var CONTACT = 'nishant@shukla.io';
+  var NOTE = 'blog/pun';
+
+  var form = document.querySelector('#post-footer .pf-sub');
+  if(!form) return;
+  var email = form.querySelector('input[type=email]');
+  var send = form.querySelector('button');
+
+  var trap = document.createElement('input');
+  trap.type = 'text'; trap.className = 'pf-trap'; trap.tabIndex = -1;
+  trap.autocomplete = 'off'; trap.setAttribute('aria-hidden','true');
+
+  var note = document.createElement('p');
+  note.className = 'pf-note'; note.setAttribute('role','status');
+
+  form.appendChild(trap);
+  form.parentNode.appendChild(note);
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(send.disabled) return;
+    send.disabled = true;
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({ email: email.value, note: NOTE, company: trap.value })
+    }).then(function(res){ return res.json(); }).then(function(data){
+      if(data.ok){
+        var span = document.createElement('span');
+        span.className = 'pf-done';
+        span.setAttribute('role','status');
+        span.textContent = data.message;
+        form.replaceWith(span);
+        note.remove();
+      } else {
+        note.textContent = data.message;
+        send.disabled = false;
+      }
+    }).catch(function(){
+      var a = document.createElement('a');
+      a.href = 'mailto:' + CONTACT + '?subject=' + encodeURIComponent('Subscribe');
+      a.textContent = 'email me instead';
+      note.replaceChildren(document.createTextNode('could not reach the list. '), a);
+      send.disabled = false;
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  var box = document.querySelector('.swap');
+  if (!box || !box.animate) return;
+  var words = box.querySelectorAll(':scope > span');
+  if (words.length !== 2) return;
+  var a = words[0], b = words[1];
+  var swapped = false;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // Hop a word from one x-offset to another along a small arc. The word
+  // moving right goes over, the word moving left ducks under.
+  function hop(el, from, to) {
+    el.getAnimations().forEach(function (an) { an.cancel(); });
+    var lift = to > from ? '-0.7em' : '0.4em';
+    var an = el.animate([
+      { transform: 'translate(' + from + 'px, 0)' },
+      { transform: 'translate(' + (from + to) / 2 + 'px, ' + lift + ')', offset: 0.5 },
+      { transform: 'translate(' + to + 'px, 0)' }
+    ], { duration: reduce ? 0 : 650, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' });
+    an.finished.then(function () { an.commitStyles(); an.cancel(); }).catch(function () {});
+  }
+
+  function set(on) {
+    if (on === swapped) return;
+    swapped = on;
+    // offset* values describe the resting layout, unaffected by transforms.
+    var gap = b.offsetLeft - (a.offsetLeft + a.offsetWidth);
+    var da = b.offsetWidth + gap;
+    var db = -(a.offsetWidth + gap);
+    if (on) { hop(a, 0, da); hop(b, 0, db); }
+    else    { hop(a, da, 0); hop(b, db, 0); }
+    box.classList.toggle('is-swapped', on);
+    box.setAttribute('aria-pressed', String(on));
+  }
+
+  if (hover) {
+    box.addEventListener('mouseenter', function () { set(true); });
+    box.addEventListener('mouseleave', function () { set(false); });
+  } else {
+    box.addEventListener('click', function () { set(!swapped); });
+  }
+  box.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(!swapped); }
+  });
+})();
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="476c224d-08f5-44d4-a25a-005e5c890f79" data-utcoffset="-7" defer></script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<link rel="alternate" type="application/rss+xml" title="Nishant Shukla" href="https://shukla.io/blog/rss.xml">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="https://shukla.io/blog/2026-09/pun.html">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Nishant Shukla">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://shukla.io/blog/2026-09/pun.html">
+<meta property="og:title" content="The Greatest Pun: JavaScript's ${{ }} tagged template literal">
+<meta property="og:description" content="JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.">
+<meta property="og:image" content="https://shukla.io/blog/2026-09/og-pun.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The string ${{ url }} bracketed two ways: as a template hole, and as JavaScript's object literal inside a substitution.">
+<meta property="article:published_time" content="2026-09-26">
+<meta property="article:author" content="Nishant Shukla">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Greatest Pun: JavaScript's ${{ }} tagged template literal">
+<meta name="twitter:description" content="JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.">
+<meta name="twitter:image" content="https://shukla.io/blog/2026-09/og-pun.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Greatest Pun",
+  "alternativeHeadline": "JavaScript's ${{ }} tagged template literal",
+  "description": "JavaScript's ${{ name }} looks like a Mustache template but parses as an object literal inside a tagged template literal. The pun behind Helicone's prompt tag.",
+  "image": "https://shukla.io/blog/2026-09/og-pun.png",
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "inLanguage": "en",
+  "keywords": "tagged template literal, JavaScript template literal, tag function, Mustache syntax, object shorthand, prompt template, Helicone, puns",
+  "author": {
+    "@type": "Person",
+    "name": "Nishant Shukla",
+    "url": "https://shukla.io"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Nishant Shukla",
+    "url": "https://shukla.io"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shukla.io/blog/2026-09/pun.html"
+  },
+  "about": [
+    "JavaScript tagged template literals",
+    "template languages",
+    "puns and wordplay",
+    "prompt engineering"
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&family=Libre+Caslon+Text:wght@400;700&family=La+Belle+Aurore&family=Jacquard+24+Charted&display=swap" rel="stylesheet">
+<style>
+  /* Base. Ubuntu for the running text, as in the July and August posts.
+     Pandoc's default sets no line-height, which is too tight for a sans. */
+  body {
+    font-family: 'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    /* Pandoc's 36em runs to about 79 characters a line in Ubuntu; 32em
+       brings it to about 70, and leaves the editor grid more gutter. */
+    max-width: 32em;
+  }
+  h1, h2, h3 {
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  /* The title is set in Jacquard 24 Charted: blackletter drawn on the grid
+     of a jacquard loom's punch card, so the one word-shape reads as old
+     English and as loom code. The face is drawn on a 24px pixel grid, so
+     the size is a multiple of 24 to keep the cells crisp. */
+  h1.title {
+    font-family: 'Jacquard 24 Charted', 'Ubuntu', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 72px;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+  @media (max-width: 600px) {
+    h1.title { font-size: 48px; }
+  }
+  /* Two grammars. The post opens in Shakespeare and ends in JavaScript, so
+     the page makes the same trip: unbleached manuscript paper at the top,
+     the pale dotted surface of a code editor at the bottom. The crossfade is
+     tied to the hinge paragraph ("...one property in common: grammar") by a
+     view timeline, so it always takes one screen-height of scrolling around
+     that sentence, whatever the device. Browsers without scroll-driven
+     animations, and readers who asked for reduced motion, get the same two
+     tones as a still gradient down the document instead. */
+  html {
+    background-color: #f8f4ea;
+    background-image: linear-gradient(#f8f4ea, #eef1f6);
+  }
+  /* Editor grid: a fixed layer faded in with the crossfade. Opacity is
+     compositor work, so the scroll stays smooth. A horizontal mask keeps the
+     grid out of the reading column: it is clear across the 32em column and
+     a little beyond, then fades in over the next 120px, so no dot ever
+     sits behind a word, a code chip or the figure. On phones there is no
+     gutter, so the lower half is simply the cool tone. The dots are neutral
+     grey rather than slate, so they do not compete with the blue accents. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(rgb(30 30 30 / 0.10) 1px, transparent 1.6px);
+    background-size: 24px 24px;
+    -webkit-mask-image: linear-gradient(to right,
+      #000 calc(50% - 388px), transparent calc(50% - 268px),
+      transparent calc(50% + 268px), #000 calc(50% + 388px));
+    mask-image: linear-gradient(to right,
+      #000 calc(50% - 388px), transparent calc(50% - 268px),
+      transparent calc(50% + 268px), #000 calc(50% + 388px));
+    opacity: 0;
+  }
+  @keyframes paper-to-editor {
+    from { background-color: #f8f4ea; }
+    to   { background-color: #eef1f6; }
+  }
+  @keyframes grid-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      html {
+        background-image: none;
+        timeline-scope: --hinge;
+        animation: paper-to-editor linear both;
+        animation-timeline: --hinge;
+        animation-range: cover 0% cover 100%;
+      }
+      body::before {
+        animation: grid-in linear both;
+        animation-timeline: --hinge;
+        animation-range: cover 0% cover 100%;
+      }
+      .hinge {
+        view-timeline-name: --hinge;
+        view-timeline-axis: block;
+      }
+    }
+  }
+  /* :::quote blocks. Convention: the first paragraph is the quotation, the
+     last paragraph is the attribution.
+
+     The quotation is written by hand: La Belle Aurore, an ink-pen cursive,
+     which is what the manuscript half of the page calls for and needs no
+     quotation mark to announce itself. A short hairline and a small muted
+     attribution follow. */
+  .quote {
+    max-width: 30em;
+    margin: 2.6em 0;
+  }
+  .quote > p {
+    margin: 0;
+    text-indent: 0;
+  }
+  .quote > p:first-child {
+    font-family: 'La Belle Aurore', cursive;
+    font-size: 1.75em;
+    line-height: 1.3;
+    color: #1a1a1a;
+    text-wrap: balance;
+  }
+  /* Attribution: a short hairline, then the source, small and muted. Titles
+     are italicised in the markdown, so no extra styling is needed here. */
+  .quote > p:last-child {
+    margin-top: 0.9em;
+    font-size: 0.9em;
+    color: #6b7380;
+  }
+  .quote > p:last-child::before {
+    content: "";
+    display: block;
+    width: 2.5em;
+    height: 1px;
+    margin: 0 0 0.7em;
+    background: #5b8ed4;
+    opacity: 0.55;
+  }
+  /* :::dictionary blocks. Convention: a pandoc definition list whose term is
+     the headword (bold), an optional [pronunciation]{.pron}, and the part of
+     speech in italics; the definition follows, and a final paragraph names
+     and links the source. Set as a quiet card, so it reads as a reference
+     insert rather than more prose. */
+  .dictionary {
+    margin: 2.2em 0;
+    padding: 1.15em 1.5em 1.05em;
+    background: rgb(255 255 255 / 0.7);
+    border: 1px solid rgb(30 30 30 / 0.08);
+    border-radius: 8px;
+  }
+  .dictionary dl,
+  .dictionary dt,
+  .dictionary dd {
+    margin: 0;
+  }
+  .dictionary dt {
+    font-family: 'Libre Caslon Text', Georgia, serif;
+    font-size: 1em;
+    line-height: 1.2;
+    color: #6b7380;
+  }
+  .dictionary dt strong {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-right: 0.15em;
+  }
+  .dictionary dt .pron {
+    /* Stays in the headword's serif; it reads as part of the entry line. */
+    font-size: 0.85em;
+    margin-right: 0.35em;
+  }
+  .dictionary dt em {
+    font-style: italic;
+  }
+  .dictionary dd {
+    margin-top: 0.55em;
+    line-height: 1.55;
+    color: #1a1a1a;
+  }
+  .dictionary dd p {
+    margin: 0;
+  }
+  /* The one word the post hinges on gets a soft highlight rather than plain
+     bold, so the eye lands on it before reading the definition. */
+  .dictionary dd strong {
+    font-weight: 600;
+    background: rgba(91, 142, 212, 0.16);
+    border-radius: 3px;
+    padding: 0 0.22em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .dictionary > p:last-child {
+    margin: 0.85em 0 0;
+    font-size: 0.82em;
+    color: #6b7380;
+    text-indent: 0;
+  }
+  .dictionary > p:last-child a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #c5d3e8;
+  }
+  .dictionary > p:last-child a:hover {
+    color: #1a1a1a;
+    border-bottom-color: #5b8ed4;
+  }
+  /* The "correct grammatically" easter egg: a grammar-checker squiggle that,
+     on hover or tap, hops the two words past each other into the right order
+     (scripts.html does the measuring and animating). The squiggle fades once
+     the phrase is fixed, and comes back when the words return. */
+  .swap {
+    white-space: nowrap;
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .swap > span {
+    display: inline-block;
+    text-decoration: underline wavy #d0453a;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.22em;
+    text-decoration-skip-ink: none;
+    transition: text-decoration-color 0.35s ease 0.25s;
+  }
+  .swap.is-swapped > span {
+    text-decoration-color: transparent;
+  }
+  .swap:focus-visible {
+    outline: 2px solid #5b8ed4;
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  /* Code blocks sit on a translucent panel, so on the editor half the grid
+     runs behind them rather than through them. Pandoc's own overflow-x
+     scrolling on long lines is unaffected. */
+  pre {
+    padding: 0.8em 1em;
+    background: rgb(255 255 255 / 0.55);
+    border: 1px solid rgb(30 30 30 / 0.06);
+    border-radius: 6px;
+  }
+  /* Inline code in prose. Pandoc only switches the font, so `dedent` and
+     `${...}` read as prose in a different face. A blue tint on the text plus a
+     faint chip gives each one an edge. Blocks are excluded. */
+  :not(pre) > code {
+    color: #2f5fa8;
+    background: rgba(91, 142, 212, 0.10);
+    padding: 0.08em 0.32em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  /* The parse figure: the same string bracketed two ways, and nothing else.
+     Its glyphs are placed one per cell (the x list in the markup), so the
+     brackets land on the right characters whatever monospace face the reader
+     has. Small and centred; it never needs to scroll. */
+  .parse {
+    max-width: 280px;
+    margin: 2.2em auto;
+  }
+  .parse svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: 'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .parse .code { font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace; }
+  .parse .hero { font-size: 28px; fill: #1a1a1a; }
+  .parse .lbl  { font-size: 14px; fill: #6b7380; }
+  .parse .brk  { fill: none; stroke: #5b8ed4; stroke-width: 1.5; stroke-linecap: round; }
+  /* Two pens. The human reading is a red pen stroke with its label in the
+     handwriting face; the machine reading keeps the ruled blue brackets,
+     labelled in monospace. */
+  .parse .pen {
+    font-family: 'La Belle Aurore', cursive;
+    font-size: 20px;
+    fill: #c4463b;
+  }
+  .parse .pen-stroke {
+    fill: none;
+    stroke: #d0453a;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .parse .mach {
+    font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+    font-size: 12.5px;
+    fill: #2f5fa8;
+  }
+</style>

@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 18 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 26 Sep 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>The Greatest Pun</title>
+      <link>https://shukla.io/blog/2026-09/pun.html</link>
+      <guid>https://shukla.io/blog/2026-09/pun.html</guid>
+      <pubDate>Sat, 26 Sep 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      Shakespeare, tagged template literals, and the ${{ }} pun that made it into Helicone's SDK.
+      ]]></description>
+    </item>
 
     <item>
       <title>Who benchmarks the benchmark?</title>
