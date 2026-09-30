@@ -106,7 +106,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - **peak scratch** sets the qubit count
 - clean scratch is **necessary, not sufficient**
 
-<button class="coming" disabled>Coming Sept 29</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-06" style="--accent: #B6D792"}
@@ -121,7 +121,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - **half the T gates** of an adder
 - safe when scratch holds a **basis function** of the data
 
-<button class="coming" disabled>Coming Oct 6</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-07" style="--accent: #761D01"}
@@ -136,7 +136,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - **restoration types**: Hoare contracts over subspaces
 - a 12-bit oracle: **20 qubits to 13**
 
-<button class="coming" disabled>Coming Oct 13</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-08" style="--accent: #D9EB4E"}
@@ -151,7 +151,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - past **Toffoli**, assertions grow exponentially
 - **one theorem per family**, checked in milliseconds
 
-<button class="coming" disabled>Coming Oct 20</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::::
@@ -171,7 +171,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - the **SHIFTS channel**: one qubit in, two out, built to show it
 - the quantum lives in the **memory between steps**
 
-<button class="coming" disabled>Coming Oct 27</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-10" style="--accent: #9598CA"}
@@ -186,7 +186,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - SHIFTS: at least **0.03 qubits per copy**
 - a **theorem**, with constants
 
-<button class="coming" disabled>Coming Nov 3</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-11" style="--accent: #92BBA8"}
@@ -200,7 +200,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - too little memory fails **exponentially fast**
 - the device stays a **black box**
 
-<button class="coming" disabled>Coming Nov 10</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::: {.lesson data-lesson="qoe-lesson-12" style="--accent: #9F4668"}
@@ -215,7 +215,7 @@ This course teaches the craft of building practical quantum circuits from scratc
 - oracle cost hidden behind **"assume oracle access"**
 - the three questions on a **headline claim**, live
 
-<button class="coming" disabled>Coming Nov 17</button>
+<button class="coming" disabled>Coming soon</button>
 :::
 
 ::::
