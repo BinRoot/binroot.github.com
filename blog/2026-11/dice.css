@@ -1,0 +1,98 @@
+/* Keep the page's Pandoc typography intact; these rules only style the roll. */
+body { font-family: "Source Serif 4", Georgia, serif; }
+
+.dice {
+  max-width: 34rem;
+  margin: 1.5rem auto;
+  padding: 0;
+}
+
+.dice-stage {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: clamp(280px, 55vw, 400px);
+  overflow: hidden;
+  border: 1px solid #ded8ce;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.dice.is-showing-die .dice-stage { display: block; }
+
+.dice-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.dice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem 1rem;
+  padding: 0;
+}
+
+.dice.is-showing-die .dice-controls {
+  padding: .85rem .1rem .1rem;
+}
+
+.dice-roll-button {
+  padding: .6rem 1rem;
+  border: 1px solid #c8c2cc;
+  border-radius: 6px;
+  background: #f4f2f5;
+  color: #514b58;
+  font: 400 .95rem/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.dice-roll-button:hover:not(:disabled) { background: #ebe8ee; }
+.dice-roll-button:focus-visible { outline: 3px solid #d99b60; outline-offset: 3px; }
+.dice-roll-button:disabled { cursor: wait; opacity: .65; }
+
+.dice-result {
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.dice-result:empty { display: none; }
+.dice.has-rolled .dice-roll-button { display: none; }
+
+.dice-result[data-kind="success"] { color: #275b77; }
+.dice-result[data-kind="failure"] { color: #8b3f4b; }
+
+figure .photo-credit {
+  margin-top: .3rem;
+  color: #777;
+  font-size: .78rem;
+  text-align: center;
+}
+
+figure .photo-credit a { color: inherit; }
+
+figure img[src$="petrov.jpg"],
+figure img[src$="grenander.jpg"],
+figure img[src*="static-prod.rtl.lu"] {
+  display: block;
+  width: min(100%, 260px);
+  height: 210px;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+figure img[src$="grenander.jpg"] { object-position: center 70%; }
+
+figure img.movie-poster {
+  display: block;
+  width: min(100%, 300px);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}

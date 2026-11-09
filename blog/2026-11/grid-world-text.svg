@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title desc">
+  <title id="title">Grid world with text signals and obstacles</title>
+  <desc id="desc">Inside an orange outlined board, a purple square sends blue signal traces toward two red barriers. The upper trace is labeled text, and each trace stops at a barrier.</desc>
+
+  <!-- Board -->
+  <rect x="70" y="50" width="480" height="360" fill="#fffdf9" stroke="#d99b60" stroke-width="8"/>
+
+  <!-- Blue signals stop at the first red barrier they meet. -->
+  <g fill="none" stroke="#275b77" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M151 310 L239 150 H430"/>
+    <path d="M151 310 L310 240"/>
+    <path d="M151 310 L310 270"/>
+  </g>
+  <text x="270" y="137" fill="#275b77" font-family="system-ui, sans-serif" font-size="25" font-weight="650" letter-spacing="1">TEXT</text>
+
+  <!-- Two solid barriers -->
+  <g fill="#f7dfe1" stroke="#c96c78" stroke-width="5">
+    <path d="M430 50 H550 V110 H490 V170 H430 Z"/>
+    <rect x="310" y="210" width="240" height="70" rx="8"/>
+  </g>
+
+  <!-- Purple square -->
+  <rect x="105" y="286" width="52" height="52" rx="7" fill="#f4eff8" stroke="#a58bbd" stroke-width="5"/>
+</svg>

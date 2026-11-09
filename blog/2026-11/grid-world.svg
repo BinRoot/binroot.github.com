@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title desc">
+  <title id="title">Grid world with a blue observation cone</title>
+  <desc id="desc">An orthogonal grid world contains red brick obstacles along its top and right edges, a purple agent square, and a blue cone extending diagonally toward the upper right.</desc>
+  <defs>
+    <clipPath id="board-clip">
+      <rect x="70" y="50" width="480" height="360"/>
+    </clipPath>
+  </defs>
+
+  <!-- Board and square grid -->
+  <rect x="70" y="50" width="480" height="360" fill="#fffdf9" stroke="#d99b60" stroke-width="8"/>
+  <g stroke="#e9e1d7" stroke-width="2">
+    <path d="M130 50V410 M190 50V410 M250 50V410 M310 50V410 M370 50V410 M430 50V410 M490 50V410"/>
+    <path d="M70 110H550 M70 170H550 M70 230H550 M70 290H550 M70 350H550"/>
+  </g>
+
+  <!-- Light cone spreads radially and ends at the first wall or board edge. -->
+  <g clip-path="url(#board-clip)">
+    <path d="M220 260 L260 110 L278 110 L298 110 L322 110 L346 110 L370 110 L390 92 L410 72 L430 54 L460 50 L490 50 L520 50 L550 69 L490 110 L490 135 L490 160 L490 190 L490 225 L490 260 Z"
+      fill="#4f8fc5" fill-opacity=".16"/>
+    <g fill="none" stroke="#275b77" stroke-opacity=".62" stroke-width="3" stroke-linecap="round">
+      <path d="M220 260L260 110 M220 260L278 110 M220 260L298 110 M220 260L322 110 M220 260L346 110 M220 260L370 110"/>
+      <path d="M220 260L390 92 M220 260L410 72 M220 260L430 54 M220 260L460 50 M220 260L490 50 M220 260L520 50"/>
+      <path d="M220 260L550 69 M220 260L490 135 M220 260L490 160 M220 260L490 190 M220 260L490 225 M220 260L490 260"/>
+    </g>
+  </g>
+
+  <!-- Brick obstacles sit above the cone, occluding rays beyond each collision. -->
+  <g fill="#f7dfe1" stroke="#c96c78" stroke-width="4">
+    <rect x="130" y="50" width="60" height="60"/>
+    <rect x="190" y="50" width="60" height="60"/>
+    <rect x="250" y="50" width="60" height="60"/>
+    <rect x="310" y="50" width="60" height="60"/>
+    <rect x="490" y="110" width="60" height="60"/>
+    <rect x="490" y="170" width="60" height="60"/>
+    <rect x="490" y="230" width="60" height="60"/>
+    <rect x="490" y="290" width="60" height="60"/>
+    <rect x="490" y="350" width="60" height="60"/>
+  </g>
+
+  <!-- Agent square -->
+  <rect x="196" y="236" width="48" height="48" rx="7" fill="#f4eff8" stroke="#a58bbd" stroke-width="5"/>
+</svg>

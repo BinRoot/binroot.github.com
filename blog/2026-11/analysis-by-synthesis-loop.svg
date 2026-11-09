@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title desc">
+  <title id="title">Analysis by synthesis</title>
+  <desc id="desc">A reconstructed world produces predicted readings, while the real world supplies actual readings. Comparing them reveals mismatches that guide what to investigate next. Investigation supplies new observations and helps revise the reconstructed world.</desc>
+  <defs>
+    <marker id="model-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#7352a5"/>
+    </marker>
+    <marker id="real-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#275b77"/>
+    </marker>
+    <marker id="mismatch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#b42318"/>
+    </marker>
+  </defs>
+
+  <g fill="none" stroke="#7352a5" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#model-arrow)">
+    <path d="M154 106 V146"/>
+    <path d="M154 220 V302 H207"/>
+  </g>
+  <g fill="none" stroke="#275b77" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#real-arrow)">
+    <path d="M486 106 V146"/>
+    <path d="M486 220 V302 H433"/>
+    <path d="M434 424 H636 V66 H610"/>
+  </g>
+  <path d="M320 334 V390" fill="none" stroke="#b42318" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#mismatch-arrow)"/>
+  <path d="M206 424 H4 V66 H30" fill="none" stroke="#7352a5" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#model-arrow)"/>
+
+  <g stroke-width="2.5">
+    <rect x="32" y="26" width="244" height="80" rx="10" fill="#f4eff8" stroke="#7352a5"/>
+    <rect x="364" y="26" width="244" height="80" rx="10" fill="#eef5fa" stroke="#275b77"/>
+    <rect x="32" y="150" width="244" height="70" rx="10" fill="#f4eff8" stroke="#7352a5"/>
+    <rect x="364" y="150" width="244" height="70" rx="10" fill="#eef5fa" stroke="#275b77"/>
+    <rect x="210" y="270" width="220" height="64" rx="10" fill="#f4f4f4" stroke="#777777"/>
+    <rect x="206" y="394" width="228" height="60" rx="10" fill="#f4f4f4" stroke="#777777"/>
+  </g>
+
+  <g font-family="system-ui, sans-serif" font-size="22" text-anchor="middle" fill="#34313a">
+    <text x="154" y="61">Reconstructed</text>
+    <text x="154" y="88">world</text>
+    <text x="486" y="74">Real world</text>
+    <text x="154" y="193">Predicted readings</text>
+    <text x="486" y="193">Actual readings</text>
+    <text x="320" y="310">Compare</text>
+    <text x="320" y="432">What to check next</text>
+  </g>
+  <g font-family="system-ui, sans-serif" font-size="19">
+    <text x="334" y="368" fill="#b42318">Mismatch</text>
+    <text x="110" y="411" text-anchor="middle" fill="#7352a5">Revise</text>
+    <text x="530" y="411" text-anchor="middle" fill="#275b77">Observe</text>
+  </g>
+</svg>

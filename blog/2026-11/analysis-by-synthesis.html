@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Nishant Shukla" />
+  <meta name="dcterms.date" content="2026-11-15" />
+  <title>Preventing an AI catastrophe</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dice.css?v=13" />
+  <link rel="stylesheet" href="article.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Preventing an AI catastrophe</h1>
+<p class="author">Nishant Shukla</p>
+<p class="date">2026-11-15</p>
+</header>
+<h2 id="petrov">Petrov</h2>
+<p>Look out the window and point at the sky. Go on, point somewhere and
+with your eyes trace a line upwards. Somewhere on the line is an
+intercontinental ballistic missile heading your way. Reports say it’s
+the Americans. Your name is Petrov, Lieutenant Colonel of Soviet Air
+Defence Forces. A siren howls with utmost urgency.</p>
+<div class="dice">
+<p>13 – Your heart pounds. The sirens seem to recede into a muffled blur
+as you reason that the early warning system must be mistaken. else – You
+panic. You freeze up. You cannot muster the courage to even blink.</p>
+</div>
+<p>You report your assessment that the warning is false. The false alarm
+is cleared, and no retaliatory strike follows.</p>
+<p>This was a real event that happened on September 26, 1983.</p>
+<blockquote>
+<p>“the [early warning] satellite had been fooled by the sun’s rays
+reflecting off clouds high over North Dakota, which had two launch
+areas” Source: <a
+href="https://www.economist.com/news/obituary/21729727-man-who-save-world-was-77-stanislav-petrov-was-declared-have-died-september-18th">The
+Economist, “Midnight and counting” (30 September 2017)</a></p>
+</blockquote>
+<figure>
+<img src="petrov.jpg" alt="Stanislav Petrov at home in 2016">
+<figcaption class="photo-credit">
+<a href="https://commons.wikimedia.org/wiki/User:Queery-54">Queery-54</a>
+· <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>
+</figcaption>
+</figure>
+<p>Petrov rolled a natural 20 that day.</p>
+<blockquote>
+<p>Some of his doubts were logical: the newness of the system, and the
+too-swift passage of the message through the 30 layers of verification
+he had set up himself. Other doubts were vaguer: a funny gut feeling,
+and a sense that he knew better than a machine. Even so, his decision to
+declare a false alarm was a 50-50 guess, no better. Source: <a
+href="https://www.economist.com/news/obituary/21729727-man-who-save-world-was-77-stanislav-petrov-was-declared-have-died-september-18th">The
+Economist, “Midnight and counting” (30 September 2017)</a></p>
+</blockquote>
+<p>Did the sensors betray us? Were the machines immoral? Should the
+Soviets invest in model alignment?</p>
+<p>Safe agentic behavior is on everyone’s mind nowadays. Funny enough,
+nearly four months before the Soviet nuclear false alarm incident, the
+movie WarGames came out with an uncannily similar premise.</p>
+<figure>
+<img class="movie-poster" src="https://cdn.posteritati.com/posters/000/000/049/087/war-games-md-web.jpg" alt="The 1983 theatrical poster for WarGames">
+<figcaption class="photo-credit">
+<a href="https://posteritati.com/poster/30644/war-games-1983-us-one-sheet-poster">Theatrical
+poster</a> · © MGM/UA
+</figcaption>
+</figure>
+<p>In both Petrov’s case and the movie, humans played a critical role as
+guardrails for their automated systems.</p>
+<h2 id="grenander">Grenander</h2>
+<p>During the week of <em>WarGames</em>’ wide release, Ulf Grenander
+presented “Reflections on Global Tendencies in Mathematics” at a
+conference in Lund called <em>An Inventory of Present Thinking about
+Parts and Wholes</em>. After all, computers were changing mathematical
+practice rapidly around this time. Wait, since <a
+href="https://teorth.github.io/tao-web/slides/math-2-0-caltech-2026.pdf">Math
+2.0</a> is taken, let’s call his take Math 1.5.</p>
+<figure>
+<img src="grenander.jpg" alt="Ulf Grenander">
+<figcaption class="photo-credit">
+<a href="https://commons.wikimedia.org/wiki/File:Professor_Ulf_Grenander.jpg">Svenskt
+Porträttarkiv</a> ·
+<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>
+</figcaption>
+</figure>
+<p>Petrov’s false alarm took place in September, months after
+Grenander’s June presentation, and <a
+href="https://www.chathamhouse.org/sites/default/files/2022-03/2022-03-07-nuclear-decision-making-unal-et-al_0.pdf">details
+of the incident did not become public until the 1990s</a>. Much of
+Grenander’s mathematical framework, developed during the Cold War,
+centered on probabilistic pattern representations and inference from
+signals. These ideas also offer a useful lens for thinking about
+early-warning systems. One powerful idea is that pattern analysis and
+pattern synthesis should share a common probabilistic model.</p>
+<blockquote>
+<p>Pattern analysis = Pattern synthesis. (Attributed to Grenander (1983,
+§5.3) in <a
+href="https://www2.stat.duke.edu/~sschmid/Courses/Stat376/Papers/BCSSStatSci1995.pdf">“Bayesian
+Computation and Stochastic Systems”</a>)</p>
+</blockquote>
+<p>Bottom-up signals from sensors may fire an alert warning Petrov of
+incoming missiles.</p>
+<p>Top-down understanding is the process of synthesizing or simulating
+evidence, and matching those synthetic signals against real signals.</p>
+<ul>
+<li>Why would the United States launch only five missiles rather than an
+overwhelming first strike?</li>
+<li>Why should he trust a relatively new warning system?</li>
+<li>Why wasn’t there corroborating evidence from ground radar?</li>
+</ul>
+<p>If we can construct models of the processes that could have generated
+the signals, then we better understand our world. His compositional and
+probabilistic framework for representing the underlying structures and
+inferring them from observations was called Pattern Theory.</p>
+<p>Whatever happened to Pattern Theory?</p>
+<h2 id="hermès">Hermès</h2>
+<figure>
+<img src="https://static-prod.rtl.lu/dims4/default/6a66561/2147483647/strip/true/crop/640x427%2B0%2B0/resize/1224x817%21/quality/90/?url=https%3A%2F%2Frtl-luxembourg-new-production-web.s3.eu-central-1.amazonaws.com%2Fbrightspot%2Fe1%2Fb1%2F90620cb0e569095ca0815a8d3238%2F8fe20b2cd0c4dd01dfa9990391cc6cba.jpeg" alt="Corinne Hermès in a portrait">
+<figcaption class="photo-credit">
+© RTL Today
+</figcaption>
+</figure>
+<p>Six weeks before the conference and <em>WarGames</em>’ wide release,
+Munich hosted the 28th edition of the Eurovision Song Contest.</p>
+<p>Corinne Hermès stunned us with her song “Si la vie est cadeau”,
+representing Luxembourg and winning 1st place.</p>
+<p>She sings:</p>
+<div
+style="position: relative; width: 100%; max-width: 560px; aspect-ratio: 16 / 9;">
+<iframe src="https://www.youtube.com/embed/F8y5xc8UodE" title="Corinne Hermès performing ‘Si la vie est cadeau’ at Eurovision 1983" style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+</iframe>
+</div>
+<blockquote>
+<p>Cadeau donné, cadeau repris, cadeau volé</p>
+</blockquote>
+<p>It translates to “a gift given, a gift taken back, a gift
+stolen.”</p>
+<p>In fact, in her later interviews after the competition, Hermès does
+not explicitly say that Grenander’s Pattern Theory was the gift.</p>
+<p>But that’s how I read it, because get this: Grenander’s approach
+differed from neural-network backpropagation. <a
+href="https://www-isl.stanford.edu/~widrow/papers/c1992backpropagationand.pdf">Backpropagation
+predated 1986</a>; the influential paper by Rumelhart, Hinton, and
+Williams that year helped popularize it.</p>
+<p>In his <a
+href="https://pure.iiasa.ac.at/id/eprint/2589/1/XB-85-406.pdf">1985
+account</a>, Grenander described pattern inference as stochastic
+relaxation: repeatedly resampling local parts of a pattern to form a
+Markov chain. Later, he and Michael Miller developed <a
+href="https://doi.org/10.1111/j.2517-6161.1994.tb02000.x">jump-diffusion
+methods</a> for sampling Bayesian pattern models.</p>
+<p>Maybe it’s cliche now, but you may have heard the phrase “the map is
+not the territory.” To me, it means the patterns we analyze and the
+signals our sensors capture are only projections of reality, not to be
+confused with reality itself.</p>
+<p>I think that’s what Hermès means when she sings,</p>
+<blockquote>
+<p>Alors pourquoi m’avoir promis la terre entière?</p>
+</blockquote>
+<p>It translates to, “so why did you promise me the whole world?”</p>
+<p>To which Claude responds, “That was an honest mistake, and you’re
+right to push back on that.”</p>
+<p>In many ways, an LLM’s output resembles the warning from the Soviet
+early warning system. Petrov had a rich model of the world in his head
+that allowed him to be skeptical of the sensor readings. As Grenander
+put it, the key idea is “analysis by synthesis.”</p>
+<h2 id="analysis-by-synthesis">Analysis by synthesis</h2>
+<p>Consider a grid world, where an agent can use optical sensors to
+measure distance to obstacles.</p>
+<p><img src="grid-world.svg" alt="A grid world with brick walls, a purple square, and a blue observation path."></p>
+<p>The blue vision cone represents the measurement of sensor
+signals.</p>
+<p>One problem with using LLMs for agentic planning is that they can
+conflate the map with the territory.</p>
+<p><img src="grid-world-text.svg" alt="A purple square with blue text signals stopping at two red barriers."></p>
+<p>The LLM is the sensor. I’ve seen related questions raised in <a
+href="https://arxiv.org/pdf/2606.08666">a paper that models language as
+a sensor</a> and in <a
+href="https://www.cambridge.org/core/journals/episteme/article/assertion-without-a-speaker-testimony-tracking-and-large-language-models/6F19C8DC4ECBD9FA0E43BA300DA45AF1">an
+argument that LLMs do not yet transmit testimonial knowledge</a>. When
+the sensor becomes the planner, we confuse the signals with reality. A
+trustworthy agentic system shall reconstruct a generative explanation of
+reality that predicts observations it has never seen.</p>
+<p>For example, the agent reconstructs a possible world and predicts the
+sensor readings that world would produce. It compares those predictions
+with the real readings, then uses the mismatches to decide what to
+investigate next.</p>
+<p>Its imagined world gives it questions to ask the real one.</p>
+<p><img src="analysis-by-synthesis-loop.svg" alt="Predicted and actual sensor readings are compared. Mismatches guide what to investigate next, leading to new observations and a revised reconstruction."></p>
+<p>An AI catastrophe could begin with a sensible plan for an imagined
+world, so reality must have a chance to interrupt the plan before the
+agent does something irreversible.</p>
+<p>I aim to return to this discussion in the future, as I am now running
+out of time to checkpoint my thoughts.</p>
+<script type="module" src="dice.js?v=4"></script>
+</body>
+</html>
