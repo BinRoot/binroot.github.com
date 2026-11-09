@@ -152,3 +152,8 @@ Its imagined world gives it questions to ask the real one.
 An AI catastrophe could begin with a sensible plan for an imagined world, so reality must have a chance to interrupt the plan before the agent does something irreversible.
 
 I aim to return to this discussion in the future, as I am now running out of time to checkpoint my thoughts.
+
+## Related reading
+
+- [Grammar models are back, baby!](../2026-02/grammar.html) connects top-down generation from hidden structure with bottom-up inference from observations.
+- [Who benchmarks the benchmark?](../2026-08/gym.html) shows how misleading observations and broken environments can make an agent appear to fail.
