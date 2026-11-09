@@ -5,8 +5,18 @@
     <link>https://shukla.io</link>
     <description>A blog about Math, Computer Science, and Software Engineering.</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 26 Sep 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 09 Nov 2026 02:21:34 GMT</lastBuildDate>
     <atom:link href="https://shukla.io/blog/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Preventing an AI catastrophe</title>
+      <link>https://shukla.io/blog/2026-11/analysis-by-synthesis.html</link>
+      <guid>https://shukla.io/blog/2026-11/analysis-by-synthesis.html</guid>
+      <pubDate>Sun, 15 Nov 2026 12:00:00 GMT</pubDate>
+      <description><![CDATA[
+      The 1983 Petrov false alarm and Ulf Grenander’s Pattern Theory offer a lens for AI agents that compare predictions with real-world observations before acting.
+      ]]></description>
+    </item>
 
     <item>
       <title>The Greatest Pun</title>

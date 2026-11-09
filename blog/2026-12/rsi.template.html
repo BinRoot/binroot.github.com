@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$pagetitle$</title>
+$for(css)$
+  <link rel="stylesheet" href="$css$">
+$endfor$
+$if(math)$
+  <script>
+    window.MathJax = {
+      loader: {load: ['[tex]/html']},
+      tex: {packages: {'[+]': ['html']}},
+      startup: {
+        pageReady() {
+          return MathJax.startup.defaultPageReady().then(async () => {
+            await document.fonts.ready;
+            const diagram = document.querySelector('.agent-equation');
+            if (!diagram) return;
+            const pairs = [
+              ['parametric', '.parametric-term', '.parametric-label'],
+              ['nonparametric', '.nonparametric-term', '.nonparametric-label']
+            ];
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'equation-arrows');
+            svg.setAttribute('aria-hidden', 'true');
+            const paths = pairs.map(([name]) => {
+              const path = document.createElementNS(svg.namespaceURI, 'path');
+              path.setAttribute('class', 'equation-arrow ' + name);
+              svg.append(path);
+              return path;
+            });
+            diagram.append(svg);
+            function drawArrows() {
+              const box = diagram.getBoundingClientRect();
+              svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
+              pairs.forEach(([, termSelector, labelSelector], index) => {
+                const term = diagram.querySelector('mjx-container ' + termSelector);
+                const label = diagram.querySelector(labelSelector);
+                if (!term || !label) return;
+                const to = term.getBoundingClientRect();
+                const from = label.getBoundingClientRect();
+                const x1 = from.left + from.width / 2 - box.left;
+                const y1 = from.top - box.top - 8;
+                const x2 = to.left + to.width / 2 - box.left;
+                const y2 = to.bottom - box.top + 8;
+                // A straight approach keeps the shaft between both arrowhead wings.
+                const leadY = y2 + 10;
+                const bend = (y1 - leadY) * .55;
+                paths[index].setAttribute('d',
+                  'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + (y1 - bend) +
+                  ' ' + x2 + ' ' + (leadY + bend) + ' ' + x2 + ' ' + leadY +
+                  ' L ' + x2 + ' ' + y2 +
+                  ' m -3.5 4.5 l 3.5 -4.5 l 3.5 4.5');
+              });
+            }
+            drawArrows();
+            new ResizeObserver(drawArrows).observe(diagram);
+          });
+        }
+      }
+    };
+  </script>
+  $math$
+$endif$
+</head>
+<body>
+  <main>
+    <header><h1 id="post-title">$title$</h1></header>
+    $body$
+  </main>
+  <script>
+    // A tapped hint keeps focus, so tapping anywhere else closes it.
+    document.addEventListener('pointerdown', event => {
+      const hint = document.activeElement;
+      if (hint && hint.classList.contains('hint') && event.target !== hint) hint.blur();
+    });
+  </script>
+</body>
+</html>

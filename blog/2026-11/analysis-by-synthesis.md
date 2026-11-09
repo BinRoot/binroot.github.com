@@ -1,7 +1,12 @@
 ---
 title: Preventing an AI catastrophe
+pagetitle: Preventing an AI Catastrophe with Pattern Theory
 author: Nishant Shukla
 date: 2026-11-15
+lang: en
+description-meta: The 1983 Petrov false alarm and Ulf Grenander’s Pattern Theory offer a lens for AI agents that compare predictions with real-world observations before acting.
+canonical_url: https://shukla.io/blog/2026-11/analysis-by-synthesis.html
+og_image: https://shukla.io/blog/2026-11/petrov.jpg
 ---
 
 ## Petrov

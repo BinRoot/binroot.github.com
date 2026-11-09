@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Utility learning agents</title>
+  <link rel="stylesheet" href="rsi.css?v=125049428">
+  <script>
+    window.MathJax = {
+      loader: {load: ['[tex]/html']},
+      tex: {packages: {'[+]': ['html']}},
+      startup: {
+        pageReady() {
+          return MathJax.startup.defaultPageReady().then(async () => {
+            await document.fonts.ready;
+            const diagram = document.querySelector('.agent-equation');
+            if (!diagram) return;
+            const pairs = [
+              ['parametric', '.parametric-term', '.parametric-label'],
+              ['nonparametric', '.nonparametric-term', '.nonparametric-label']
+            ];
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'equation-arrows');
+            svg.setAttribute('aria-hidden', 'true');
+            const paths = pairs.map(([name]) => {
+              const path = document.createElementNS(svg.namespaceURI, 'path');
+              path.setAttribute('class', 'equation-arrow ' + name);
+              svg.append(path);
+              return path;
+            });
+            diagram.append(svg);
+            function drawArrows() {
+              const box = diagram.getBoundingClientRect();
+              svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
+              pairs.forEach(([, termSelector, labelSelector], index) => {
+                const term = diagram.querySelector('mjx-container ' + termSelector);
+                const label = diagram.querySelector(labelSelector);
+                if (!term || !label) return;
+                const to = term.getBoundingClientRect();
+                const from = label.getBoundingClientRect();
+                const x1 = from.left + from.width / 2 - box.left;
+                const y1 = from.top - box.top - 8;
+                const x2 = to.left + to.width / 2 - box.left;
+                const y2 = to.bottom - box.top + 8;
+                // A straight approach keeps the shaft between both arrowhead wings.
+                const leadY = y2 + 10;
+                const bend = (y1 - leadY) * .55;
+                paths[index].setAttribute('d',
+                  'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + (y1 - bend) +
+                  ' ' + x2 + ' ' + (leadY + bend) + ' ' + x2 + ' ' + leadY +
+                  ' L ' + x2 + ' ' + y2 +
+                  ' m -3.5 4.5 l 3.5 -4.5 l 3.5 4.5');
+              });
+            }
+            drawArrows();
+            new ResizeObserver(drawArrows).observe(diagram);
+          });
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body>
+  <main>
+    <header><h1 id="post-title">Utility learning agents</h1></header>
+    <p><a href="https://arxiv.org/pdf/2607.13104#page=12">Ren et al. (2026)</a> say it best: an agent is made up of two parts, the model and its scaffold.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+    <div class="agent-equation">
+    <div class="agent-formula">
+    <p><span class="math display">\[
+    \mathcal{A}_t = (
+      \class{parametric-term}{\theta_t},
+      \class{nonparametric-term}{\Sigma_t}
+    )
+    \]</span></p>
+    </div>
+    <div class="equation-labels">
+    <div class="equation-label parametric-label">
+    <p><strong>Parametric</strong></p>
+    <p>Model weights</p>
+    </div>
+    <div class="equation-label nonparametric-label">
+    <p><strong>Non-parametric</strong></p>
+    <p>Prompts, memory, tools, <span class="component-name">control code</span></p>
+    <p><a href="https://arxiv.org/pdf/2609.20804#page=3" class="component-citation">Fan et al. (2026)</a></p>
+    </div>
+    </div>
+    </div>
+    <p>Recursive self-improvement (RSI) methods typically focus on improving one of these two parts. The parametric vs. non-parametric breakdown tells us <strong>what part of the system is improved</strong>. We can also ask <strong>why the agent is making changes</strong>:</p>
+    <ul>
+    <li><strong>Discovery:</strong> To explore and discover new concepts and skills.
+    <ul>
+    <li>example: learning what questions to ask to uncover gaps in its knowledge</li>
+    </ul></li>
+    <li><strong>Direct optimization:</strong> To improve the task metric directly.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+    <ul>
+    <li>example: adjusting prompts to improve a benchmark score</li>
+    </ul></li>
+    </ul>
+    <p>Both approaches are still measured by their performance on the task.</p>
+    <p>Utility learning agents learn a utility <span class="math inline">\(V(s;\theta_t,\Sigma_t)\)</span> over situations.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The weights and scaffold determine how the current agent evaluates a situation. Its ideal planning rule is:</p>
+    <p><span class="math display">\[
+    \mathcal{A}_t(s_0) = \operatorname*{arg\,max}_{\mathbf{u}}
+    \mathbb{E}\!\left[V(s_T;\theta_t,\Sigma_t) - K(\mathbf{u})\right]
+    \]</span></p>
+    <p>Here, <span class="math inline">\(\mathcal{A}_t(s_0)\)</span> denotes the action sequence <span class="math inline">\(\mathbf{u}\)</span> selected by the agent from situation <span class="math inline">\(s_0\)</span>. The search is over plans it can execute; <span class="math inline">\(s_T\)</span> is the resulting situation, including its history, and <span class="math inline">\(K\)</span> is the plan’s cost. Learning this utility can change the model weights <span class="math inline">\(\theta_t\)</span>, the scaffold <span class="math inline">\(\Sigma_t\)</span>, or both.</p>
+    <table class="paper-matrix" role="table" aria-labelledby="post-title"><colgroup><col class="row-axis"><col><col></colgroup><thead role="rowgroup"><tr role="row"><td class="corner" role="cell"></td>
+    <th scope="col" role="columnheader" id="parametric">Parametric</th>
+    <th scope="col" role="columnheader" id="non-parametric">Non-parametric</th>
+    </tr></thead><tbody role="rowgroup">
+    <tr role="row"><th class="row-label" scope="row" role="rowheader" id="discovery"><span>Discovery</span></th>
+    <td role="cell" id="discovery-parametric" headers="discovery parametric"><p class="cell-label" aria-hidden="true">Discovery · Parametric</p>
+    <section class="paper-group"><h2><span class="hint" tabindex="0" aria-describedby="discovery-parametric-failure-reports-hint">Failure reports</span><span class="hint-text" role="tooltip" id="discovery-parametric-failure-reports-hint">Papers whose main finding is a way self-improvement fails.</span></h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2609.39102" class="paper-link">CrossFit</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2026</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2604.18292" class="paper-link">Agent-World</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.15840" class="paper-link">CoEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.07055" class="paper-link">Dr. Zero</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.22905" class="paper-link">EVE-Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.27389" class="paper-link">EvoAudio</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.09959" class="paper-link">G-Zero</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.26582" class="paper-link">J-Zero</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.09206" class="paper-link">MM-Zero</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://ornith.ai/ornith_1_5.html" class="paper-link">Ornith-1.5</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.18131" class="paper-link">Reward-Free World Knowledge Exploration</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.15255" class="paper-link">SAGE (multi-agent self-evolution)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.03548" class="paper-link">SEAD</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.30063" class="paper-link">Self-Play Pretraining</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.22529" class="paper-link">Skill Self-Play</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.19197" class="paper-link">SPADE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14144" class="paper-link">SpatialEvo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.04697" class="paper-link">SQL-Zero</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.03472" class="paper-link">Vocabulary Dropout</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2025</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2505.03335" class="paper-link">Absolute Zero</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.16043" class="paper-link">Agent0</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.10395" class="paper-link">AgentEvolver</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.15805" class="paper-link">ALAS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.14253" class="paper-link">ASL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.08558" class="paper-link">Early Experience</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.04287" class="paper-link">EXIF</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.19682" class="paper-link">GenEnv</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.07414" class="paper-link">Language Self-Play</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.23595" class="paper-link">Multi-Agent Evolve</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.02472" class="paper-link">R-Few</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.05004" class="paper-link">R-Zero</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.04700" class="paper-link">SEAgent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.18821" class="paper-link">Search Self-Play</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.02752" class="paper-link">Self-Aware RL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.01716" class="paper-link">Self-Challenging Agents</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.07184" class="paper-link">SENATOR</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.20347" class="paper-link">SeRL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.24726" class="paper-link">Socratic-Zero</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.23863" class="paper-link">SPELL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.24684" class="paper-link">SPICE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.24119" class="paper-link">SPIRAL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.03682" class="paper-link">SQLM</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.18552" class="paper-link">SSR</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.16518" class="paper-link">SyncLoop</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.25541" class="paper-link">Vision-Zero</a> <span class="paper-year">(2025)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2024 and earlier</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2403.04746" class="paper-link">STE</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2411.02337" class="paper-link">WebRL</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2206.08896" class="paper-link">ELM</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2107.12808" class="paper-link">Open-Ended Learning Agents</a> <span class="paper-year">(2021)</span></li>
+    </ul></section>
+    </td>
+    <td role="cell" id="discovery-non-parametric" headers="discovery non-parametric"><p class="cell-label" aria-hidden="true">Discovery · Non-parametric</p>
+    <section class="paper-group"><h2><span class="hint" tabindex="0" aria-describedby="discovery-non-parametric-failure-reports-hint">Failure reports</span><span class="hint-text" role="tooltip" id="discovery-non-parametric-failure-reports-hint">Papers whose main finding is a way self-improvement fails.</span></h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2609.17817" class="paper-link">Trusting Trust</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2026</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2602.07755" class="paper-link">ALMA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.04837" class="paper-link">GEA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.35328" class="paper-link">Hyper Algorithm Design Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.19461" class="paper-link">HyperAgents</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.17352" class="paper-link">Lean Benchmark Coevolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.30450" class="paper-link">LensDesigner</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.07645" class="paper-link">Mendel Gödel Machine</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.01803" class="paper-link">OctoT2I</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.15364" class="paper-link">RSIAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.37968" class="paper-link">SelfSearch</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.19526" class="paper-link">SIFT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.03753" class="paper-link">SimSkill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.03964" class="paper-link">SkillFoundry</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2025</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2505.17673" class="paper-link">Bottom-Up Agent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.22954" class="paper-link">Darwin Gödel Machine</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2503.14432" class="paper-link">PLAY2PROMPT</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.07079" class="paper-link">SkillWeaver</a> <span class="paper-year">(2025)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2024 and earlier</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2408.08435" class="paper-link">ADAS</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.08197" class="paper-link">DRAFT</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2305.16291" class="paper-link">Voyager</a> <span class="paper-year">(2023)</span></li>
+    </ul></section>
+    </td>
+    </tr>
+    <tr role="row"><th class="row-label" scope="row" role="rowheader" id="direct-optimization"><span>Direct optimization</span></th>
+    <td role="cell" id="direct-optimization-parametric" headers="direct-optimization parametric"><p class="cell-label" aria-hidden="true">Direct optimization · Parametric</p>
+    <section class="paper-group"><h2><span class="hint" tabindex="0" aria-describedby="direct-optimization-parametric-failure-reports-hint">Failure reports</span><span class="hint-text" role="tooltip" id="direct-optimization-parametric-failure-reports-hint">Papers whose main finding is a way self-improvement fails.</span></h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2607.03523" class="paper-link">Anchored Self-Play</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.09134" class="paper-link">Harness-Model Co-Evolution</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2026</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2608.04872" class="paper-link">A-SR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.06114" class="paper-link">ANCHOR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.01750" class="paper-link">ARA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.01120" class="paper-link">AReaL2.0</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.16060" class="paper-link">ARISE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.14211" class="paper-link">ASH</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.02709" class="paper-link">ATLAS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.16211" class="paper-link">BaT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.34785" class="paper-link">BEHAVE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.17075" class="paper-link">CircuitBuilder</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.05559" class="paper-link">CLaaS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.16352" class="paper-link">CLARE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.07487" class="paper-link">CLEAR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.33398" class="paper-link">COEVO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.17621" class="paper-link">Complementary RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.21464" class="paper-link">CoNL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.09998" class="paper-link">Continual Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.11653" class="paper-link">Continual RL for VLAs</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.04865" class="paper-link">CoSkill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.20987" class="paper-link">COSPLAY</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.15314" class="paper-link">Cura 1T</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://cursor.com/blog/real-time-rl-for-composer" class="paper-link">Cursor Composer real-time RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.30652" class="paper-link">DCE+SRCL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.14697" class="paper-link">E-SPL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.16443" class="paper-link">Endless Terminals</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.19980" class="paper-link">ENPIRE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.05808" class="paper-link">EnvScaler</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.13949" class="paper-link">ERL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.13803" class="paper-link">EvoGround</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.05446" class="paper-link">EvoHarness-RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.10663" class="paper-link">Evolving-RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.08919" class="paper-link">Experience Funnel</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.11882" class="paper-link">FATE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.28568" class="paper-link">Frontis-MA1</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.15957" class="paper-link">GASP</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.26115" class="paper-link">GPT-Red</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.02721" class="paper-link">GrandCode</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.36695" class="paper-link">InFlow</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.25593" class="paper-link">JIT-Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.09819" class="paper-link">Macaron-V1</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.03524" class="paper-link">MASS (meta-adaptation)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.07603" class="paper-link">MetaEvo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.06396" class="paper-link">MetaRSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.04503" class="paper-link">MIA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.11327" class="paper-link">MR-Search</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.08183" class="paper-link">NeoHorse-1</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.03109" class="paper-link">OMAR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.17628" class="paper-link">OPD-Evolver</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.10165" class="paper-link">OpenClaw-RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.09791" class="paper-link">Pioneer Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.03098" class="paper-link">Policy and Reward Co-Evolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.11658" class="paper-link">Pragmatic Self-Evolving Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.20572" class="paper-link">ProactAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.00931" class="paper-link">PsychAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.24231" class="paper-link">RecurSE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.03075" class="paper-link">ReMiT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.18272" class="paper-link">Retrieval-Aware Fine-Tuning</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.08561" class="paper-link">RetroAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.17497" class="paper-link">RICOL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.02488" class="paper-link">RLAnything</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.23802" class="paper-link">RLSVR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.02482" class="paper-link">RLTF</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.37633" class="paper-link">RLTL;DR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.15659" class="paper-link">RSIR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.06820" class="paper-link">ScaleEnv</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.17523" class="paper-link">ScienceBuddy</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19064" class="paper-link">SDB</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.07791" class="paper-link">SEARL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.07835" class="paper-link">SecureCAI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.14777" class="paper-link">SEED</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.01966" class="paper-link">Self-Consolidation</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.18003" class="paper-link">SELF-EMO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://shopify.engineering/sidekicks-continual-learning-loop" class="paper-link">Shopify Sidekick continual learning</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.27276" class="paper-link">SIA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19341" class="paper-link">SimpleTES</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.08693" class="paper-link">SkillMaster</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.06614" class="paper-link">SkillOS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.08234" class="paper-link">SkillRL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.28638" class="paper-link">SKL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.18079" class="paper-link">SLEA-RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.09974" class="paper-link">SPRInG</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.06130" class="paper-link">SWiRL (latent actions)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.02203" class="paper-link">T3RL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.04536" class="paper-link">TMEM</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.05336" class="paper-link">TRACE (capability-targeted training)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.22628" class="paper-link">TTCS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.06296" class="paper-link">U-OPSD</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.24533" class="paper-link">UI-Voyager</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.10652" class="paper-link">UMEM</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.38721" class="paper-link">UniEvo-VL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.10505" class="paper-link">VeriEnv</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.00196" class="paper-link">WHALE</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2025</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2501.11425" class="paper-link">Agent-R</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.19900" class="paper-link">Agent0-VL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.22857" class="paper-link">AutoForge</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.08791" class="paper-link">Automated Build Environments</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.22254" class="paper-link">Co-Evolving Agents</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.08529" class="paper-link">CoMAS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.03136" class="paper-link">CURE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://cursor.com/blog/tab-rl" class="paper-link">Cursor Tab online RL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.13399" class="paper-link">DERL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.19850" class="paper-link">DISCOVER</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.03773" class="paper-link">DreamGym</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.15194" class="paper-link">EVOL-RL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.22501" class="paper-link">EvolveSearch</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.05907" class="paper-link">EvolvingAgent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.08870" class="paper-link">Fed-SE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.09963" class="paper-link">Generating on Generated</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.01945" class="paper-link">INSPO</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2503.00735" class="paper-link">LADDER</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.15414" class="paper-link">MARSHAL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.18884" class="paper-link">MindFlow+</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.12710" class="paper-link">Reflective Self-Adaptation</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.11442" class="paper-link">ReVeal</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.17102" class="paper-link">SAGE (skill library RL)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.20562" class="paper-link">SAMULE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.04306" class="paper-link">ScoreFlow</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.10943" class="paper-link">SEAL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.04780" class="paper-link">SiriuS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.14172" class="paper-link">SOAR</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.14948" class="paper-link">Sol-Ver</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.19162" class="paper-link">SPC</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.21561" class="paper-link">SPORT</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2503.04625" class="paper-link">START</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.22558" class="paper-link">StepORLM</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.04736" class="paper-link">SWiRL (multi-step RL)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.06026" class="paper-link">Temporal Self-Rewarding LMs</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.23285" class="paper-link">Tool-Light</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.04786" class="paper-link">TTC-RL</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.21024" class="paper-link">WebEvolver</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.04370" class="paper-link">WebSynthesis</a> <span class="paper-year">(2025)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2024 and earlier</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2408.07199" class="paper-link">Agent Q</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.04151" class="paper-link">AgentGym</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2404.12253" class="paper-link">AlphaLLM</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2405.14333" class="paper-link">DeepSeek-Prover</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2412.17451" class="paper-link">M-STAR</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2412.01928" class="paper-link">MALT</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2404.14662" class="paper-link">NExT</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.08115" class="paper-link">Optima</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.08146" class="paper-link">PAV</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2402.00658" class="paper-link">Planning Trajectories DPO</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.03816" class="paper-link">ReST-MCTS*</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2407.12874" class="paper-link">SELF-GUIDE</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2401.10020" class="paper-link">Self-Rewarding Language Models</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2404.17140" class="paper-link">Small LM Self-Correction</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2401.01335" class="paper-link">SPIN</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2405.00675" class="paper-link">SPPO</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2404.03683" class="paper-link">Stream of Search</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.06617" class="paper-link">ToolEVO</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2312.10908" class="paper-link">CLOVA</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2308.14034" class="paper-link">Confucius</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2312.08935" class="paper-link">Math-Shepherd</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2304.04370" class="paper-link">OpenAGI</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2312.06585" class="paper-link">ReST-EM</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2308.02151" class="paper-link">Retroformer</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2310.00533" class="paper-link">SELF</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2309.17179" class="paper-link">TS-LLM</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2212.08073" class="paper-link">Constitutional AI</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2210.16257" class="paper-link">CoRe</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2210.11610" class="paper-link">LLMs Can Self-Improve</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2212.10560" class="paper-link">Self-Instruct</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2203.14465" class="paper-link">STaR</a> <span class="paper-year">(2022)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/1805.00899" class="paper-link">Debate</a> <span class="paper-year">(2018)</span></li>
+    </ul></section>
+    </td>
+    <td role="cell" id="direct-optimization-non-parametric" headers="direct-optimization non-parametric"><p class="cell-label" aria-hidden="true">Direct optimization · Non-parametric</p>
+    <section class="paper-group"><h2><span class="hint" tabindex="0" aria-describedby="direct-optimization-non-parametric-failure-reports-hint">Failure reports</span><span class="hint-text" role="tooltip" id="direct-optimization-non-parametric-failure-reports-hint">Papers whose main finding is a way self-improvement fails.</span></h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2609.31760" class="paper-link">Agentic Robot Skill Discovery</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.09315" class="paper-link">Capability-Preserving Evolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.22610" class="paper-link">CASS and u-SMCO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.19576" class="paper-link">Library Drift</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.00017" class="paper-link">LUCID</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17774" class="paper-link">Meta-Prompt Collusion Loop</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.08106" class="paper-link">PACE (commit gate)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.02246" class="paper-link">PROCTOR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.36043" class="paper-link">SAGE (acceptance gate)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.24300" class="paper-link">Self-Authored Verification</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.05810" class="paper-link">VaG</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2026</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2602.00359" class="paper-link">A-Evolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.20657" class="paper-link">A-Evolve-Training</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.04625" class="paper-link">A/B Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.08887" class="paper-link">Ace-Skill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2610.00906" class="paper-link">ActiveSaddler</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.01770" class="paper-link">Adaptive Auto-Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.15565" class="paper-link">ADMITOR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.21725" class="paper-link">AEL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.04620" class="paper-link">AgentDevel</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.18000" class="paper-link">AgentFactory</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.08010" class="paper-link">Agentic Tool-Making Pipeline</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.20318" class="paper-link">AgenticDB</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.20213" class="paper-link">AgenticGEO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.30949" class="paper-link">AgRefactor</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.25850" class="paper-link">AHE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.26457" class="paper-link">AIDE²</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.15820" class="paper-link">AlgoEvo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.23910" class="paper-link">AnalogAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.21240" class="paper-link">APEX</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.06699" class="paper-link">aPSF</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.00272" class="paper-link">ASPIRE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.09716" class="paper-link">AutoAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.13560" class="paper-link">AutoDesign</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.15034" class="paper-link">Autogenesis</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.14621" class="paper-link">AutoMem</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.22871" class="paper-link">AutoRISE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.23041" class="paper-link">AutoSaddler</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.01145" class="paper-link">AutoSkill (lifelong)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.12517" class="paper-link">AutoSkill (taxonomy routing)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17488" class="paper-link">AutoVQA-G</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.22037" class="paper-link">AWO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.05810" class="paper-link">Bifrost</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.12629" class="paper-link">CAKE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.29621" class="paper-link">CineForge</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.00290" class="paper-link">ClinicalReTrial</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.11610" class="paper-link">CluE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.11682" class="paper-link">COBRA-Skills</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.01687" class="paper-link">CoEvoSkills</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.04247" class="paper-link">Combee</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.08832" class="paper-link">Consistency Gap Framework</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.00755" class="paper-link">Constitutional Evolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17937" class="paper-link">ContraPrompt</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.32870" class="paper-link">Counterfactual Self-Evolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.07545" class="paper-link">DarwinX</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.29966" class="paper-link">DataFoundry</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.31568" class="paper-link">DeepEdu-v1</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.03083" class="paper-link">DeltaMem</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.12790" class="paper-link">Double Ratchet</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14989" class="paper-link">Dr. RTL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.14858" class="paper-link">Dream-RSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.15461" class="paper-link">DrugSAGE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.10677" class="paper-link">DxEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.36746" class="paper-link">EASE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.11677" class="paper-link">Ecdysis</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.05533" class="paper-link">Echo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.16113" class="paper-link">ECS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.13533" class="paper-link">EEAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.11182" class="paper-link">EEVEE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14609" class="paper-link">El Agente Forjador</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.24018" class="paper-link">ELITE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.19880" class="paper-link">EnvHarness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.05513" class="paper-link">EpiEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17658" class="paper-link">ErrorProbe</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.15071" class="paper-link">Evo-Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14475" class="paper-link">Evo-MedAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.20133" class="paper-link">EvoAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.22964" class="paper-link">EvoClinician</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.34988" class="paper-link">EvoCUE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.20019" class="paper-link">EvoDRC</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.09465" class="paper-link">EvoFSM</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.10846" class="paper-link">EvoKernel</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.05149" class="paper-link">EvolveRouter</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17406" class="paper-link">EvoMaster</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17708" class="paper-link">EvoOR-Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.28368" class="paper-link">EvoRec</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.30105" class="paper-link">EvoRepair</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.02695" class="paper-link">EvoRoute</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.08127" class="paper-link">EvoScientist</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.07321" class="paper-link">EvoSOP</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.17721" class="paper-link">EXG</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.24639" class="paper-link">Experiential Reflective Learning</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.32630" class="paper-link">ExpVoyager</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.01041" class="paper-link">ExpWeaver (latent RAG)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.07164" class="paper-link">ExpWeaver (utilization)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.14670" class="paper-link">FactorMiner</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.21596" class="paper-link">FlowEvo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.22057" class="paper-link">FlyRoute</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19837" class="paper-link">Forage V2</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.16233" class="paper-link">FORGE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17091" class="paper-link">GenericAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.10494" class="paper-link">GeoForge</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.11117" class="paper-link">GRAFT-ATHENA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.22096" class="paper-link">GSEM</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.19013" class="paper-link">Harness Continual Learning</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.00829" class="paper-link">HarnessEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.06324" class="paper-link">HarnessFix</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.13940" class="paper-link">HealthClaw</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.13951" class="paper-link">HELIX</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.00901" class="paper-link">HERA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/skills" class="paper-link">Hermes Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.19639" class="paper-link">HyEvo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.18510" class="paper-link">JitRL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19821" class="paper-link">JTPRO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.14293" class="paper-link">KernelBlaster</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.12625" class="paper-link">KnowAct-GUIClaw</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.19592" class="paper-link">KSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.00722" class="paper-link">LangMARL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.26664" class="paper-link">Learning to Commit</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.10224" class="paper-link">LinkedIn Self-Evolving Support</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.02369" class="paper-link">Live-Evo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.26598" class="paper-link">Living-Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.25480" class="paper-link">LLM-Wiki</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.34151" class="paper-link">LOTS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.11811" class="paper-link">M*</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.05860" class="paper-link">MACRO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.11288" class="paper-link">Mako</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.31789" class="paper-link">MammoClaw</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.21557" class="paper-link">MCE</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.36549" class="paper-link">MedForge-RSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.24838" class="paper-link">MedRSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.10504" class="paper-link">MEGA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.10923" class="paper-link">Mem2Evolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.13258" class="paper-link">MemCoder</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.18743" class="paper-link">Memento-Skills</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.09022" class="paper-link">MEMO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.14159" class="paper-link">MemoHarness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14004" class="paper-link">Memory Transfer Learning</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.03192" class="paper-link">MemRL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.02474" class="paper-link">MemSkill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.28052" class="paper-link">Meta-Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.24735" class="paper-link">Meta^n</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17399" class="paper-link">Metacognitive Consolidation</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.05297" class="paper-link">MetaSkill-Evolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.24151" class="paper-link">Metis</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.15719" class="paper-link">Milkyway</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.13131" class="paper-link">MineEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.37834" class="paper-link">Mixture of Self-Improving Branches</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.14857" class="paper-link">ModularRSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.22794" class="paper-link">MOSS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.27366" class="paper-link">MUSE-Autoskill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.27266" class="paper-link">NPO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.09629" class="paper-link">OEO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.18394" class="paper-link">OpenGame</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.06741" class="paper-link">OpenSkill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.08311" class="paper-link">Ouroboros</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.23019" class="paper-link">PACE (two-timescale)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.14408" class="paper-link">Pairwise Validator</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.24443" class="paper-link">PhysNote</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.26530" class="paper-link">PILOT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.23129" class="paper-link">Polaris</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.07645" class="paper-link">PRIME</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.23552" class="paper-link">Prime Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19795" class="paper-link">Prism</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.09153" class="paper-link">Procedural Graph</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.26334" class="paper-link">ProofEvolve</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.12780" class="paper-link">ProPlay</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.31763" class="paper-link">ProtoPilot</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.03509" class="paper-link">PSN</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.33867" class="paper-link">R^2 Flow</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.08192" class="paper-link">R^4</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.33439" class="paper-link">Raven</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.24876" class="paper-link">Recuris</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.15524" class="paper-link">Recursive Harness Self-Improvement</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.26294" class="paper-link">Red Queen Gödel Machine</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.27612" class="paper-link">RegenHarness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.08703" class="paper-link">RewardHarness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.09646" class="paper-link">RobustSGPO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.02508" class="paper-link">RoMeRL</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.07595" class="paper-link">ROZA Graphs</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.24972" class="paper-link">RRSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.28374" class="paper-link">RSEA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.34712" class="paper-link">RSI-Router</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.01550" class="paper-link">S1-NexusAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.12061" class="paper-link">SAGE (graph memory)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.35568" class="paper-link">SAGE (kernel agent)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.09521" class="paper-link">SAGEAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.14972" class="paper-link">SAGER</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.10157" class="paper-link">SBCO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.28692" class="paper-link">SciToolAgent-Evo</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.08228" class="paper-link">SE-GoS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2607.00871" class="paper-link">SEA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.28971" class="paper-link">SEAR</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.04873" class="paper-link">SEATS</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.08405" class="paper-link">Self-evolving fluid control agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.17220" class="paper-link">Self-evolving legal rule rewriting</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.01480" class="paper-link">Self-Evolving Metasurface Agent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.09498" class="paper-link">Self-Harness</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.02988" class="paper-link">Self-Optimizing Deep Research</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.23875" class="paper-link">SEMA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.25111" class="paper-link">SEVerA</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.11350" class="paper-link">SHAPER</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.06822" class="paper-link">SHARP</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.04869" class="paper-link">Skill-Evo4GUI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.08944" class="paper-link">SkillAdam</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.08377" class="paper-link">SkillClaw</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.08618" class="paper-link">SkillForge</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.02217" class="paper-link">SkillGLoW</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.17503" class="paper-link">SkillGraph</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.09297" class="paper-link">SkillMOO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2605.23904" class="paper-link">SkillOpt</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.07449" class="paper-link">SkillProx</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.03692" class="paper-link">SkillPyramid</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.01314" class="paper-link">SkillSmith</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.04804" class="paper-link">SkillX</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.26122" class="paper-link">SkinGPT-X</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.20519" class="paper-link">SoL-Pi</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.22132" class="paper-link">SSE-Bio</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.00966" class="paper-link">Symphony-Coord</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2606.10316" class="paper-link">TabClaw</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.19572" class="paper-link">TACO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.07641" class="paper-link">Test-Time Tool Evolution</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.23691" class="paper-link">The Station</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.13676" class="paper-link">TheraAgent</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.20714" class="paper-link">TPGO</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.22120" class="paper-link">TRACE (executable walkthroughs)</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.25158" class="paper-link">Trace2Skill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.10600" class="paper-link">Trajectory-Informed Memory Generation</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.09044" class="paper-link">Tree-of-Experience</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2602.01983" class="paper-link">UCT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2603.19306" class="paper-link">VERDICT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.37950" class="paper-link">Video-RSI</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2609.19664" class="paper-link">VideoResearcher</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2608.27454" class="paper-link">WikiSkill</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.08158" class="paper-link">WISE-Flow</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2604.26703" class="paper-link">XDFT</a> <span class="paper-year">(2026)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2601.18226" class="paper-link">Yunjue Agent</a> <span class="paper-year">(2026)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2025</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2511.15915" class="paper-link">AccelOpt</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.06229" class="paper-link">Agent KB</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.04618" class="paper-link">Agentic Context Engineering</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.00587" class="paper-link">AgentNet</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.17716" class="paper-link">AgentRR</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.11448" class="paper-link">AGrail</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.20286" class="paper-link">Alita</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.23601" class="paper-link">Alita-G</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.04439" class="paper-link">ArcMemo</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.17131" class="paper-link">ARIA</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.09108" class="paper-link">ARTEMIS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.23760" class="paper-link">ASG-SI</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.06821" class="paper-link">ASI</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.20297" class="paper-link">BREW</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.23880" class="paper-link">CASCADE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2501.06590" class="paper-link">ChemAgent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.07952" class="paper-link">Dynamic Cheatsheet</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.20857" class="paper-link">Evo-Memory</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.03616" class="paper-link">EvoAgentX</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.16079" class="paper-link">EvolveR</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.13220" class="paper-link">EvoTest</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.06449" class="paper-link">FLEX</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.07398" class="paper-link">G-Memory</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.19457" class="paper-link">GEPA</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.02621" class="paper-link">HealthFlow</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.04651" class="paper-link">HexMachina</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.22502" class="paper-link">InfiAgent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.24771" class="paper-link">LatentEvolve</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.13646" class="paper-link">Live-SWE-agent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.04180" class="paper-link">MaAS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.02533" class="paper-link">MASS (multi-agent design)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2503.13856" class="paper-link">MDTeamGPT</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2503.22678" class="paper-link">MedAgentSim</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.16153" class="paper-link">Memento</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.18746" class="paper-link">MemEvolve</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.06433" class="paper-link">Memp</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.22967" class="paper-link">MermaidFlow</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.22606" class="paper-link">MetaAgent (FSM construction)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2508.00271" class="paper-link">MetaAgent (tool meta-learning)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2501.19318" class="paper-link">MINDSTORES</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.08002" class="paper-link">MUSE</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.06254" class="paper-link">PersonaAgent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.22074" class="paper-link">PRAXIS</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.25140" class="paper-link">ReasoningBank</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.10696" class="paper-link">ReMe</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.13152" class="paper-link">SE-VLN</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.04868" class="paper-link">SEAL (KBCQA)</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2509.09498" class="paper-link">SEDM</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.00234" class="paper-link">Self-Generated In-Context Examples</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2504.15228" class="paper-link">Self-Improving Coding Agent</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2505.18646" class="paper-link">SEW</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2502.06855" class="paper-link">SPO</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.02004" class="paper-link">STELLA</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2511.07800" class="paper-link">Trainable Graph Memory</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2510.08191" class="paper-link">Training-Free GRPO</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2507.21124" class="paper-link">VizGenie</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2506.14234" class="paper-link">Xolver</a> <span class="paper-year">(2025)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2512.24615" class="paper-link">Youtu-Agent</a> <span class="paper-year">(2025)</span></li>
+    </ul></section>
+    <section class="paper-group"><h2>2024 and earlier</h2><ul class="paper-list">
+    <li class="paper"><a href="https://arxiv.org/abs/2410.10762" class="paper-link">AFlow</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2405.02957" class="paper-link">Agent Hospital</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.18532" class="paper-link">Agent Symbolic Learning</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2409.07429" class="paper-link">Agent Workflow Memory</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2402.11359" class="paper-link">AgentOptimizer</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.05295" class="paper-link">AutoDAN-Turbo</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2407.12821" class="paper-link">AutoFlow</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.04271" class="paper-link">Buffer of Thoughts</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.16670" class="paper-link">CoPS</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.11782" class="paper-link">G-Designer</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2402.17564" class="paper-link">GPO</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2402.16823" class="paper-link">GPTSwarm</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2407.12865" class="paper-link">GRAD-SUM</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.11695" class="paper-link">MIPRO</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2412.03092" class="paper-link">REVOLVE</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2412.03624" class="paper-link">Semantic Backpropagation</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2410.08601" class="paper-link">StraGo</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2406.07496" class="paper-link">TextGrad</a> <span class="paper-year">(2024)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2305.03495" class="paper-link">APO</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2309.17428" class="paper-link">CRAFT</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2310.03714" class="paper-link">DSPy</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2309.08532" class="paper-link">EvoPrompt</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2305.17126" class="paper-link">LATM</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2305.05181" class="paper-link">MoT</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2312.17294" class="paper-link">OpenAgent</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2309.03409" class="paper-link">OPRO</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2310.16427" class="paper-link">PromptAgent</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2309.16797" class="paper-link">Promptbreeder</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2303.11366" class="paper-link">Reflexion</a> <span class="paper-year">(2023)</span></li>
+    <li class="paper"><a href="https://arxiv.org/abs/2211.01910" class="paper-link">APE</a> <span class="paper-year">(2022)</span></li>
+    </ul></section>
+    </td>
+    </tr>
+    </tbody></table>
+    <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+    <hr />
+    <ol>
+    <li id="fn1"><p>Here, I mean agents built around foundation models, such as LLMs.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+    <li id="fn2"><p><a href="https://gwern.net/doc/statistics/decision/1997-strathern.pdf#page=4">Goodhart’s law</a> reminds us that the metric is a proxy for the goal.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+    <li id="fn3"><p>The planning objective is adapted from <a href="https://escholarship.org/uc/item/2nj5n4f1">Shukla (2019)</a>, Chapter 5, §§5.1.1–5.1.3. Its preference-ranking method is one example of how utility can be learned.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+    </ol>
+    </section>
+  </main>
+  <script>
+    // A tapped hint keeps focus, so tapping anywhere else closes it.
+    document.addEventListener('pointerdown', event => {
+      const hint = document.activeElement;
+      if (hint && hint.classList.contains('hint') && event.target !== hint) hint.blur();
+    });
+  </script>
+</body>
+</html>

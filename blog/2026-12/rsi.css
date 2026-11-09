@@ -1,0 +1,94 @@
+:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #263238;
+  background: #fff;
+  --line: #d8e0e5;
+  --blue: #275678;
+  --muted: #52616b;
+  --wash: #f4f7f9;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-size: 1rem; line-height: 1.7; }
+main { max-width: 86rem; padding: 1.5rem 2rem 2rem; margin-inline: auto; }
+header { max-width: 75ch; margin-inline: auto; }
+h1 { margin: 0 0 1.1rem; font-size: 1.75rem; line-height: 1.2; font-weight: 650; }
+main > p { max-width: 75ch; margin: 0 auto 1.25rem; }
+a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+a:hover { color: #183b56; text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+.agent-equation {
+  --parametric: #275678;
+  --nonparametric: #745183;
+  position: relative;
+  max-width: 30rem;
+  margin: .5rem auto 1.5rem;
+  text-align: center;
+}
+.agent-equation p { margin: 0; }
+.agent-formula { padding-inline-end: 2em; font-size: clamp(1.75rem, 1.5rem + 1vw, 2rem); }
+.agent-equation mjx-container[display="true"] { margin: 0; }
+.parametric-term, .parametric-label strong { color: var(--parametric); }
+.nonparametric-term, .nonparametric-label strong { color: var(--nonparametric); }
+.equation-labels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin: 2.75rem 0 1rem; }
+.equation-label { min-width: 0; font-size: 1rem; line-height: 1.5; }
+.equation-label strong { font-weight: 650; }
+.equation-label p + p { margin-top: .2rem; color: var(--muted); }
+.nonparametric-label p { text-wrap: balance; }
+.component-name { white-space: nowrap; }
+.component-citation { font-size: .875rem; }
+.equation-arrows { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.equation-arrow { fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.equation-arrow.parametric { stroke: var(--parametric); }
+.equation-arrow.nonparametric { stroke: var(--nonparametric); }
+
+main > ul { max-width: 75ch; margin: 0 auto 1.25rem; padding-inline-start: 1.25rem; }
+main > ul strong { font-weight: 650; }
+main > ul li + li { margin-top: .5rem; }
+.taxonomy-example { max-width: 75ch; margin: 0 auto 1.5rem; }
+.taxonomy-example p { margin: 0; }
+.utility-term { max-width: 75ch; margin: 0 auto 1.5rem; }
+.utility-term p { margin: 0 0 1.25rem; }
+.utility-term p:last-child { margin-bottom: 0; }
+
+.footnotes { max-width: 75ch; margin: 2rem auto 0; font-size: .875rem; color: var(--muted); }
+.footnotes hr { margin: 0 0 1rem; border: 0; border-top: 1px solid var(--line); }
+.footnotes ol { margin: 0; padding-inline-start: 1.25rem; }
+.footnotes p { margin: 0; }
+
+.paper-matrix { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); border-radius: 5px; }
+.row-axis { width: 8.5rem; }
+.paper-matrix th, .paper-matrix td { text-align: left; vertical-align: top; padding: 1rem 1.25rem; }
+.paper-matrix thead th, .paper-matrix .corner { position: sticky; top: 0; z-index: 1; background: var(--wash); border-bottom: 1px solid var(--line); }
+.paper-matrix thead th { font-size: 1.05rem; font-weight: 650; }
+.paper-matrix tr > * + * { border-left: 1px solid var(--line); }
+.paper-matrix tbody tr + tr > * { border-top: 1px solid var(--line); }
+.row-label { background: var(--wash); font-weight: 650; overflow-wrap: anywhere; }
+.row-label span { display: block; position: sticky; top: 5rem; }
+.cell-label { display: none; }
+.paper-group + .paper-group { margin-top: 1.15rem; }
+.paper-group h2 { position: relative; margin: 0 0 .4rem; font-size: 1rem; line-height: 1.5; font-weight: 650; }
+.hint { cursor: help; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.hint-text { display: none; position: absolute; top: 100%; left: 0; z-index: 2; width: max-content; max-width: min(18rem, 100%); margin-top: .25rem; padding: .4rem .6rem; border: 1px solid var(--line); border-radius: 4px; background: #fff; color: var(--muted); font-size: .875rem; font-weight: 400; line-height: 1.4; }
+.hint:hover + .hint-text, .hint:focus + .hint-text { display: block; }
+.paper-list { display: flex; flex-wrap: wrap; gap: .3rem .85rem; margin: 0; padding: 0; list-style: none; }
+.paper { max-width: 100%; overflow-wrap: anywhere; }
+.paper-year { color: var(--muted); font-size: .875rem; white-space: nowrap; }
+
+@media (max-width: 800px) {
+  main { padding: 1.2rem 1rem 1.5rem; }
+  .paper-matrix, .paper-matrix tbody, .paper-matrix tr { display: block; border: 0; }
+  .paper-matrix thead, .paper-matrix .row-label { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); border: 0; }
+  .paper-matrix td { display: block; width: auto; margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 5px; }
+  .paper-matrix tr > td, .paper-matrix tbody tr + tr > td { border: 1px solid var(--line); }
+  .cell-label { display: block; position: sticky; top: 0; margin: -1rem -1rem 1rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line); border-radius: 4px 4px 0 0; background: var(--wash); font-weight: 650; overflow-wrap: anywhere; }
+}
+
+@media print {
+  main { max-width: none; padding: 0; }
+  .paper-matrix thead th, .paper-matrix .corner, .row-label span { position: static; }
+  .paper-group h2 { break-after: avoid; }
+  .paper { break-inside: avoid; }
+}
