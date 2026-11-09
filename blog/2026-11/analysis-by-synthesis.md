@@ -157,3 +157,14 @@ I aim to return to this discussion in the future, as I am now running out of tim
 
 - [Grammar models are back, baby!](../2026-02/grammar.html) connects top-down generation from hidden structure with bottom-up inference from observations.
 - [Who benchmarks the benchmark?](../2026-08/gym.html) shows how misleading observations and broken environments can make an agent appear to fail.
+
+<footer class="article-footer">
+  <nav aria-label="Contact, profiles, and RSS">
+    <ul class="footer-links">
+      <li><a href="mailto:nishant@shukla.io">Email</a></li>
+      <li><a href="https://github.com/binroot">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/shuklanx/">LinkedIn</a></li>
+      <li><a href="../rss.xml">RSS</a></li>
+    </ul>
+  </nav>
+</footer>
