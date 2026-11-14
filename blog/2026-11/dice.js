@@ -66,6 +66,9 @@
         enableShadows: true
       }).init();
     }).then(function (box) {
+      if (!box.canvas) {
+        block.classList.remove('is-showing-die');
+      }
       diceBox = box;
       return box;
     }).catch(function (error) {
@@ -93,6 +96,7 @@
       setResult(value);
     }).catch(function (error) {
       console.error('The 3D d20 roll could not complete:', error);
+      block.classList.remove('has-rolled');
       result.removeAttribute('data-kind');
       result.textContent = '';
     }).finally(function () {

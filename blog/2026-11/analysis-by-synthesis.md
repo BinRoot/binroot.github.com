@@ -13,8 +13,8 @@ og_image: https://shukla.io/blog/2026-11/petrov.jpg
 
 Look out the window and point at the sky.
 Go on, point somewhere and with your eyes trace a line upwards.
-Somewhere on the line is an intercontinental ballistic missile heading your way.
-Reports say it's the Americans. Your name is Petrov, Lieutenant Colonel of Soviet Air Defence Forces.
+Beyond that horizon, an intercontinental ballistic missile is arcing your way.
+At least, that's what the screen inside your bunker says: the Americans have launched. Your name is Petrov, Lieutenant Colonel of Soviet Air Defence Forces.
 A siren howls with utmost urgency.
 
 :::dice
@@ -22,32 +22,29 @@ A siren howls with utmost urgency.
 else -- You panic. You freeze up. You cannot muster the courage to even blink.
 :::
 
-You report your assessment that the warning is false.
-The false alarm is cleared, and no retaliatory strike follows.
+In reality, Petrov didn't freeze. He reported his assessment that the warning was false.
+The alarm cleared, and no retaliatory strike followed.
 
-This was a real event that happened on September 26, 1983.
+This happened on September 26, 1983.
 
 > "the [early warning] satellite had been fooled by the sun’s rays reflecting off clouds high over North Dakota, which had two launch areas"
-> Source: [The Economist, “Midnight and counting” (30 September 2017)](https://www.economist.com/news/obituary/21729727-man-who-save-world-was-77-stanislav-petrov-was-declared-have-died-september-18th)
+> Source: [The Economist, “Midnight and counting” (30 September 2017)](https://www.economist.com/obituary/2017/09/30/obituary-stanislav-petrov-was-declared-to-have-died-on-september-18th)
 
 <figure>
 <img src="petrov.jpg" alt="Stanislav Petrov at home in 2016">
 <figcaption class="photo-credit"><a href="https://commons.wikimedia.org/wiki/User:Queery-54">Queery-54</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></figcaption>
 </figure>
 
- Petrov rolled a natural 20 that day.
- 
+Petrov rolled a natural 20 that day.
+
 > Some of his doubts were logical: the newness of
 > the system, and the too-swift passage of the message through the 30 layers of
 > verification he had set up himself. Other doubts were vaguer: a funny gut feeling,
 > and a sense that he knew better than a machine. Even so, his decision to declare a
 > false alarm was a 50-50 guess, no better.
-> Source: [The Economist, “Midnight and counting” (30 September 2017)](https://www.economist.com/news/obituary/21729727-man-who-save-world-was-77-stanislav-petrov-was-declared-have-died-september-18th)
+> Source: [The Economist, “Midnight and counting” (30 September 2017)](https://www.economist.com/obituary/2017/09/30/obituary-stanislav-petrov-was-declared-to-have-died-on-september-18th)
 
-Did the sensors betray us? Were the machines immoral? Should the Soviets invest in model alignment?
-
-Safe agentic behavior is on everyone's mind nowadays. 
-Funny enough, nearly four months before the Soviet nuclear false alarm incident, the movie WarGames came out with an uncannily similar premise. 
+Did the sensors betray us? Were the machines immoral? Should the Soviets have invested in model alignment? No, the satellite did its job and it wasn't misaligned. It just had no model of the world. Safe agentic behavior is on everyone's mind nowadays, yet we often conflate alignment with basic epistemics. Funny enough, nearly four months before the Soviet nuclear false alarm, the movie _WarGames_ hit theaters in June 1983 with an uncannily similar premise.
 
 <figure>
 <img class="movie-poster" src="https://cdn.posteritati.com/posters/000/000/049/087/war-games-md-web.jpg" alt="The 1983 theatrical poster for WarGames">
@@ -71,18 +68,18 @@ Petrov's false alarm took place in September, months after Grenander's June pres
 > Pattern analysis = Pattern synthesis.
 > (Attributed to Grenander (1983, §5.3) in [“Bayesian Computation and Stochastic Systems”](https://www2.stat.duke.edu/~sschmid/Courses/Stat376/Papers/BCSSStatSci1995.pdf))
 
-Bottom-up signals from sensors may fire an alert warning Petrov of incoming missiles.
+Bottom-up signals from sensors may fire an alert warning Petrov of incoming missiles, first one and then four more.
 
-Top-down understanding is the process of synthesizing or simulating evidence, and matching those synthetic signals against real signals.
+Top-down understanding is the process of synthesizing or simulating a world that could produce those signals, and comparing those synthetic predictions against the observed readings:
 
-- Why would the United States launch only five missiles rather than an overwhelming first strike?
-- Why should he trust a relatively new warning system?
+- Why would the United States open a nuclear war with one missile, followed by only four more, rather than an overwhelming first strike?
+- Why should he trust a relatively new warning system rushing through verification?
 - Why wasn't there corroborating evidence from ground radar?
 
-If we can construct models of the processes that could have generated the signals, then we better understand our world.
-His compositional and probabilistic framework for representing the underlying structures and inferring them from observations was called Pattern Theory. 
+To understand a signal, model what could have produced it.
+Grenander's compositional and probabilistic framework for representing hidden structures and inferring them from noisy observations was called Pattern Theory.
 
-Whatever happened to Pattern Theory?
+Whatever happened to Pattern Theory? Six weeks earlier in 1983 gives a clue.
 
 ## Hermès
 
@@ -91,7 +88,7 @@ Whatever happened to Pattern Theory?
 <figcaption class="photo-credit">© RTL Today</figcaption>
 </figure>
 
-Six weeks before the conference and _WarGames_' wide release, Munich hosted the 28th edition of the Eurovision Song Contest.
+Six weeks before the Lund conference and _WarGames_' wide release, Munich hosted the 28th edition of the Eurovision Song Contest.
 
 Corinne Hermès stunned us with her song "Si la vie est cadeau", representing Luxembourg and winning 1st place. 
 
@@ -103,28 +100,24 @@ She sings:
 
 > Cadeau donné, cadeau repris, cadeau volé
 
-It translates to "a gift given, a gift taken back, a gift stolen."
+It translates to “a gift given, a gift taken back, a gift stolen.”
 
 In fact, in her later interviews after the competition, Hermès does not explicitly say that Grenander's Pattern Theory was the gift.
 
-But that's how I read it, because get this: Grenander's approach differed from neural-network backpropagation. [Backpropagation predated 1986](https://www-isl.stanford.edu/~widrow/papers/c1992backpropagationand.pdf); the influential paper by Rumelhart, Hinton, and Williams that year helped popularize it. 
-
-In his [1985 account](https://pure.iiasa.ac.at/id/eprint/2589/1/XB-85-406.pdf), Grenander described pattern inference as stochastic relaxation: repeatedly resampling local parts of a pattern to form a Markov chain. Later, he and Michael Miller developed [jump-diffusion methods](https://doi.org/10.1111/j.2517-6161.1994.tb02000.x) for sampling Bayesian pattern models. 
+But that's how I read it. Three years later, Rumelhart, Hinton, and Williams popularized [backpropagation](https://www-isl.stanford.edu/~widrow/papers/c1992backpropagationand.pdf), and the field went all-in on training neural networks directly from inputs to labels. Grenander was doing the opposite: modeling the generative structure first, then inferring it by sampling. In his [1985 IIASA report](https://pure.iiasa.ac.at/id/eprint/2589/1/XB-85-406.pdf), he cast pattern inference as stochastic relaxation, repeatedly resampling local parts of a pattern in a Markov chain (alongside Stuart and Donald Geman's Gibbs sampling at Brown), and later developed [jump-diffusion](https://doi.org/10.1111/j.2517-6161.1994.tb02000.x) with Michael Miller. As hardware scaled, end-to-end curve fitting won out, and Pattern Theory faded into the background.
 
 Maybe it's cliche now, but you may have heard the phrase "the map is not the territory." 
 To me, it means the patterns we analyze and the signals our sensors capture are only projections of reality, not to be confused with reality itself.
 
-I think that's what Hermès means when she sings,
+I think that's what Hermès gets at a few bars earlier when she sings:
 
-> Alors pourquoi m'avoir promis la terre entière?
+> Alors pourquoi m'avoir promis la terre entière? ... Je ne voulais pas d'un bonheur imaginaire.
 
-It translates to, "so why did you promise me the whole world?"
+“So why did you promise me the whole world? ... I didn't want an imaginary happiness.”
 
-To which Claude responds, "That was an honest mistake, and you're right to push back on that."
+To which Claude responds, “That was an honest mistake, and you're right to push back on that.”
 
-In many ways, an LLM's output resembles the warning from the Soviet early warning system. 
-Petrov had a rich model of the world in his head that allowed him to be skeptical of the sensor readings. 
-As Grenander put it, the key idea is "analysis by synthesis."
+When you push back on an LLM, it rewrites its answer rather than checking the world, because it has no world to check. In that sense, an LLM's output resembles the alert from the Soviet satellite. Petrov had a rich generative model of the world in his head that let him doubt the sensor readings. That loop is called _analysis by synthesis_, and Pattern Theory was one way to formalize it.
 
 ## Analysis by synthesis
 
@@ -132,26 +125,24 @@ Consider a grid world, where an agent can use optical sensors to measure distanc
 
 <img src="grid-world.svg" alt="A grid world with brick walls, a purple square, and a blue observation path.">
 
-The blue vision cone represents the measurement of sensor signals. 
+The blue vision cone represents the measurement of sensor signals: rays cast outward until they hit an obstacle.
 
-One problem with using LLMs for agentic planning is that they can conflate the map with the territory.
+In a text-based agent, prompts, tool outputs, and model completions take the place of those distance readings, and the agent treats text as the environment itself.
 
 <img src="grid-world-text.svg" alt="A purple square with blue text signals stopping at two red barriers.">
 
-The LLM is the sensor. 
+The LLM is the sensor.
 I've seen related questions raised in [a paper that models language as a sensor](https://arxiv.org/pdf/2606.08666) and in [an argument that LLMs do not yet transmit testimonial knowledge](https://www.cambridge.org/core/journals/episteme/article/assertion-without-a-speaker-testimony-tracking-and-large-language-models/6F19C8DC4ECBD9FA0E43BA300DA45AF1). 
-When the sensor becomes the planner, we confuse the signals with reality.
+When the sensor becomes the planner, we confuse the signals with reality, mistaking sunlight on clouds for a launch.
 A trustworthy agentic system shall reconstruct a generative explanation of reality that predicts observations it has never seen.
 
 For example, the agent reconstructs a possible world and predicts the sensor readings that world would produce. It compares those predictions with the real readings, then uses the mismatches to decide what to investigate next.
 
-Its imagined world gives it questions to ask the real one.
-
 <img src="analysis-by-synthesis-loop.svg" alt="Predicted and actual sensor readings are compared. Mismatches guide what to investigate next, leading to new observations and a revised reconstruction.">
 
-An AI catastrophe could begin with a sensible plan for an imagined world, so reality must have a chance to interrupt the plan before the agent does something irreversible.
+The agent uses its model to decide what to measure next.
 
-I aim to return to this discussion in the future, as I am now running out of time to checkpoint my thoughts.
+Hermès sang “cadeau donné, cadeau repris, cadeau volé.” I think we still have this gift. We've gotten remarkably good at teaching machines to synthesize. Maybe we're in a better position now to revisit what Grenander wanted to do with that ability: understand.
 
 ## Related reading
 
